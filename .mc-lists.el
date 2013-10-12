@@ -26,6 +26,7 @@
 	matlab-linefeed
 	rm-kill-region
 	semantic-complete-self-insert
+	sgml-slash
 	))
 
 (setq mc/cmds-to-run-once
@@ -39,6 +40,7 @@
 	ido-switch-buffer-other-window
 	kill-rectangle
 	make-default
+	mouse-save-then-kill
 	multiple-cursors-mode
 	scroll-other-window
 	))
