@@ -29,6 +29,12 @@
 (global-set-key (kbd "C-c c") 'comment-region)
 (global-set-key (kbd "C-c u") 'uncomment-region)
 
+;; ! (WINDOWS ONLY) !
+;; Make sure that the bash executable can be found
+(setq explicit-shell-file-name "C:/cygwin/bin/bash.exe")
+(setq shell-file-name explicit-shell-file-name)
+(add-to-list 'exec-path "C:/cygwin/bin")
+
 ;; Add support for isearch functionality with multiple cursors
 ;; (source: https://github.com/zk-phi/phi-search.git)
 (add-to-list 'load-path "~/.emacs.d/site-lisp/phi-search")
@@ -52,6 +58,33 @@
 ;; (source: http://matlab-emacs.cvs.sourceforge.net/viewvc/matlab-emacs/matlab-emacs/?view=tar)
 (add-to-list 'load-path "~/.emacs.d/site-lisp/matlab-emacs")
 (load-library "matlab-load")
+
+;; Add AUCTeX Mode for generating LaTeX documents
+;; (source: http://ftp.gnu.org/pub/gnu/auctex/)
+(add-to-list 'load-path "~/.emacs.d/site-lisp/auctex")
+(load "auctex.el" nil t t)
+(load "preview-latex.el" nil t t)
+(setq
+  TeX-auto-save t
+  TeX-parse-self t
+  TeX-source-correlate-method (quote synctex)
+  TeX-source-correlate-mode t
+  TeX-source-correlate-start-server t
+  reftex-plug-into-AUCTeX t
+  TeX-view-program-list (quote (("Sumatra PDF" "/usr/local/bin/sumatra -reuse-instance %o")))
+  TeX-view-program-selection (quote ((output-pdf "Sumatra PDF"))))
+(setq-default TeX-master nil)
+(add-hook 'LaTeX-mode-hook 'visual-line-mode)
+(add-hook 'LaTeX-mode-hook 'flyspell-mode)
+(add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
+(add-hook 'LaTeX-mode-hook 'TeX-PDF-mode)
+(add-hook 'LaTeX-mode-hook 'turn-on-reftex)
+
+;; Add support for Chrome extension "Edit with Emacs"
+;; (source: https://github.com/stsquad/emacs_chrome.git)
+(add-to-list 'load-path "~/.emacs.d/site-lisp/emacs_chrome/servers")
+(require 'edit-server)
+(edit-server-start)
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
