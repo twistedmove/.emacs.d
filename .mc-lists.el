@@ -17,6 +17,8 @@
 	c-indent-line-or-region
 	comment-dwim
 	delete-horizontal-space
+	dired-next-line
+	dired-previous-line
 	eval-print-last-sexp
 	indent-for-tab-command
 	kill-region
@@ -43,4 +45,5 @@
 	mouse-save-then-kill
 	multiple-cursors-mode
 	scroll-other-window
+	wdired-finish-edit
 	))
