@@ -19,6 +19,8 @@
 	delete-horizontal-space
 	dired-next-line
 	dired-previous-line
+	end-of-buffer
+	end-of-visual-line
 	eval-print-last-sexp
 	indent-for-tab-command
 	kill-region
@@ -29,6 +31,7 @@
 	rm-kill-region
 	semantic-complete-self-insert
 	sgml-slash
+	sh-end-of-command
 	))
 
 (setq mc/cmds-to-run-once
