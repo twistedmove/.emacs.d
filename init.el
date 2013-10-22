@@ -36,6 +36,10 @@
 (global-set-key (kbd "C-c c") 'comment-region)
 (global-set-key (kbd "C-c u") 'uncomment-region)
 
+;; Easily kill windows and buffers
+(global-set-key (kbd "M-1") 'delete-other-windows)
+(global-set-key (kbd "M-q") 'kill-buffer-and-window)
+
 ;; Easy buffer swapping
 (require 'buffer-move)
 (global-set-key (kbd "<C-up>")     'buf-move-up)
@@ -49,10 +53,18 @@
 (setq shell-file-name explicit-shell-file-name)
 (add-to-list 'exec-path "C:/cygwin/bin")
 
+;; Add an easy way to produce dummy text
+;; (source: http://www.emacswiki.org/emacs/download/lorem-ipsum.el)
+(require 'lorem-ipsum)
+(global-set-key (kbd "C-c C-l") 'Lorem-ipsum-insert-paragraphs)
+
 ;; Add support for isearch functionality with multiple cursors
 ;; (source: https://github.com/zk-phi/phi-search.git)
 (add-to-list 'load-path "~/.emacs.d/site-lisp/phi-search")
 (require 'phi-search)
+;; Make phi-search the default instead of isearch (I think I like it better)
+(global-set-key (kbd "C-s") 'phi-search)
+(global-set-key (kbd "C-r") 'phi-search-backward)
 
 ;; Add support for using multiple cursors
 ;; (source: https://github.com/magnars/multiple-cursors.el.git)
@@ -69,6 +81,7 @@
 (global-set-key (kbd "<f7>") 'multiple-cursors-mode)
 
 ;; Unfortunately, multiple-cursors falls short on rectangular selection
+;;   so I use rect-mark.el to fill in the gaps for now
 ;; (source: http://www.emacswiki.org/emacs/rect-mark.el)
 (global-set-key (kbd "C-x r C-SPC") 'rm-set-mark)
 (global-set-key (kbd "C-x r C-x") 'rm-exchange-point-and-mark)
@@ -149,8 +162,11 @@
 ;; Add support for Chrome extension "Edit with Emacs"
 ;; (source: https://github.com/stsquad/emacs_chrome.git)
 (add-to-list 'load-path "~/.emacs.d/site-lisp/emacs_chrome/servers")
-(require 'edit-server)
-(edit-server-start)
+(when (require 'edit-server nil t)
+    (setq edit-server-new-frame nil)
+    (add-hook 'edit-server-started-hook 'delete-other-windows)
+    (add-hook 'edit-server-buffer-closed-hook 'delete-window)
+    (edit-server-start))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -158,7 +174,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(default ((t (:family "DejaVu Sans Mono" :foundry "outline" :height 113 :slant normal :weight normal :width normal))))
- '(column-marker-1 ((t (:background "DarkOrange3"))) t)
+ '(column-marker-1 ((t (:background "DarkOrange3"))))
  '(font-lock-comment-face ((t (:foreground "green1"))))
  '(font-lock-constant-face ((t (:foreground "gray100"))))
  '(font-lock-function-name-face ((t (:foreground "gray100"))))
@@ -179,6 +195,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(column-number-mode t)
+ '(safe-local-variable-values (quote ((visual-line-mode . t) (auto-fill-mode . 0))))
  '(show-paren-mode t)
  '(tool-bar-mode nil))
 (put 'dired-find-alternate-file 'disabled nil)
