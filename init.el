@@ -164,6 +164,8 @@
 (add-to-list 'load-path "~/.emacs.d/site-lisp/emacs_chrome/servers")
 (when (require 'edit-server nil t)
     (setq edit-server-new-frame nil)
+    (add-hook 'edit-server-start-hook 'flyspell-mode)
+    (add-hook 'edit-server-start-hook 'visual-line-mode)
     (add-hook 'edit-server-started-hook 'delete-other-windows)
     (add-hook 'edit-server-buffer-closed-hook 'delete-window)
     (edit-server-start))
