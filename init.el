@@ -64,6 +64,7 @@
 (define-key ctl-x-map (kbd "<f6>") 'add-file-local-variable)
 
 ;; Easy buffer swapping
+;; (source: http://www.emacswiki.org/emacs/download/buffer-move.el)
 (require 'buffer-move)
 (global-set-key (kbd "<C-up>")     'buf-move-up)
 (global-set-key (kbd "<C-down>")   'buf-move-down)
@@ -142,8 +143,9 @@
 (setq-default fill-column 81)
 
 ;; Add AUCTeX Mode for generating LaTeX documents
-;; (source: http://ftp.gnu.org/pub/gnu/auctex/)
+;; (source: http://ftp.gnu.org/pub/gnu/auctex/auctex-11.87.tar.gz)
 (add-to-list 'load-path "~/.emacs.d/site-lisp/auctex")
+(add-to-list 'load-path "~/.emacs.d/site-lisp/auctex/preview")
 (load "auctex.el" nil t t)
 (load "preview-latex.el" nil t t)
 (setq
@@ -198,6 +200,9 @@
     (add-hook 'edit-server-started-hook 'delete-other-windows)
     (add-hook 'edit-server-buffer-closed-hook 'delete-window)
     (edit-server-start))
+
+;; Use DejaVu Sans Mono as default font
+;; (source: http://sourceforge.net/projects/dejavu/files/dejavu/2.34/dejavu-fonts-ttf-2.34.tar.bz2)
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
