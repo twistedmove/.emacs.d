@@ -29,16 +29,26 @@
 (setq require-final-newline t)		; Always end a file with a newline
 (setq frame-title-format "emacs - %b")  ; Set frame title to "emacs - <buffer name>"
 
+;; If not in a TTY, Unbind C-m so that we can use it elsewhere
+(if window-system (define-key input-decode-map [?\C-m] [C-m]))
+
 ;; Use unix line endings by default
 (setq default-buffer-file-coding-system 'utf-8-unix)
 
-;; Comment / Uncomment Lines
+;; Set up indenting in C/C++
+(setq c-default-style "linux")
+(setq c-basic-offset 4)
+
+;; Other keybindings
+(global-set-key (kbd "C-\\") 'other-window)
 (global-set-key (kbd "C-c c") 'comment-region)
 (global-set-key (kbd "C-c u") 'uncomment-region)
-
-;; Easily kill windows and buffers
 (global-set-key (kbd "M-1") 'delete-other-windows)
 (global-set-key (kbd "M-q") 'kill-buffer-and-window)
+(global-set-key (kbd "<f12>") 'compile)
+(define-key ctl-x-map (kbd "<f1>") (lambda () (interactive) (message buffer-file-name)))
+(define-key ctl-x-map (kbd "<f5>") 'revert-buffer)
+(define-key ctl-x-map (kbd "<f6>") 'add-file-local-variable)
 
 ;; Easy buffer swapping
 (require 'buffer-move)
