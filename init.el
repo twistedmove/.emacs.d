@@ -13,10 +13,11 @@
 (show-paren-mode)		        ; Show matching parenthesis
 
 ;; Disable useless UI features
-(scroll-bar-mode 0)		        ; Disable scroll bars
-(tool-bar-mode 0)		        ; Disable toolbar
-(tooltip-mode 0)		        ; Disable tooltips
-(fringe-mode 0)			        ; Disable fringes
+(when window-system
+  (scroll-bar-mode 0)		        ; Disable scroll bars
+  (tool-bar-mode 0)		        ; Disable toolbar
+  (tooltip-mode 0)		        ; Disable tooltips
+  (fringe-mode 0))			; Disable fringes
 
 ;; Further customization
 (load-theme 'manoj-dark)	        ; Set color theme
@@ -29,8 +30,20 @@
 (setq require-final-newline t)		; Always end a file with a newline
 (setq frame-title-format "emacs - %b")  ; Set frame title to "emacs - <buffer name>"
 
+;; ;; Manually set time zone to MST/MDT to fix problems with Cygwin/Windows
+;; (setenv "TZ" "MST+7MDT,M4.1.0/2,M10.5.0/2")
+
 ;; If not in a TTY, Unbind C-m so that we can use it elsewhere
-(if window-system (define-key input-decode-map [?\C-m] [C-m]))
+(if (not window-system) nil
+  (define-key input-decode-map [?\C-m] [C-m])
+  ;; In Org Mode, use <C-m> as <M-return>
+  (defun my-fake-M-RET ()
+    (interactive)
+    (let ((command (key-binding (kbd "<M-return>"))))
+      (setq last-command-event [M-return])
+      (setq this-command command)
+      (call-interactively command)))
+  (add-hook 'org-mode-hook (lambda () (local-set-key (kbd "<C-m>") 'my-fake-M-RET))))
 
 ;; Use unix line endings by default
 (setq default-buffer-file-coding-system 'utf-8-unix)
@@ -57,11 +70,11 @@
 (global-set-key (kbd "<C-left>")   'buf-move-left)
 (global-set-key (kbd "<C-right>")  'buf-move-right)
 
-;; ! (WINDOWS ONLY) !
-;; Make sure that the bash executable can be found
-(setq explicit-shell-file-name "C:/cygwin/bin/bash.exe")
-(setq shell-file-name explicit-shell-file-name)
-(add-to-list 'exec-path "C:/cygwin/bin")
+;; Make sure that the cygwin bash executable can be found (Windows Emacs)
+(when (eq system-type 'windows-nt)
+  (setq explicit-shell-file-name "C:/cygwin/bin/bash.exe")
+  (setq shell-file-name explicit-shell-file-name)
+  (add-to-list 'exec-path "C:/cygwin/bin"))
 
 ;; Add an easy way to produce dummy text
 ;; (source: http://www.emacswiki.org/emacs/download/lorem-ipsum.el)
@@ -89,6 +102,12 @@
 (global-set-key (kbd "C-c SPC") 'set-rectangular-region-anchor)
 (global-set-key (kbd "C-c C-SPC") (lambda () (interactive) (mc/create-fake-cursor-at-point)))
 (global-set-key (kbd "<f7>") 'multiple-cursors-mode)
+
+;; Keybindings for multiple cursors mode in TTY
+(global-set-key (kbd "M-[ 1 ; 6 n") 'mc/mark-next-like-this)
+(global-set-key (kbd "M-[ 1 ; 6 l") 'mc/mark-previous-like-this)
+(global-set-key (kbd "C-c M-[ 1 ; 6 l") 'mc/mark-all-like-this)
+(global-set-key (kbd "C-c M-[ 1 ; 6 n") 'mc/mark-more-like-this-extended)
 
 ;; Unfortunately, multiple-cursors falls short on rectangular selection
 ;;   so I use rect-mark.el to fill in the gaps for now
