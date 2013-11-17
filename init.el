@@ -4,30 +4,30 @@
 (add-to-list 'load-path "~/.emacs.d/site-lisp")
 
 ;; Basic emacs settings
-(global-font-lock-mode 1)	        ; Enable syntax highlighting
+(global-font-lock-mode 1)               ; Enable syntax highlighting
 (global-linum-mode)                     ; Enable line numbers
 (setq inhibit-startup-screen t)         ; Disable splash screen
 (setq visible-bell t)                   ; Disable system beep
 (setq transient-mark-mode t)            ; Enable visual feedback on selections
-(column-number-mode t)		        ; Show column number on mode line
-(show-paren-mode)		        ; Show matching parenthesis
+(column-number-mode t)                  ; Show column number on mode line
+(show-paren-mode)                       ; Show matching parenthesis
 
 ;; Disable useless UI features
 (when window-system
-  (scroll-bar-mode 0)		        ; Disable scroll bars
-  (tool-bar-mode 0)		        ; Disable toolbar
-  (tooltip-mode 0)		        ; Disable tooltips
-  (fringe-mode 0))			; Disable fringes
+  (scroll-bar-mode 0)                   ; Disable scroll bars
+  (tool-bar-mode 0)                     ; Disable toolbar
+  (tooltip-mode 0)                      ; Disable tooltips
+  (fringe-mode 0))                      ; Disable fringes
 
 ;; Further customization
-(load-theme 'manoj-dark)	        ; Set color theme
-(ido-mode t)			        ; Enable ido mode (interactively do)
+(load-theme 'manoj-dark)                ; Set color theme
+(ido-mode t)                            ; Enable ido mode (interactively do)
 (setq linum-format "%d ")               ; Add space after line numbers
-(setq scroll-step 1)		        ; Only scroll by one line at top/bottom
+(setq scroll-step 1)                    ; Only scroll by one line at top/bottom
 (setq-default truncate-lines t)         ; Truncate lines by default
 (setq display-time-day-and-date t)      ; Dispaly date along with time in status bar
-(display-time)			        ; Display date and time in status bar
-(setq require-final-newline t)		; Always end a file with a newline
+(display-time)                          ; Display date and time in status bar
+(setq require-final-newline t)          ; Always end a file with a newline
 (setq frame-title-format "emacs - %b")  ; Set frame title to "emacs - <buffer name>"
 
 ;; ;; Manually set time zone to MST/MDT to fix problems with Cygwin/Windows
@@ -51,6 +51,7 @@
 ;; Set up indenting in C/C++
 (setq c-default-style "linux")
 (setq-default c-basic-offset 4)
+(setq-default tab-width 4)
 (c-set-offset 'inline-open 0)
 
 ;; Other keybindings
