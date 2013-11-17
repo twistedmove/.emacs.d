@@ -34,7 +34,7 @@
 ;; (setenv "TZ" "MST+7MDT,M4.1.0/2,M10.5.0/2")
 
 ;; If not in a TTY, Unbind C-m so that we can use it elsewhere
-(if (not window-system) nil
+(unless (not window-system)
   (define-key input-decode-map [?\C-m] [C-m])
   ;; In Org Mode, use <C-m> as <M-return>
   (defun my-fake-M-RET ()
@@ -50,7 +50,8 @@
 
 ;; Set up indenting in C/C++
 (setq c-default-style "linux")
-(setq c-basic-offset 4)
+(setq-default c-basic-offset 4)
+(c-set-offset 'inline-open 0)
 
 ;; Other keybindings
 (global-set-key (kbd "C-\\") 'other-window)
