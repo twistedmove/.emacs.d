@@ -11,6 +11,7 @@
 (setq transient-mark-mode t)            ; Enable visual feedback on selections
 (column-number-mode t)                  ; Show column number on mode line
 (show-paren-mode)                       ; Show matching parenthesis
+(electric-pair-mode 1)					; Enable automatic bracket closing
 
 ;; Disable useless UI features
 (when window-system
@@ -64,6 +65,20 @@
 (define-key ctl-x-map (kbd "<f1>") (lambda () (interactive) (message buffer-file-name)))
 (define-key ctl-x-map (kbd "<f5>") 'revert-buffer)
 (define-key ctl-x-map (kbd "<f6>") 'add-file-local-variable)
+
+;; Shortcut for opening and closing braces in c-mode
+(defun nispio/insert-braces ()
+  (interactive)
+  (execute-kbd-macro '[return 123 tab return return 125 tab 16 tab]))
+(defun nispio/insert-braces-hook ()
+  (local-set-key (kbd "<C-m>") 'nispio/insert-braces))
+(add-hook 'c-mode-common-hook 'nispio/insert-braces-hook)
+
+;; Use dired-x to add the ability to open all marked files at once
+(eval-after-load "dired"
+  '(progn
+	 (load "dired-x")
+	 (define-key dired-mode-map "F" 'dired-do-find-marked-files)))
 
 ;; Easy buffer swapping
 ;; (source: http://www.emacswiki.org/emacs/download/buffer-move.el)
@@ -184,6 +199,7 @@
                    (when (buffer-file-name b) (buffer-name b)))
                  (buffer-list)))))
 (global-set-key (kbd "S-<f3>") 'my-helm-multi-all)
+(global-set-key (kbd "C-c C-h") 'my-helm-multi-all)
 
 ;; Add sublimity mode for mini-map
 ;; (source: https://github.com/zk-phi/sublimity.git)
