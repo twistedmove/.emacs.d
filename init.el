@@ -227,6 +227,25 @@
     (add-hook 'edit-server-buffer-closed-hook 'delete-window)
     (edit-server-start))
 
+;; Set up auto-complete
+;; (source: https://github.com/auto-complete/auto-complete.git)
+(add-to-list 'load-path "~/.emacs.d/site-lisp/auto-complete")
+(add-to-list 'load-path "~/.emacs.d/site-lisp/auto-complete/lib/popup")
+(add-to-list 'load-path "~/.emacs.d/site-lisp/auto-complete/lib/fuzzy")
+(add-to-list 'load-path "~/.emacs.d/site-lisp/auto-complete/lib/erc")
+(require 'auto-complete-config)
+(ac-config-default)
+;; start after 3 characters were typed
+(setq ac-auto-start 3)
+;; show menu immediately...
+(setq ac-auto-show-menu t)
+;; explicit call to auto-complete
+(define-key ac-mode-map (kbd "C-.") 'auto-complete)
+
+;; Configure CEDET settings
+(load-file "~/.emacs.d/site-lisp/minimal-cedet-config.el")
+
+
 ;; Use DejaVu Sans Mono as default font
 ;; (source: http://sourceforge.net/projects/dejavu/files/dejavu/2.34/dejavu-fonts-ttf-2.34.tar.bz2)
 
@@ -257,6 +276,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(column-number-mode t)
+ '(ede-project-directories (quote ("c:/home/Josh/proj/ecc/src")))
  '(safe-local-variable-values (quote ((visual-line-mode . t) (auto-fill-mode . 0))))
  '(show-paren-mode t)
  '(tool-bar-mode nil))
