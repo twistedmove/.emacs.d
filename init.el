@@ -55,6 +55,11 @@
 (setq-default tab-width 4)
 (c-set-offset 'inline-open 0)
 
+;; Set up C-mode specific keybindings
+(defun nispio/c-mode-keys-hook ()
+  (local-set-key (kbd "C-c C-c") 'compile))
+(add-hook 'c-mode-common-hook 'nispio/c-mode-keys-hook)
+
 ;; Other keybindings
 (global-set-key (kbd "C-\\") 'other-window)
 (global-set-key (kbd "C-c c") 'comment-region)
@@ -73,6 +78,9 @@
 (defun nispio/insert-braces-hook ()
   (local-set-key (kbd "<C-m>") 'nispio/insert-braces))
 (add-hook 'c-mode-common-hook 'nispio/insert-braces-hook)
+
+;; Make C mode use C++-style commenting
+(add-hook 'c-mode-hook (lambda () (setq comment-start "// " comment-end   "")))
 
 ;; Use dired-x to add the ability to open all marked files at once
 (eval-after-load "dired"
