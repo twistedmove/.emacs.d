@@ -13,7 +13,7 @@ git clone "https://github.com/zk-phi/sublimity.git"
 git clone "https://github.com/stsquad/emacs_chrome.git"
 
 curl -O "http://www.emacswiki.org/emacs/download/buffer-move.el"
-curl -O "http://www.emacswiki.org/emacs/rect-mark.el"
+curl -O "http://www.emacswiki.org/emacs/download/rect-mark.el"
 curl -O "http://www.emacswiki.org/emacs/download/column-marker.el"
 
 URL="http://matlab-emacs.cvs.sourceforge.net/viewvc/matlab-emacs/matlab-emacs/?view=tar"
