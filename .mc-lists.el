@@ -34,6 +34,7 @@
 		matlab-comment
 		matlab-electric-comment
 		matlab-linefeed
+		org-self-insert-command
 		phi-search
 		reindent-then-newline-and-indent
 		rm-kill-region
