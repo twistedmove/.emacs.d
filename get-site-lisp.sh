@@ -2,10 +2,13 @@
 
 INSTALL_PATH="${HOME%%/}/.emacs.d/site-lisp"
 [ ! -e "$INSTALL_PATH" ] && mkdir "$INSTALL_PATH"
-cd "$INSTALL_PATH"
+pushd "$INSTALL_PATH"
 
 URL="https://github.com/magnars/multiple-cursors.el.git"
 git clone "$URL" "multiple-cursors"
+
+URL="https://github.com/knu/phi-search-mc.el.git"
+git clone "$URL" "phi-search-mc"
 
 git clone "https://github.com/zk-phi/phi-search.git"
 git clone "https://github.com/emacs-helm/helm.git"
@@ -15,6 +18,7 @@ git clone "https://github.com/stsquad/emacs_chrome.git"
 curl -O "http://www.emacswiki.org/emacs/download/buffer-move.el"
 curl -O "http://www.emacswiki.org/emacs/download/rect-mark.el"
 curl -O "http://www.emacswiki.org/emacs/download/column-marker.el"
+curl -O "http://www.emacswiki.org/emacs/download/lorem-ipsum.el"
 
 URL="http://matlab-emacs.cvs.sourceforge.net/viewvc/matlab-emacs/matlab-emacs/?view=tar"
 NAME="matlab-emacs.tar.gz"
@@ -35,3 +39,5 @@ curl -L "$URL" -o "$NAME" \
     && tar xf "$NAME" && rm "$NAME" \
     && mv "auctex-$VER" "auctex" && cd "auctex" \
     &&  echo "-- REMINDER: AUCTeX must be built and installed before use."
+
+popd
