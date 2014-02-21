@@ -18,8 +18,7 @@
 (when window-system
   (scroll-bar-mode 0)                   ; Disable scroll bars
   (tool-bar-mode 0)                     ; Disable toolbar
-  (tooltip-mode 0)                      ; Disable tooltips
-  (fringe-mode 0))                      ; Disable fringes
+  (tooltip-mode 0))						; Disable tooltips
 
 ;; Further customization
 (load-theme 'manoj-dark)                ; Set color theme
@@ -31,6 +30,8 @@
 (display-time)                          ; Display date and time in status bar
 (setq require-final-newline t)          ; Always end a file with a newline
 (setq frame-title-format "emacs - %b")  ; Set frame title to "emacs - <buffer name>"
+(setq linum-format "%3d")				; Right-aligned line numbers with width 3
+(fringe-mode left-only))				; Disable fringes
 
 ;; ;; Manually set time zone to MST/MDT to fix problems with Cygwin/Windows
 ;; (setenv "TZ" "MST+7MDT,M4.1.0/2,M10.5.0/2")
@@ -393,6 +394,7 @@ Recognized window header names are: 'comint, 'locals, 'registers,
  '(font-lock-string-face ((t (:foreground "red3"))))
  '(font-lock-type-face ((t (:foreground "DodgerBlue"))))
  '(font-lock-variable-name-face ((t (:foreground "gray100"))))
+ '(fringe ((t (:background "black" :foreground "Wheat"))))
  '(matlab-operator-face ((t (:foreground "gray100"))) t)
  '(minibuffer-prompt ((t (:foreground "cyan1"))))
  '(mode-line ((t (:box nil))))
