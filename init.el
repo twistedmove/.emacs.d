@@ -55,13 +55,14 @@
 (setq-default tab-width 4)
 (c-set-offset 'inline-open 0)
 
-;; Set up C-mode specific keybindings
-(defun nispio/c-mode-keys-hook ()
-  (local-set-key (kbd "C-c C-c") 'compile))
-(add-hook 'c-mode-common-hook 'nispio/c-mode-keys-hook)
+;; Easier navigation between windows/frames
+(defun nispio/other-window (&optional arg)
+  "With prefix argument, select the next frame. Otherwise, select the next window"
+  (interactive "P")
+  (if arg (other-frame 1) (other-window 1)))
+(global-set-key (kbd "C-\\") 'nispio/other-window)
 
 ;; Other keybindings
-(global-set-key (kbd "C-\\") 'other-window)
 (global-set-key (kbd "C-c c") 'comment-region)
 (global-set-key (kbd "C-c u") 'uncomment-region)
 (global-set-key (kbd "M-1") 'delete-other-windows)
@@ -105,6 +106,23 @@
 (global-set-key (kbd "M-o 6 c")     'enlarge-window-horizontally)
 (global-set-key (kbd "M-o 6 a")     'shrink-window)
 (global-set-key (kbd "M-o 6 b")     'enlarge-window)
+
+;; Custom function to toggle fullscreen by maximizing or restoring the current frame.
+(defvar nispio/fullscreen-p t "Check if fullscreen is on or off")
+(defun nispio/restore-frame ()
+  (if (fboundp 'w32-send-sys-command) (w32-send-sys-command 61728)
+	(progn (set-frame-parameter nil 'width 82)
+		   (set-frame-parameter nil 'fullscreen 'fullheight))))
+(defun nispio/maximize-frame ()
+  (if (fboundp 'w32-send-sys-command) (w32-send-sys-command 61488)
+	(set-frame-parameter nil 'fullscreen 'fullboth)))
+(defun nispio/toggle-fullscreen ()
+;; Toggle "fullscreen" by maximizing or restoring the current frame.
+  (interactive)
+  (setq nispio/fullscreen-p (not nispio/fullscreen-p))
+  (if nispio/fullscreen-p (nispio/restore-frame) (nispio/maximize-frame)))
+(global-set-key (kbd "<f11>") 'nispio/toggle-fullscreen)
+(global-set-key (kbd "<S-f11>") 'delete-frame)
 
 ;; Make sure that the cygwin bash executable can be found (Windows Emacs)
 (when (eq system-type 'windows-nt)
@@ -240,6 +258,50 @@
 ;; Configure GDB for debugging
 (setq gdb-show-main t)
 (setq gdb-many-windows t)
+(put 'debug-command 'safe-local-variable 'stringp)
+
+;; Call the compiler and save the compile command when in C
+(defun nispio/compile-c (&optional arg)
+  (interactive "P")
+  (when arg (makunbound 'compile-command))
+  (unless (boundp 'compile-command)
+	(let* ((src-file (file-name-nondirectory buffer-file-name))
+		   (src-ext (file-name-extension src-file))
+		   (src-base (file-name-base src-file))
+		   (src-compiler (if (string= src-ext "cpp") "g++" "gcc"))
+		   (my-guess (concat src-compiler " -g3 -ggdb -o " src-base " " src-file)))
+	  (setq-local compile-command (read-string "Compile command: " my-guess))
+	  (when (y-or-n-p "Save file-local variable compile-command?")
+		(add-file-local-variable 'compile-command compile-command))))
+  (compile compile-command t))
+
+;; Run the debugger and save the debug command when in C
+(defun nispio/run-debugger (&optional arg)
+  (interactive "P")
+  (when arg (makunbound 'debug-command))
+  (unless (boundp 'debug-command)
+	(let* ((src-base (file-name-base buffer-file-name))
+		   (my-guess (concat "gdb -i=mi " src-base)))
+	  (setq-local debug-command (read-string "Run gdb (like this): " my-guess))
+	  (when (y-or-n-p "Save file-local variable debug-command?")
+		(add-file-local-variable 'debug-command debug-command))))
+  (gdb debug-command))
+
+;; Run debugger in another (maximized) frame
+(defun nispio/debug-other-frame ()
+  (interactive)
+  (select-frame (make-frame))
+  (setq nispio/fullscreen-p t)
+  (nispio/maximize-frame)
+  (nispio/run-debugger))
+
+;; Set up C-mode specific keybindings
+(defun nispio/c-mode-keys-hook ()
+  (local-set-key (kbd "C-c C-c") 'nispio/compile-c)
+  (local-set-key (kbd "<f5>") 'nispio/run-debugger)
+  (local-set-key (kbd "<S-f5>") 'nispio/debug-other-frame))
+(add-hook 'c-mode-common-hook 'nispio/c-mode-keys-hook)
+
 
 ;; Set up hotkeys for transitioning between windows in gdb
 ;; (source: http://markshroyer.com/2012/11/emacs-gdb-keyboard-navigation/)
