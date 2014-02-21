@@ -266,6 +266,11 @@
     (add-hook 'edit-server-buffer-closed-hook 'delete-window)
     (edit-server-start))
 
+;; SrSpeedbar allows a speedbar that is "docked" in the current frame
+(require 'sr-speedbar)
+(global-set-key (kbd "C-c M-SPC") 'sr-speedbar-toggle)
+(global-set-key (kbd "C-c C-g w") 'sr-speedbar-select-window)
+
 ;; Configure GDB for debugging
 (setq gdb-show-main t)
 (setq gdb-many-windows t)
@@ -296,6 +301,7 @@
 	  (setq-local debug-command (read-string "Run gdb (like this): " my-guess))
 	  (when (y-or-n-p "Save file-local variable debug-command?")
 		(add-file-local-variable 'debug-command debug-command))))
+  (sr-speedbar-open)
   (gdb debug-command))
 
 ;; Run debugger in another (maximized) frame
@@ -306,13 +312,25 @@
   (nispio/maximize-frame)
   (nispio/run-debugger))
 
+;; Set a Watch Expression in the debugger
+(defun nispio/gud-watch-expression (&optional arg)
+  (interactive "P")
+  (if arg
+	  (call-interactively gud-watch)
+	(gud-watch '(4))))
+
 ;; Set up C-mode specific keybindings
 (defun nispio/c-mode-keys-hook ()
   (local-set-key (kbd "C-c C-c") 'nispio/compile-c)
   (local-set-key (kbd "<f5>") 'nispio/run-debugger)
-  (local-set-key (kbd "<S-f5>") 'nispio/debug-other-frame))
+  (local-set-key (kbd "<S-f5>") 'nispio/debug-other-frame)
+  (local-set-key (kbd "<f6>") 'nispio/gud-watch-expression))
 (add-hook 'c-mode-common-hook 'nispio/c-mode-keys-hook)
 
+;; Set up GUD specific keybindings
+(defun nispio/gdb-mode-keys-hook ()
+  (local-set-key (kbd "<f6>") 'nispio/gud-watch-expression))
+(add-hook 'gdb-mode-hook 'nispio/gdb-mode-keys-hook)
 
 ;; Set up hotkeys for transitioning between windows in gdb
 ;; (source: http://markshroyer.com/2012/11/emacs-gdb-keyboard-navigation/)
@@ -378,6 +396,7 @@ Recognized window header names are: 'comint, 'locals, 'registers,
 
 ;; Use DejaVu Sans Mono as default font
 ;; (source: http://sourceforge.net/projects/dejavu/files/dejavu/2.34/dejavu-fonts-ttf-2.34.tar.bz2)
+
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

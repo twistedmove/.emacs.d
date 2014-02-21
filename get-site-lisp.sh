@@ -19,6 +19,7 @@ curl -O "http://www.emacswiki.org/emacs/download/buffer-move.el"
 curl -O "http://www.emacswiki.org/emacs/download/rect-mark.el"
 curl -O "http://www.emacswiki.org/emacs/download/column-marker.el"
 curl -O "http://www.emacswiki.org/emacs/download/lorem-ipsum.el"
+curl -O "http://www.emacswiki.org/emacs/download/sr-speedbar.el"
 
 URL="http://matlab-emacs.cvs.sourceforge.net/viewvc/matlab-emacs/matlab-emacs/?view=tar"
 NAME="matlab-emacs.tar.gz"
