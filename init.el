@@ -12,6 +12,7 @@
 (column-number-mode t)                  ; Show column number on mode line
 (show-paren-mode)                       ; Show matching parenthesis
 (electric-pair-mode 1)					; Enable automatic bracket closing
+(setq x-stretch-cursor t)				; Cursor as wide as the glyph under it
 
 ;; Disable useless UI features
 (when window-system
@@ -155,6 +156,9 @@
 (global-set-key (kbd "C-c C->") 'mc/mark-more-like-this-extended)
 (global-set-key (kbd "C-c SPC") 'set-rectangular-region-anchor)
 (global-set-key (kbd "C-c C-SPC") (lambda () (interactive) (mc/create-fake-cursor-at-point)))
+(global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
+(global-set-key (kbd "C-S-c C-<") 'mc/mark-all-in-region)
+;(global-set-key (kbd "C-S-c C->") 'mc/mark-all-regexp-in-region)
 (global-set-key (kbd "<f7>") 'multiple-cursors-mode)
 
 ;; Keybindings for multiple cursors mode in TTY
@@ -179,6 +183,12 @@
   "Kill a rectangular region and save it in the kill ring." t)
 (autoload 'rm-kill-ring-save "rect-mark"
   "Copy a rectangular region to the kill ring." t)
+
+;; Add extended interoperability between phi-search and multiple cursors
+;; (source: https://github.com/knu/phi-search-mc.el.git)
+(add-to-list 'load-path "~/.emacs.d/site-lisp/phi-search-mc")
+(require 'phi-search-mc)
+(phi-search-mc/setup-keys)
 
 ;; Add support for editing matlab files
 ;; (source: http://matlab-emacs.cvs.sourceforge.net/viewvc/matlab-emacs/matlab-emacs/?view=tar)
