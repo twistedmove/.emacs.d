@@ -31,7 +31,7 @@
 (setq require-final-newline t)          ; Always end a file with a newline
 (setq frame-title-format "emacs - %b")  ; Set frame title to "emacs - <buffer name>"
 (setq linum-format "%3d")				; Right-aligned line numbers with width 3
-(fringe-mode left-only))				; Disable fringes
+(fringe-mode '(nil . 0))				; Left fringes only
 
 ;; ;; Manually set time zone to MST/MDT to fix problems with Cygwin/Windows
 ;; (setenv "TZ" "MST+7MDT,M4.1.0/2,M10.5.0/2")
