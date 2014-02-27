@@ -69,7 +69,6 @@
 (global-set-key (kbd "C-c u") 'uncomment-region)
 (global-set-key (kbd "M-1") 'delete-other-windows)
 (global-set-key (kbd "M-q") 'kill-buffer-and-window)
-(global-set-key (kbd "<f12>") 'compile)
 (define-key ctl-x-map (kbd "<f1>") (lambda () (interactive) (message buffer-file-name)))
 (define-key ctl-x-map (kbd "<f5>") 'revert-buffer)
 (define-key ctl-x-map (kbd "<f6>") 'add-file-local-variable)
@@ -123,8 +122,8 @@
   (interactive)
   (setq nispio/fullscreen-p (not nispio/fullscreen-p))
   (if nispio/fullscreen-p (nispio/restore-frame) (nispio/maximize-frame)))
-(global-set-key (kbd "<f11>") 'nispio/toggle-fullscreen)
-(global-set-key (kbd "<S-f11>") 'delete-frame)
+(global-set-key (kbd "<f12>") 'nispio/toggle-fullscreen)
+(global-set-key (kbd "<S-f12>") 'delete-frame)
 
 ;; Make sure that the cygwin bash executable can be found (Windows Emacs)
 (when (eq system-type 'windows-nt)
@@ -323,13 +322,98 @@
 (defun nispio/c-mode-keys-hook ()
   (local-set-key (kbd "C-c C-c") 'nispio/compile-c)
   (local-set-key (kbd "<f5>") 'nispio/run-debugger)
-  (local-set-key (kbd "<S-f5>") 'nispio/debug-other-frame)
-  (local-set-key (kbd "<f6>") 'nispio/gud-watch-expression))
+  (local-set-key (kbd "<S-f5>") 'nispio/debug-other-frame))
 (add-hook 'c-mode-common-hook 'nispio/c-mode-keys-hook)
+
+(defun nispio/set-clear-breakpoint (&optional arg)
+  "Set/clear breakpoint on current line"
+  (interactive "P")
+  (if (or (buffer-file-name) (derived-mode-p 'gdb-disassembly-mode))
+	  (if (eq (car (fringe-bitmaps-at-pos (point))) 'breakpoint)
+		  (gud-remove nil)
+		(gud-break nil))))
+
+(defun nispio/toggle-breakpoint (&optional arg)
+  "Enable/disable breakpoint on current line"
+  (interactive "P")
+  (save-excursion
+	(forward-line 0)
+	(dolist (overlay (overlays-in (point) (point)))
+	  (when (overlay-get overlay 'put-break)
+		(setq obj (overlay-get overlay 'before-string))))
+	(when (and (boundp 'obj) (stringp obj))
+	  (gud-basic-call
+	   (concat
+		(if (get-text-property 0 'gdb-enabled obj)
+			"-break-disable "
+		  "-break-enable ")
+		(get-text-property 0 'gdb-bptno obj))))))
+
+(defun nispio/clear-all-breakpoints (&optional arg)
+  "Clear all breakpoints"
+  (interactive "P")
+  (gud-basic-call "delete breakpoints"))
+
+(defun nispio/enable-breakpoints (&optional arg)
+  "Enable/Disable all breakpoints at once"
+  (interactive "P")
+  (gud-basic-call "enable breakpoints"))
+
+(defun nispio/disable-breakpoints (&optional arg)
+  "Enable/Disable all breakpoints at once"
+  (interactive "P")
+  (gud-basic-call "disable breakpoints"))
+
+(defun nispio/stop-debugging (&optional arg)
+  "Kill the process being debugged"
+  (interactive "P")
+  (kill-buffer gud-comint-buffer))
+
+(defun nispio/mouse-toggle-breakpoint (event)
+  "Set/clear breakpoint in left fringe/margin at mouse click.
+If not in a source or disassembly buffer just set point."
+  (interactive "e")
+  (mouse-minibuffer-check event)
+  (let ((posn (event-end event)))
+    (with-selected-window (posn-window posn)
+      (if (or (buffer-file-name) (derived-mode-p 'gdb-disassembly-mode))
+	  (if (numberp (posn-point posn))
+	      (save-excursion
+		(goto-char (posn-point posn))
+		(if (eq (car (fringe-bitmaps-at-pos (posn-point posn)))
+			    'breakpoint)
+		    (gud-remove nil)
+		  (gud-break nil)))))
+      (posn-set-point posn))))
+
 
 ;; Set up GUD specific keybindings
 (defun nispio/gdb-mode-keys-hook ()
-  (local-set-key (kbd "<f6>") 'nispio/gud-watch-expression))
+  ;; Mouse Actions
+  (define-key gud-minor-mode-map [left-margin mouse-1] 'nispio/mouse-toggle-breakpoint)
+  (define-key gud-minor-mode-map [double-mouse-1] 'gud-until)
+  (define-key gud-minor-mode-map [mouse-3] 'mouse-set-point)
+  (define-key gud-minor-mode-map [double-mouse-3] 'gud-print)
+  (define-key gud-minor-mode-map [mouse-2] 'gud-watch)
+  ;; Keyboard Actions
+  (define-key gud-minor-mode-map [f5] 'gud-go) ; "Continue"
+  (define-key gud-minor-mode-map [f6] 'gud-watch)
+  (define-key gud-minor-mode-map [S-f6] 'gud-until)
+  (define-key gud-minor-mode-map [S-f5] 'nispio/stop-debugging) ; "Stop Debugging"
+  (define-key gud-minor-mode-map [C-S-f5] 'gud-run) ; "Restart""
+  (define-key gud-minor-mode-map [f8] 'nispio/enable-breakpoints) ; "Toggle Breakpoint"
+  (define-key gud-minor-mode-map [S-f8] 'nispio/disable-breakpoints) ; "Toggle Breakpoint"
+  (define-key gud-minor-mode-map [f9] 'nispio/set-clear-breakpoint) ; "Toggle Breakpoint"
+  (define-key gud-minor-mode-map [C-f9] 'nispio/toggle-breakpoint) ; "Disable/Enable Breakpoint"
+  (define-key gud-minor-mode-map [C-S-f9] 'nispio/clear-all-breakpoints) ; "Delete all Breakpoints"
+  (define-key gud-minor-mode-map [S-f9] 'nispio/gud-watch-expression) ; "Quick Watch"
+  (define-key gud-minor-mode-map [f10] 'gud-next) ; "Step over"
+  (define-key gud-minor-mode-map [S-f10] 'gud-stepi)
+  (define-key gud-minor-mode-map [f11] 'gud-step) ; "Step into""
+  (define-key gud-minor-mode-map [S-f11] 'gud-finish)) ; "Step out of"
+;; gud-jump	      ; Set execution address to current line
+;; gud-refresh	  ; Fix up a possibly garbled display, and redraw the arrow
+;; gud-tbreak	  ; Set temporary breakpoint at current line
 (add-hook 'gdb-mode-hook 'nispio/gdb-mode-keys-hook)
 
 ;; Set up hotkeys for transitioning between windows in gdb
