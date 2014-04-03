@@ -26,7 +26,9 @@
 		dired-previous-line
 		end-of-buffer
 		end-of-visual-line
+		eval-last-sexp
 		eval-print-last-sexp
+		forward-sentence
 		indent-for-tab-command
 		kill-region
 		kill-visual-line

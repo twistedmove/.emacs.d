@@ -205,6 +205,26 @@
 (setq matlab-comment-column 50)
 (setq-default fill-column 81)
 
+;; Set up auto-complete
+;; (source: https://github.com/auto-complete/auto-complete.git)
+(add-to-list 'load-path "~/.emacs.d/site-lisp/auto-complete")
+(add-to-list 'load-path "~/.emacs.d/site-lisp/auto-complete/lib/popup")
+(add-to-list 'load-path "~/.emacs.d/site-lisp/auto-complete/lib/fuzzy")
+(add-to-list 'load-path "~/.emacs.d/site-lisp/auto-complete/lib/erc")
+(require 'auto-complete-config)
+(ac-config-default)
+;; start after 3 characters were typed
+(setq ac-auto-start 3)
+;; show menu immediately...
+(setq ac-auto-show-menu t)
+;; explicit call to auto-complete
+(define-key ac-mode-map (kbd "C-.") 'auto-complete)
+;; Allow auto-complete with matlab-mode
+(setq ac-modes (cons 'matlab-mode ac-modes))
+;; (add-hook 'matlab-mode-hook 'nispio/auto-complete-mode)
+;;(add-hook 'matlab-mode-hook 'auto-complete-mode)
+
+
 ;; Add AUCTeX Mode for generating LaTeX documents
 ;; (source: http://ftp.gnu.org/pub/gnu/auctex/auctex-11.87.tar.gz)
 (add-to-list 'load-path "~/.emacs.d/site-lisp/auctex")
