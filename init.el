@@ -208,9 +208,6 @@
 ;; Set up auto-complete
 ;; (source: https://github.com/auto-complete/auto-complete.git)
 (add-to-list 'load-path "~/.emacs.d/site-lisp/auto-complete")
-(add-to-list 'load-path "~/.emacs.d/site-lisp/auto-complete/lib/popup")
-(add-to-list 'load-path "~/.emacs.d/site-lisp/auto-complete/lib/fuzzy")
-(add-to-list 'load-path "~/.emacs.d/site-lisp/auto-complete/lib/erc")
 (require 'auto-complete-config)
 (ac-config-default)
 ;; start after 3 characters were typed

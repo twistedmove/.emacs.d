@@ -25,6 +25,14 @@ URL="http://matlab-emacs.cvs.sourceforge.net/viewvc/matlab-emacs/matlab-emacs/?v
 NAME="matlab-emacs.tar.gz"
 curl -L "$URL" -o "$NAME" && tar xf "$NAME" && rm "$NAME"
 
+NAME="auto-complete.tar.bz2"
+VER="1.3.1"
+URL="http://cx4a.org/pub/auto-complete/auto-complete-1.3.1.tar.bz2"
+curl -L "$URL" -o "$NAME" \
+    && tar xf "$NAME" && rm "$NAME" \
+    && mv "auto-complete-$VER" "auto-complete" \
+    && echo "-- REMINDER: auto-complete may require installation."
+
 NAME="dejavu-fonts.tar.bz2"
 VER="2.34"
 URL="http://sourceforge.net/projects/dejavu/files/dejavu/$VER/dejavu-fonts-ttf-$VER.tar.bz2/download"
