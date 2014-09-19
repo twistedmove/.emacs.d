@@ -11,7 +11,6 @@
 (setq transient-mark-mode t)            ; Enable visual feedback on selections
 (column-number-mode t)                  ; Show column number on mode line
 (show-paren-mode)                       ; Show matching parenthesis
-(electric-pair-mode 1)					; Enable automatic bracket closing
 (setq x-stretch-cursor t)				; Cursor as wide as the glyph under it
 
 ;; Disable useless UI features
@@ -21,7 +20,7 @@
   (tooltip-mode 0))						; Disable tooltips
 
 ;; Further customization
-(load-theme 'manoj-dark)                ; Set color theme
+(load-theme 'manoj-dark)			    ; Set color theme
 (ido-mode t)                            ; Enable ido mode (interactively do)
 (setq linum-format "%d ")               ; Add space after line numbers
 (setq scroll-step 1)                    ; Only scroll by one line at top/bottom
@@ -503,12 +502,13 @@ Recognized window header names are: 'comint, 'locals, 'registers,
 
 
 (custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(default ((t (:family "DejaVu Sans Mono" :foundry "outline" :height 113 :slant normal :weight normal :width normal))))
+  ;; custom-set-faces was added by Custom.
+  ;; If you edit it by hand, you could mess it up, so be careful.
+  ;; Your init file should contain only one such instance.
+  ;; If there is more than one, they won't work right.
+ '(default ((t (:stipple nil :background "Black" :foreground "WhiteSmoke" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 113 :width normal :foundry "unknown" :family "DejaVu Sans Mono"))))
  '(column-marker-1 ((t (:background "DarkOrange3"))))
+ '(cursor ((t (:background "orchid"))))
  '(font-lock-comment-face ((t (:foreground "green1"))))
  '(font-lock-constant-face ((t (:foreground "gray100"))))
  '(font-lock-function-name-face ((t (:foreground "gray100"))))
@@ -525,10 +525,10 @@ Recognized window header names are: 'comint, 'locals, 'registers,
  '(mode-line-inactive ((t (:box nil))))
  '(org-table ((t (:foreground "DodgerBlue"))) t))
 (custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
+  ;; custom-set-variables was added by Custom.
+  ;; If you edit it by hand, you could mess it up, so be careful.
+  ;; Your init file should contain only one such instance.
+  ;; If there is more than one, they won't work right.
  '(column-number-mode t)
  '(safe-local-variable-values (quote ((visual-line-mode . t) (auto-fill-mode . 0))))
  '(show-paren-mode t)

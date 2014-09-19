@@ -20,6 +20,7 @@ curl -O "http://www.emacswiki.org/emacs/download/rect-mark.el"
 curl -O "http://www.emacswiki.org/emacs/download/column-marker.el"
 curl -O "http://www.emacswiki.org/emacs/download/lorem-ipsum.el"
 curl -O "http://www.emacswiki.org/emacs/download/sr-speedbar.el"
+curl -O "https://raw.githubusercontent.com/tovbinm/emacs-24-mac/master/etc/themes/manoj-dark-theme.el"
 
 URL="http://matlab-emacs.cvs.sourceforge.net/viewvc/matlab-emacs/matlab-emacs/?view=tar"
 NAME="matlab-emacs.tar.gz"
@@ -38,7 +39,15 @@ VER="11.87"
 URL="http://ftp.gnu.org/pub/gnu/auctex/auctex-$VER.tar.gz"
 curl -L "$URL" -o "$NAME" \
     && tar xf "$NAME" && rm "$NAME" \
-    && mv "auctex-$VER" "auctex" && cd "auctex" \
+    && mv "auctex-$VER" "auctex" \
     &&  echo "-- REMINDER: AUCTeX must be built and installed before use."
+
+git clone "https://github.com/auto-complete/auto-complete.git" \
+    && cd "$INSTALL_PATH/auto-complete" \
+	&& curl -L "http://elpa.gnu.org/packages/cl-lib-0.5.el" -o "cl-lib.el" \
+	&& git checkout -b legacy 14203fa \
+	&& git submodule init && git submodule update \
+    && echo "-- REMINDER: auto-complete downloaded, but not installed."
+	cd "$INSTALL_PATH"
 
 popd
