@@ -224,27 +224,27 @@
 ;;(add-hook 'matlab-mode-hook 'auto-complete-mode)
 
 
-;; Add AUCTeX Mode for generating LaTeX documents
-;; (source: http://ftp.gnu.org/pub/gnu/auctex/auctex-11.87.tar.gz)
-(add-to-list 'load-path "~/.emacs.d/site-lisp/auctex")
-(add-to-list 'load-path "~/.emacs.d/site-lisp/auctex/preview")
-(load "auctex.el" nil t t)
-(load "preview-latex.el" nil t t)
-(setq
-  TeX-auto-save t
-  TeX-parse-self t
-  TeX-source-correlate-method (quote synctex)
-  TeX-source-correlate-mode t
-  TeX-source-correlate-start-server t
-  reftex-plug-into-AUCTeX t
-  TeX-view-program-list (quote (("Sumatra PDF" "/usr/local/bin/sumatra -reuse-instance %o")))
-  TeX-view-program-selection (quote ((output-pdf "Sumatra PDF"))))
-(setq-default TeX-master nil)
-(add-hook 'LaTeX-mode-hook 'visual-line-mode)
-(add-hook 'LaTeX-mode-hook 'flyspell-mode)
-(add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
-(add-hook 'LaTeX-mode-hook 'TeX-PDF-mode)
-(add-hook 'LaTeX-mode-hook 'turn-on-reftex)
+;; ;; Add AUCTeX Mode for generating LaTeX documents
+;; ;; (source: http://ftp.gnu.org/pub/gnu/auctex/auctex-11.87.tar.gz)
+;; (add-to-list 'load-path "~/.emacs.d/site-lisp/auctex")
+;; (add-to-list 'load-path "~/.emacs.d/site-lisp/auctex/preview")
+;; (load "auctex.el" nil t t)
+;; (load "preview-latex.el" nil t t)
+;; (setq
+;;   TeX-auto-save t
+;;   TeX-parse-self t
+;;   TeX-source-correlate-method (quote synctex)
+;;   TeX-source-correlate-mode t
+;;   TeX-source-correlate-start-server t
+;;   reftex-plug-into-AUCTeX t
+;;   TeX-view-program-list (quote (("Sumatra PDF" "/usr/local/bin/sumatra -reuse-instance %o")))
+;;   TeX-view-program-selection (quote ((output-pdf "Sumatra PDF"))))
+;; (setq-default TeX-master nil)
+;; (add-hook 'LaTeX-mode-hook 'visual-line-mode)
+;; (add-hook 'LaTeX-mode-hook 'flyspell-mode)
+;; (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
+;; (add-hook 'LaTeX-mode-hook 'TeX-PDF-mode)
+;; (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
 
 ;; Add Helm support for advanced searching
 ;; (source: https://github.com/emacs-helm/helm.git)
