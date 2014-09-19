@@ -22,6 +22,7 @@
 		comment-dwim
 		comment-region
 		delete-horizontal-space
+		dired-mark
 		dired-next-line
 		dired-previous-line
 		end-of-buffer
