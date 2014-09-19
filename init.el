@@ -32,6 +32,9 @@
 (setq frame-title-format "emacs - %b")  ; Set frame title to "emacs - <buffer name>"
 (setq linum-format "%3d")				; Right-aligned line numbers with width 3
 (fringe-mode '(nil . 0))				; Left fringes only
+(setq compilation-scroll-output 'first-error)     ; Auto-scroll compilation output until first error
+(setq ido-default-file-method 'selected-window)   ; Always open files in selected window
+(setq ido-default-buffer-method 'selected-window) ; Always open buffers in selected window
 
 ;; ;; Manually set time zone to MST/MDT to fix problems with Cygwin/Windows
 ;; (setenv "TZ" "MST+7MDT,M4.1.0/2,M10.5.0/2")
@@ -47,6 +50,10 @@
       (setq this-command command)
       (call-interactively command)))
   (add-hook 'org-mode-hook (lambda () (local-set-key (kbd "<C-m>") 'my-fake-M-RET))))
+
+;; Org Mode Customizations
+(setq org-hide-leading-stars t)
+(setq org-odd-levels-only t)
 
 ;; Use unix line endings by default
 (setq default-buffer-file-coding-system 'utf-8-unix)
@@ -85,10 +92,16 @@
 (add-hook 'c-mode-hook (lambda () (setq comment-start "// " comment-end   "")))
 
 ;; Use dired-x to add the ability to open all marked files at once
+(defun nispio/find-marked-files ()
+  (interactive)
+  (dired-do-find-marked-files t)
+  (quit-window))
+
 (eval-after-load "dired"
   '(progn
 	 (load "dired-x")
-	 (define-key dired-mode-map "F" 'dired-do-find-marked-files)))
+	 (define-key dired-mode-map "F" 'nispio/find-marked-files)
+	 (define-key dired-mode-map "G" 'dired-do-find-marked-files)))
 
 ;; Easy buffer swapping
 ;; (source: http://www.emacswiki.org/emacs/download/buffer-move.el)
@@ -222,6 +235,7 @@
 ;;(add-hook 'matlab-mode-hook 'auto-complete-mode)
 
 
+
 ;; Add AUCTeX Mode for generating LaTeX documents
 ;; (source: http://ftp.gnu.org/pub/gnu/auctex/auctex-11.87.tar.gz)
 (add-to-list 'load-path "~/.emacs.d/site-lisp/auctex")
@@ -271,16 +285,16 @@
 (require 'sublimity-scroll)
 (require 'sublimity-map)
 
-;; Add support for Chrome extension "Edit with Emacs"
-;; (source: https://github.com/stsquad/emacs_chrome.git)
-(add-to-list 'load-path "~/.emacs.d/site-lisp/emacs_chrome/servers")
-(when (require 'edit-server nil t)
-    (setq edit-server-new-frame nil)
-    (add-hook 'edit-server-start-hook 'flyspell-mode)
-    (add-hook 'edit-server-start-hook 'visual-line-mode)
-    (add-hook 'edit-server-started-hook 'delete-other-windows)
-    (add-hook 'edit-server-buffer-closed-hook 'delete-window)
-    (edit-server-start))
+;; ;; Add support for Chrome extension "Edit with Emacs"
+;; ;; (source: https://github.com/stsquad/emacs_chrome.git)
+;; (add-to-list 'load-path "~/.emacs.d/site-lisp/emacs_chrome/servers")
+;; (when (require 'edit-server nil t)
+;;     (setq edit-server-new-frame nil)
+;;     (add-hook 'edit-server-start-hook 'flyspell-mode)
+;;     (add-hook 'edit-server-start-hook 'visual-line-mode)
+;;     (add-hook 'edit-server-started-hook 'delete-other-windows)
+;;     (add-hook 'edit-server-buffer-closed-hook 'delete-window)
+;;     (edit-server-start))
 
 ;; SrSpeedbar allows a speedbar that is "docked" in the current frame
 (require 'sr-speedbar)
@@ -495,9 +509,10 @@ Recognized window header names are: 'comint, 'locals, 'registers,
           ("b" . breakpoints)
           ("t" . threads)))
 
+
+
 ;; Use DejaVu Sans Mono as default font
 ;; (source: http://sourceforge.net/projects/dejavu/files/dejavu/2.34/dejavu-fonts-ttf-2.34.tar.bz2)
-
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -531,3 +546,5 @@ Recognized window header names are: 'comint, 'locals, 'registers,
  '(show-paren-mode t)
  '(tool-bar-mode nil))
 (put 'dired-find-alternate-file 'disabled nil)
+
+(message "nispio init complete")
