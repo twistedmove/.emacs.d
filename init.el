@@ -13,11 +13,15 @@
 (show-paren-mode)                       ; Show matching parenthesis
 (setq x-stretch-cursor t)				; Cursor as wide as the glyph under it
 
-;; Disable useless UI features
+(if (fboundp 'electric-pair-mode)		; Enable automatic parens pairing
+	(electric-pair-mode))				; when available (Emacs 24+)
+
+;; Configure features not available in the console
 (when window-system
   (scroll-bar-mode 0)                   ; Disable scroll bars
   (tool-bar-mode 0)                     ; Disable toolbar
-  (tooltip-mode 0))						; Disable tooltips
+  (tooltip-mode 0)						; Disable tooltips
+  (fringe-mode '(nil . 0)))				; Left fringes only
 
 ;; Further customization
 (load-theme 'manoj-dark)			    ; Set color theme
@@ -29,11 +33,14 @@
 (display-time)                          ; Display date and time in status bar
 (setq require-final-newline t)          ; Always end a file with a newline
 (setq frame-title-format "emacs - %b")  ; Set frame title to "emacs - <buffer name>"
-(setq linum-format "%3d")				; Right-aligned line numbers with width 3
-(fringe-mode '(nil . 0))				; Left fringes only
+(setq linum-format "%3d ")				; Right-aligned line numbers with width 3
+
 (setq compilation-scroll-output 'first-error)     ; Auto-scroll compilation output until first error
 (setq ido-default-file-method 'selected-window)   ; Always open files in selected window
 (setq ido-default-buffer-method 'selected-window) ; Always open buffers in selected window
+
+(require 'ibuffer)
+(global-set-key (kbd "C-x C-b") 'ibuffer)
 
 ;; ;; Manually set time zone to MST/MDT to fix problems with Cygwin/Windows
 ;; (setenv "TZ" "MST+7MDT,M4.1.0/2,M10.5.0/2")
@@ -74,7 +81,7 @@
 (global-set-key (kbd "C-c c") 'comment-region)
 (global-set-key (kbd "C-c u") 'uncomment-region)
 (global-set-key (kbd "M-1") 'delete-other-windows)
-(global-set-key (kbd "M-q") 'kill-buffer-and-window)
+;; (global-set-key (kbd "M-q") 'kill-buffer-and-window)
 (define-key ctl-x-map (kbd "<f1>") (lambda () (interactive) (message buffer-file-name)))
 (define-key ctl-x-map (kbd "<f5>") 'revert-buffer)
 (define-key ctl-x-map (kbd "<f6>") 'add-file-local-variable)
@@ -91,16 +98,14 @@
 (add-hook 'c-mode-hook (lambda () (setq comment-start "// " comment-end   "")))
 
 ;; Use dired-x to add the ability to open all marked files at once
-(defun nispio/find-marked-files ()
-  (interactive)
-  (dired-do-find-marked-files t)
-  (quit-window))
-
 (eval-after-load "dired"
   '(progn
 	 (load "dired-x")
-	 (define-key dired-mode-map "F" 'nispio/find-marked-files)
-	 (define-key dired-mode-map "G" 'dired-do-find-marked-files)))
+	 (defun nispio/find-marked-files ()
+	   (interactive)
+	   (dired-do-find-marked-files t)
+	   (quit-window))
+	 (define-key dired-mode-map "F" 'nispio/find-marked-files)))
 
 ;; Easy buffer swapping
 ;; (source: http://www.emacswiki.org/emacs/download/buffer-move.el)
@@ -214,6 +219,7 @@
 (add-hook 'matlab-mode-hook 'marker-at-81)
 (add-hook 'c-mode-hook 'marker-at-81)
 (add-hook 'c++-mode-hook 'marker-at-81)
+(add-hook 'python-mode-hook 'marker-at-81)
 (setq matlab-comment-column 50)
 (setq-default fill-column 81)
 
@@ -297,10 +303,22 @@
 ;;     (add-hook 'edit-server-buffer-closed-hook 'delete-window)
 ;;     (edit-server-start))
 
+
+;; (add-to-list 'load-path "~/.emacs.d/site-lisp/cedet/common")
+;; (load-file "~/.emacs.d/site-lisp/cedet/common/cedet.el")
+;; (global-ede-mode 1)
+
+;; Add doxymacs for doxygen support
+(add-to-list 'load-path "~/.emacs.d/site-lisp/doxymacs")
+(require 'doxymacs)
+
 ;; SrSpeedbar allows a speedbar that is "docked" in the current frame
 (require 'sr-speedbar)
 (global-set-key (kbd "C-c M-SPC") 'sr-speedbar-toggle)
 (global-set-key (kbd "C-c C-g w") 'sr-speedbar-select-window)
+(customize-set-variable 'sr-speedbar-default-width 20)
+(customize-set-variable 'sr-speedbar-skip-other-window-p t)
+
 
 ;; Configure GDB for debugging
 (setq gdb-show-main t)
@@ -516,11 +534,11 @@ Recognized window header names are: 'comint, 'locals, 'registers,
 ;; (source: http://sourceforge.net/projects/dejavu/files/dejavu/2.34/dejavu-fonts-ttf-2.34.tar.bz2)
 
 (custom-set-faces
-  ;; custom-set-faces was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
- '(default ((t (:stipple nil :background "Black" :foreground "WhiteSmoke" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 113 :width normal :foundry "unknown" :family "DejaVu Sans Mono"))))
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(default ((t (:stipple nil :background "Black" :foreground "WhiteSmoke" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 120 :width normal :foundry "unknown" :family "DejaVu Sans Mono"))))
  '(column-marker-1 ((t (:background "DarkOrange3"))))
  '(cursor ((t (:background "orchid"))))
  '(font-lock-comment-face ((t (:foreground "green1"))))
@@ -539,14 +557,22 @@ Recognized window header names are: 'comint, 'locals, 'registers,
  '(mode-line-inactive ((t (:box nil))))
  '(org-table ((t (:foreground "DodgerBlue"))) t))
 (custom-set-variables
-  ;; custom-set-variables was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
  '(column-number-mode t)
+ '(display-time-mode t)
+ '(doxymacs-doxygen-style "C++")
+ '(ede-project-directories (quote ("/home/jph/temp/myproject/include" "/home/jph/temp/myproject/src" "/home/jph/temp/myproject" "/home/jph/xmidas/ofdm/inc" "/home/jph/xmidas/ofdm/lib")))
+ '(ibuffer-saved-filter-groups nil)
+ '(ibuffer-saved-filters (quote (("backed-by-file" ((filename . "."))) ("gnus" ((or (mode . message-mode) (mode . mail-mode) (mode . gnus-group-mode) (mode . gnus-summary-mode) (mode . gnus-article-mode)))) ("programming" ((or (mode . emacs-lisp-mode) (mode . cperl-mode) (mode . c-mode) (mode . java-mode) (mode . idl-mode) (mode . lisp-mode)))))))
  '(safe-local-variable-values (quote ((visual-line-mode . t) (auto-fill-mode . 0))))
  '(show-paren-mode t)
+ '(sr-speedbar-default-width 20)
+ '(sr-speedbar-skip-other-window-p t)
  '(tool-bar-mode nil))
 (put 'dired-find-alternate-file 'disabled nil)
 
 (message "nispio init complete")
+(server-start)

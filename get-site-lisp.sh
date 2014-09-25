@@ -20,6 +20,8 @@ curl -O "http://www.emacswiki.org/emacs/download/rect-mark.el"
 curl -O "http://www.emacswiki.org/emacs/download/column-marker.el"
 curl -O "http://www.emacswiki.org/emacs/download/lorem-ipsum.el"
 curl -O "http://www.emacswiki.org/emacs/download/sr-speedbar.el"
+curl -O "http://www.emacswiki.org/emacs/download/dired+.el"
+curl -O "http://repo.or.cz/w/emacs.git/blob_plain/HEAD:/lisp/ibuffer.el"
 curl -O "https://raw.githubusercontent.com/tovbinm/emacs-24-mac/master/etc/themes/manoj-dark-theme.el"
 
 URL="http://matlab-emacs.cvs.sourceforge.net/viewvc/matlab-emacs/matlab-emacs/?view=tar"
@@ -49,6 +51,14 @@ curl -L "$URL" -o "$NAME" \
     && tar xf "$NAME" && rm "$NAME" \
     && mv "auctex-$VER" "auctex" \
     &&  echo "-- REMINDER: AUCTeX must be built and installed before use."
+
+NAME="cedet.tar.gz"
+VER="1.1"
+URL="http://downloads.sourceforge.net/project/cedet/cedet/cedet-$VER.tar.gz"
+curl -L "$URL" -o "$NAME" \
+    && tar xf "$NAME" && rm "$NAME" \
+    && mv "cedet-$VER" "cedet" \
+    &&  echo "-- REMINDER: CEDET must be built before use."
 
 git clone "https://github.com/auto-complete/auto-complete.git" \
     && cd "$INSTALL_PATH/auto-complete" \
