@@ -5,7 +5,6 @@
 
 ;; Basic emacs settings
 (global-font-lock-mode 1)               ; Enable syntax highlighting
-(global-linum-mode)                     ; Enable line numbers
 (setq inhibit-startup-screen t)         ; Disable splash screen
 (setq visible-bell t)                   ; Disable system beep
 (setq transient-mark-mode t)            ; Enable visual feedback on selections
@@ -22,91 +21,174 @@
 
 ;; Further customization
 (load-theme 'manoj-dark)                ; Set color theme
-(ido-mode t)                            ; Enable ido mode (interactively do)
-(setq linum-format "%d ")               ; Add space after line numbers
 (setq scroll-step 1)                    ; Only scroll by one line at top/bottom
 (setq-default truncate-lines t)         ; Truncate lines by default
 (setq display-time-day-and-date t)      ; Dispaly date along with time in status bar
 (display-time)                          ; Display date and time in status bar
 (setq require-final-newline t)          ; Always end a file with a newline
 (setq frame-title-format "emacs - %b")  ; Set frame title to "emacs - <buffer name>"
-(setq linum-format "%3d")				; Right-aligned line numbers with width 3
 (fringe-mode '(nil . 0))				; Left fringes only
 
-;; ;; Manually set time zone to MST/MDT to fix problems with Cygwin/Windows
-;; (setenv "TZ" "MST+7MDT,M4.1.0/2,M10.5.0/2")
+
+
+;; Use online archives for downloading emacs packages
+(require 'package)
+(add-to-list
+ 'package-archives
+ '("melpa" . "http://melpa.milkbox.net/packages/"))
+(setq package-enable-at-startup nil)
+(package-initialize)
+
+;; Simplify loading of packages from the network with use-package.el
+;; (source: https://github.com/jwiegley/use-package)
+(unless (package-installed-p 'use-package)
+  (package-install 'use-package))
+(require 'use-package)
+
+;; Allow asynchronous processing in emacs
+;; (source: https://github.com/jwiegley/emacs-async)
+(use-package async :ensure t)
+
+;; Use "ido" completion wherever possible
+;; (source: https://github.com/DarwinAwardWinner/ido-ubiquitous)
+(use-package ido-ubiquitous
+  :ensure t
+  :init
+  (progn
+	(ido-mode 1)			; Enable ido mode (interactively do)
+	(ido-ubiquitous-mode 1)))	; Enable ido mode almost everywhere
+  
+(bind-key "M-s n" 'find-name-dired)
+(bind-key* "C-h B" 'describe-personal-keybindings)
+
+;; Use incremental completion and selection narrowing
+;; (source: https://github.com/emacs-helm/helm)
+(use-package helm-config
+  :ensure helm
+  :init
+  (progn
+
+;; *helm-source-bookmarks
+;; *helm-source-buffers-list
+;; *helm-source-file-name-history
+;; *helm-source-files-in-all-dired
+;; *helm-source-files-in-current-dir
+;; *helm-source-find-files
+;; *helm-source-global-mark-ring
+;; *helm-source-grep
+;; *helm-source-kill-ring
+;; *helm-source-mark-ring
+;; *helm-source-moccur
+;; *helm-source-name
+;; *helm-source-occur
+;; *helm-source-recentf
+;; *helm-source-regexp
+;; *helm-source-register
+
+	;; Helm interface for describe bindings
+	;; (source: https://github.com/emacs-helm/helm-descbinds)
+    (use-package helm-descbinds
+	  :ensure t
+      :bind ("C-h b" . helm-descbinds))
+
+	(use-package helm-regexp
+	  :init	(helm-attrset 'follow 1 helm-source-moccur))
+
+	;; (source: http://stackoverflow.com/q/14726601)
+	(defun nispio/helm-multi-occur-buffers ()
+	  "multi-occur in all buffers backed by files."
+	  (interactive)
+	  (helm-multi-occur
+	   (delq nil
+			 (mapcar (lambda (b)
+					   (when (buffer-file-name b) (buffer-name b)))
+					 (buffer-list)))))
+	
+    (bind-key "C-h a" 'helm-apropos)
+    (bind-key "C-c M-x" 'helm-M-x)
+
+	(bind-key "M-s b" 'nispio/helm-multi-occur-buffers)
+    (bind-key "M-s a" 'helm-do-grep)
+    (bind-key "M-s o" 'helm-occur)
+	(bind-key "M-s r" 'helm-register)
+	
+
+))
+
+
+;; Display line numbers in all programming buffers
+(use-package linum
+  :ensure
+  :init
+  (progn
+	(add-hook 'prog-mode-hook 'linum-mode)
+	(setq linum-format "%3d")))
 
 ;; If not in a TTY, Unbind C-m so that we can use it elsewhere
 (unless (not window-system)
   (define-key input-decode-map [?\C-m] [C-m])
   ;; In Org Mode, use <C-m> as <M-return>
-  (defun my-fake-M-RET ()
+  (defun nispio/fake-M-RET ()
     (interactive)
     (let ((command (key-binding (kbd "<M-return>"))))
       (setq last-command-event [M-return])
       (setq this-command command)
       (call-interactively command)))
-  (add-hook 'org-mode-hook (lambda () (local-set-key (kbd "<C-m>") 'my-fake-M-RET))))
+  (add-hook 'org-mode-hook (lambda () (local-set-key (kbd "<C-m>") 'nispio/fake-M-RET))))
 
 ;; Use unix line endings by default
 (setq default-buffer-file-coding-system 'utf-8-unix)
-
-;; Set up indenting in C/C++
-(setq c-default-style "linux")
-(setq-default c-basic-offset 4)
-(setq-default tab-width 4)
-(c-set-offset 'inline-open 0)
 
 ;; Easier navigation between windows/frames
 (defun nispio/other-window (&optional arg)
   "With prefix argument, select the next frame. Otherwise, select the next window"
   (interactive "P")
   (if arg (other-frame 1) (other-window 1)))
-(global-set-key (kbd "C-\\") 'nispio/other-window)
+(bind-key* "C-\\" 'nispio/other-window)
+
+(defun nispio/buffer-file-name ()
+  "Display the name of the file backing the current buffer"
+  (interactive)
+  (message (or buffer-file-name "no file"))
+  buffer-file-name)
+(define-key ctl-x-map (kbd "<f1>") 'nispio/buffer-file-name)
 
 ;; Other keybindings
-(global-set-key (kbd "C-c c") 'comment-region)
-(global-set-key (kbd "C-c u") 'uncomment-region)
 (global-set-key (kbd "M-1") 'delete-other-windows)
-(global-set-key (kbd "M-q") 'kill-buffer-and-window)
-(define-key ctl-x-map (kbd "<f1>") (lambda () (interactive) (message buffer-file-name)))
-(define-key ctl-x-map (kbd "<f5>") 'revert-buffer)
-(define-key ctl-x-map (kbd "<f6>") 'add-file-local-variable)
+(global-set-key (kbd "M-0") 'kill-buffer-and-window)
 
-;; Shortcut for opening and closing braces in c-mode
-(defun nispio/insert-braces ()
-  (interactive)
-  (execute-kbd-macro '[return 123 tab return return 125 tab 16 tab]))
-(defun nispio/insert-braces-hook ()
-  (local-set-key (kbd "<C-m>") 'nispio/insert-braces))
-(add-hook 'c-mode-common-hook 'nispio/insert-braces-hook)
+;; Extend dired functionality
+(use-package dired+
+  :ensure t
+  :config
+  (progn
+    (use-package dired-x)
+    ;; Open all marked files at once
+    (bind-keys :map dired-mode-map
+	       ("F" . dired-do-find-marked-files))))
 
-;; Make C mode use C++-style commenting
-(add-hook 'c-mode-hook (lambda () (setq comment-start "// " comment-end   "")))
-
-;; Use dired-x to add the ability to open all marked files at once
-(eval-after-load "dired"
-  '(progn
-	 (load "dired-x")
-	 (define-key dired-mode-map "F" 'dired-do-find-marked-files)))
 
 ;; Easy buffer swapping
 ;; (source: http://www.emacswiki.org/emacs/download/buffer-move.el)
-(require 'buffer-move)
-(global-set-key (kbd "<C-up>")     'buf-move-up)
-(global-set-key (kbd "<C-down>")   'buf-move-down)
-(global-set-key (kbd "<C-left>")   'buf-move-left)
-(global-set-key (kbd "<C-right>")  'buf-move-right)
+(use-package buffer-move
+  :ensure t
+  :bind
+  (("<C-up>" . buf-move-up)
+   ("<C-down>" . buf-move-down)
+   ("<C-left>" . buf-move-left)
+   ("<C-right>" . buf-move-right)))
 
-;; Window manipulations:
-(global-set-key (kbd "C-S-<left>")  'shrink-window-horizontally)
-(global-set-key (kbd "C-S-<right>") 'enlarge-window-horizontally)
-(global-set-key (kbd "C-S-<up>")    'shrink-window)
-(global-set-key (kbd "C-S-<down>")  'enlarge-window)
-(global-set-key (kbd "M-o 6 d")     'shrink-window-horizontally)
-(global-set-key (kbd "M-o 6 c")     'enlarge-window-horizontally)
-(global-set-key (kbd "M-o 6 a")     'shrink-window)
-(global-set-key (kbd "M-o 6 b")     'enlarge-window)
+;; Keybindings to change the window size
+(bind-keys
+ ("C-S-<left>" . shrink-window-horizontally)
+ ("C-S-<right>" . enlarge-window-horizontally)
+ ("C-S-<up>" . shrink-window)
+ ("C-S-<down>" . enlarge-window)
+ ;; Repeat the same bindings for TTY mode
+ ("M-o 6 d" . shrink-window-horizontally)
+ ("M-o 6 c" . enlarge-window-horizontally)
+ ("M-o 6 a" . shrink-window)
+ ("M-o 6 b" . enlarge-window))
 
 ;; Custom function to toggle fullscreen by maximizing or restoring the current frame.
 (defvar nispio/fullscreen-p t "Check if fullscreen is on or off")
@@ -118,12 +200,13 @@
   (if (fboundp 'w32-send-sys-command) (w32-send-sys-command 61488)
 	(set-frame-parameter nil 'fullscreen 'fullboth)))
 (defun nispio/toggle-fullscreen ()
-;; Toggle "fullscreen" by maximizing or restoring the current frame.
+  "Toggle \"fullscreen\" by maximizing or restoring the current frame."
   (interactive)
   (setq nispio/fullscreen-p (not nispio/fullscreen-p))
   (if nispio/fullscreen-p (nispio/restore-frame) (nispio/maximize-frame)))
-(global-set-key (kbd "<f12>") 'nispio/toggle-fullscreen)
-(global-set-key (kbd "<S-f12>") 'delete-frame)
+
+(bind-key "<f12>" 'nispio/toggle-fullscreen)
+(bind-key "<S-f12>" 'delete-frame)
 
 ;; Make sure that the cygwin bash executable can be found (Windows Emacs)
 (when (eq system-type 'windows-nt)
@@ -133,80 +216,87 @@
 
 ;; Add an easy way to produce dummy text
 ;; (source: http://www.emacswiki.org/emacs/download/lorem-ipsum.el)
-(require 'lorem-ipsum)
-(global-set-key (kbd "C-c C-l") 'Lorem-ipsum-insert-paragraphs)
+(use-package lorem-ipsum
+  :ensure t
+  :bind ("C-c C-l" . Lorem-ipsum-insert-paragraphs))
 
 ;; Add support for isearch functionality with multiple cursors
-;; (source: https://github.com/zk-phi/phi-search.git)
-(add-to-list 'load-path "~/.emacs.d/site-lisp/phi-search")
-(require 'phi-search)
-;; Make phi-search the default instead of isearch (I think I like it better)
-(global-set-key (kbd "C-s") 'phi-search)
-(global-set-key (kbd "C-r") 'phi-search-backward)
+;; (source: https://github.com/zk-phi/phi-search)
+(use-package phi-search
+  :ensure t
+  :bind 
+  (("C-s" . phi-search)
+   ("C-r" . phi-search-backward))
+  :config
+  (customize-set-value 'phi-search-case-sensitive 'guess))
 
-;; Add support for using multiple cursors
-;; (source: https://github.com/magnars/multiple-cursors.el.git)
-(add-to-list 'load-path "~/.emacs.d/site-lisp/multiple-cursors")
-(require 'multiple-cursors)
+;; Add support for editing with multiple cursors
+;; (source: https://github.com/magnars/multiple-cursors.el)
+(use-package multiple-cursors
+  :ensure t
+  :bind (("C->" . mc/mark-next-like-this)
+	 ("C-<" . mc/mark-previous-like-this)
+	 ("C-c C-<" . mc/mark-all-like-this)
+	 ("C-c C->" . mc/mark-more-like-this-extended)
+	 ("C-S-c C-S-c" . mc/edit-lines)
+	 ("C-S-c C-<" . mc/mark-all-in-region)
+	 ("<f7>" . multiple-cursors-mode)
+	 ;; Keybindings for TTY mode
+	 ("M-[ 1 ; 6 n" . mc/mark-next-like-this)
+	 ("M-[ 1 ; 6 l" . mc/mark-previous-like-this)
+	 ("C-c M-[ 1 ; 6 l" . mc/mark-all-like-this)
+	 ("C-c M-[ 1 ; 6 n" . mc/mark-more-like-this-extended))
 
-;; Customize key bindings for multiple cursors mode
-(global-set-key (kbd "C->") 'mc/mark-next-like-this)
-(global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
-(global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
-(global-set-key (kbd "C-c C->") 'mc/mark-more-like-this-extended)
-(global-set-key (kbd "C-c SPC") 'set-rectangular-region-anchor)
-(global-set-key (kbd "C-c C-SPC") (lambda () (interactive) (mc/create-fake-cursor-at-point)))
-(global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
-(global-set-key (kbd "C-S-c C-<") 'mc/mark-all-in-region)
-;(global-set-key (kbd "C-S-c C->") 'mc/mark-all-regexp-in-region)
-(global-set-key (kbd "<f7>") 'multiple-cursors-mode)
+  :init
+  (progn
+    (defun nispio/fake-cursor-at-point ()
+      (interactive)
+      (mc/create-fake-cursor-at-point))
+    (bind-key "C-c C-SPC" 'nispio/fake-cursor-at-point)
 
-;; Keybindings for multiple cursors mode in TTY
-(global-set-key (kbd "M-[ 1 ; 6 n") 'mc/mark-next-like-this)
-(global-set-key (kbd "M-[ 1 ; 6 l") 'mc/mark-previous-like-this)
-(global-set-key (kbd "C-c M-[ 1 ; 6 l") 'mc/mark-all-like-this)
-(global-set-key (kbd "C-c M-[ 1 ; 6 n") 'mc/mark-more-like-this-extended)
+    ;; Add extended interoperability between phi-search and multiple cursors
+    ;; (source: https://github.com/knu/phi-search-mc.el)
+    (when (package-installed-p 'phi-search)
+      (use-package phi-search-mc
+	:ensure t
+	:init (phi-search-mc/setup-keys)))))
+
+(bind-keys
+ ("C-c c" . comment-region)
+ ("C-c u" . uncomment-region))
+
+(define-key ctl-x-map (kbd "<f5>") 'revert-buffer)
+(define-key ctl-x-map (kbd "<f6>") 'add-file-local-variable)
 
 ;; Unfortunately, multiple-cursors falls short on rectangular selection
 ;;   so I use rect-mark.el to fill in the gaps for now
 ;; (source: http://www.emacswiki.org/emacs/rect-mark.el)
-(global-set-key (kbd "C-x r C-SPC") 'rm-set-mark)
-(global-set-key (kbd "C-x r C-x") 'rm-exchange-point-and-mark)
-(global-set-key (kbd "C-x r C-w") 'rm-kill-region)
-(global-set-key (kbd "C-x r M-w") 'rm-kill-ring-save)
-(global-set-key (kbd "C-x r C-y") 'yank-rectangle)
-(autoload 'rm-set-mark "rect-mark"
-  "Set mark for rectangle." t)
-(autoload 'rm-exchange-point-and-mark "rect-mark"
-  "Exchange point and mark for rectangle." t)
-(autoload 'rm-kill-region "rect-mark"
-  "Kill a rectangular region and save it in the kill ring." t)
-(autoload 'rm-kill-ring-save "rect-mark"
-  "Copy a rectangular region to the kill ring." t)
-
-;; Add extended interoperability between phi-search and multiple cursors
-;; (source: https://github.com/knu/phi-search-mc.el.git)
-(add-to-list 'load-path "~/.emacs.d/site-lisp/phi-search-mc")
-(require 'phi-search-mc)
-(phi-search-mc/setup-keys)
+(use-package phi-rectangle
+  :ensure t
+  :bind (("C-c C-SPC" . phi-rectangle-set-mark-command)
+	 ("C-w" . phi-rectangle-kill-region)
+	 ("M-w" . phi-rectangle-kill-ring-save)
+	 ("C-y" . phi-rectangle-yank)))
 
 ;; Add support for editing matlab files
 ;; (source: http://matlab-emacs.cvs.sourceforge.net/viewvc/matlab-emacs/matlab-emacs/?view=tar)
 (add-to-list 'load-path "~/.emacs.d/site-lisp/matlab-emacs")
 (load-library "matlab-load")
+(setq matlab-comment-column 50)
 
 ;; Enable column markers at column 81 to warn of long lines
 ;; (source: http://www.emacswiki.org/emacs/download/column-marker.el)
-(require 'column-marker)
-(defun marker-at-81 () (interactive) (column-marker-1 81))
-(add-hook 'matlab-mode-hook 'marker-at-81)
-(add-hook 'c-mode-hook 'marker-at-81)
-(add-hook 'c++-mode-hook 'marker-at-81)
-(setq matlab-comment-column 50)
-(setq-default fill-column 81)
+(use-package column-marker
+  :ensure t
+  :init (progn
+	  (defun nispio/column-marker-at-81 ()
+	    (interactive)
+	    (column-marker-1 81))
+	  (add-hook 'prog-mode-hook 'nispio/column-marker-at-81)
+	  (setq-default fill-column 81)))
 
 ;; Set up auto-complete
-;; (source: https://github.com/auto-complete/auto-complete.git)
+;; (source: https://github.com/auto-complete/auto-complete)
 (add-to-list 'load-path "~/.emacs.d/site-lisp/auto-complete")
 (add-to-list 'load-path "~/.emacs.d/site-lisp/auto-complete/lib/popup")
 (add-to-list 'load-path "~/.emacs.d/site-lisp/auto-complete/lib/fuzzy")
@@ -247,43 +337,23 @@
 (add-hook 'LaTeX-mode-hook 'TeX-PDF-mode)
 (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
 
-;; Add Helm support for advanced searching
-;; (source: https://github.com/emacs-helm/helm.git)
-(add-to-list 'load-path "~/.emacs.d/site-lisp/helm")
-(require 'helm-config)
+;; ;; Add sublimity mode for mini-map
+;; ;; (source: https://github.com/zk-phi/sublimity.git)
+;; (add-to-list 'load-path "~/.emacs.d/site-lisp/sublimity")
+;; (require 'sublimity)
+;; (require 'sublimity-scroll)
+;; (require 'sublimity-map)
 
-;; Make helm search open buffers automatically
-;; (source: http://stackoverflow.com/q/14726601)
-(eval-after-load "helm-regexp"
-  '(helm-attrset 'follow 1 helm-source-moccur))
-(defun my-helm-multi-all ()
-  "multi-occur in all buffers backed by files."
-  (interactive)
-  (helm-multi-occur
-   (delq nil
-         (mapcar (lambda (b)
-                   (when (buffer-file-name b) (buffer-name b)))
-                 (buffer-list)))))
-(global-set-key (kbd "S-<f3>") 'my-helm-multi-all)
-(global-set-key (kbd "C-c C-h") 'my-helm-multi-all)
-
-;; Add sublimity mode for mini-map
-;; (source: https://github.com/zk-phi/sublimity.git)
-(add-to-list 'load-path "~/.emacs.d/site-lisp/sublimity")
-(require 'sublimity)
-(require 'sublimity-scroll)
-(require 'sublimity-map)
-
-;; Add support for Chrome extension "Edit with Emacs"
-;; (source: https://github.com/stsquad/emacs_chrome.git)
-(add-to-list 'load-path "~/.emacs.d/site-lisp/emacs_chrome/servers")
-(when (require 'edit-server nil t)
-    (setq edit-server-new-frame nil)
-    (add-hook 'edit-server-start-hook 'flyspell-mode)
-    (add-hook 'edit-server-start-hook 'visual-line-mode)
-    (add-hook 'edit-server-started-hook 'delete-other-windows)
-    (add-hook 'edit-server-buffer-closed-hook 'delete-window)
-    (edit-server-start))
+;; ;; Add support for Chrome extension "Edit with Emacs"
+;; ;; (source: https://github.com/stsquad/emacs_chrome.git)
+;; (add-to-list 'load-path "~/.emacs.d/site-lisp/emacs_chrome/servers")
+;; (when (require 'edit-server nil t)
+;;     (setq edit-server-new-frame nil)
+;;     (add-hook 'edit-server-start-hook 'flyspell-mode)
+;;     (add-hook 'edit-server-start-hook 'visual-line-mode)
+;;     (add-hook 'edit-server-started-hook 'delete-other-windows)
+;;     (add-hook 'edit-server-buffer-closed-hook 'delete-window)
+;;     (edit-server-start))
 
 ;; SrSpeedbar allows a speedbar that is "docked" in the current frame
 (require 'sr-speedbar)
@@ -498,39 +568,7 @@ Recognized window header names are: 'comint, 'locals, 'registers,
           ("b" . breakpoints)
           ("t" . threads)))
 
-;; Use DejaVu Sans Mono as default font
-;; (source: http://sourceforge.net/projects/dejavu/files/dejavu/2.34/dejavu-fonts-ttf-2.34.tar.bz2)
 
-
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(default ((t (:family "DejaVu Sans Mono" :foundry "outline" :height 113 :slant normal :weight normal :width normal))))
- '(column-marker-1 ((t (:background "DarkOrange3"))))
- '(font-lock-comment-face ((t (:foreground "green1"))))
- '(font-lock-constant-face ((t (:foreground "gray100"))))
- '(font-lock-function-name-face ((t (:foreground "gray100"))))
- '(font-lock-keyword-face ((t (:foreground "DodgerBlue"))))
- '(font-lock-preprocessor-face ((t (:foreground "DodgerBlue"))))
- '(font-lock-string-face ((t (:foreground "red3"))))
- '(font-lock-type-face ((t (:foreground "DodgerBlue"))))
- '(font-lock-variable-name-face ((t (:foreground "gray100"))))
- '(fringe ((t (:background "black" :foreground "Wheat"))))
- '(matlab-operator-face ((t (:foreground "gray100"))) t)
- '(minibuffer-prompt ((t (:foreground "cyan1"))))
- '(mode-line ((t (:box nil))))
- '(mode-line-highlight ((t (:box nil))))
- '(mode-line-inactive ((t (:box nil))))
- '(org-table ((t (:foreground "DodgerBlue"))) t))
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(column-number-mode t)
- '(safe-local-variable-values (quote ((visual-line-mode . t) (auto-fill-mode . 0))))
- '(show-paren-mode t)
- '(tool-bar-mode nil))
-(put 'dired-find-alternate-file 'disabled nil)
+;; Settings modified via the Customize interface get their own file
+(setq custom-file "~/.emacs.d/settings.el")
+(load custom-file)
