@@ -38,6 +38,9 @@
 	matlab-comment
 	matlab-electric-comment
 	matlab-linefeed
+	org-beginning-of-line
+	org-end-of-line
+	org-todo
 	phi-rectangle-kill-region
 	phi-rectangle-kill-ring-save
 	phi-rectangle-yank
@@ -58,6 +61,7 @@
 	describe-key
 	dired
 	goto-line
+	helm-descbinds
 	helm-do-grep
 	ido-find-file
 	ido-switch-buffer

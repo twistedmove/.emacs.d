@@ -1,25 +1,18 @@
 ;;;; .emacs
 
+;; parse command line arguments
+(setq init-file-broken-p (member "--broken" command-line-args))
+(setq command-line-args (delete "--broken" command-line-args))
+
+(when init-file-broken-p
+    (message "Hooray! It's broken!"))
+
 ;; Set default load path for lisp files
 (add-to-list 'load-path "~/.emacs.d/site-lisp")
 
 ;; Basic emacs settings
 (show-paren-mode 1)			; Show matching parenthesis
 (setq-default truncate-lines t)         ; Truncate lines by default
-
-;; Essential key bindings
-(global-set-key (kbd "C-\\") 'other-window)
-(global-set-key (kbd "M-1") 'delete-other-windows)
-(global-set-key (kbd "C-c c") 'comment-region)
-(global-set-key (kbd "C-c u") 'uncomment-region)
-
-(bind-keys
- ("M-0" . delete-window)
- ("M-1" . delete-other-windows)
- ("M-2" . split-window-below)
- ("M-3" . split-window-right)
- ("M-4" . ctl-x-4-map)
- ("M-5" . ctl-x-5-map))
 
 
 ;; Basic emacs settings
