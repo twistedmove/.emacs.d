@@ -40,11 +40,14 @@
 	matlab-linefeed
 	org-beginning-of-line
 	org-end-of-line
+	org-force-self-insert
+	org-self-insert-command
 	org-todo
 	phi-rectangle-kill-region
 	phi-rectangle-kill-ring-save
 	phi-rectangle-yank
 	phi-search
+	phi-search-backward
 	reindent-then-newline-and-indent
 	rm-kill-region
 	semantic-complete-self-insert

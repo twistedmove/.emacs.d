@@ -6,8 +6,9 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :stipple nil :background "black" :foreground "WhiteSmoke" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 102 :width normal :foundry "unknown" :family "DejaVu Sans Mono"))))
+ '(default ((t (:inherit nil :stipple nil :foreground "WhiteSmoke" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 102 :width normal :foundry "unknown" :family "DejaVu Sans Mono"))))
  '(column-marker-1 ((t (:background "DarkOrange3"))))
+ '(cursor ((t (:background "magenta"))))
  '(diredp-dir-heading ((t (:foreground "orange red"))))
  '(diredp-dir-priv ((t (:background "black"))))
  '(diredp-exec-priv ((t nil)))
@@ -30,7 +31,7 @@
  '(fringe ((t (:background "black" :foreground "Wheat"))))
  '(matlab-operator-face ((t (:foreground "gray100"))) t)
  '(minibuffer-prompt ((t (:foreground "cyan1"))))
- '(mode-line ((t (:box nil))))
+ '(mode-line ((t (:inverse-video t :box nil))))
  '(mode-line-highlight ((t (:box nil))))
  '(mode-line-inactive ((t (:box nil))))
  '(org-table ((t (:foreground "DodgerBlue"))) t))
@@ -47,6 +48,7 @@
  '(ibuffer-saved-filter-groups (quote (("default" ("File Buffers" (filename . ".+")) ("Dired Buffers" (used-mode . dired-mode)) ("Special Buffers" (name . "\\b\\*.*\\*\\b"))))))
  '(ibuffer-saved-filters (quote (("gnus" ((or (mode . message-mode) (mode . mail-mode) (mode . gnus-group-mode) (mode . gnus-summary-mode) (mode . gnus-article-mode)))) ("programming" ((or (mode . emacs-lisp-mode) (mode . cperl-mode) (mode . c-mode) (mode . java-mode) (mode . idl-mode) (mode . lisp-mode)))))))
  '(ido-max-window-height 2)
+ '(linum-format "%3d ")
  '(minimap-dedicated-window nil)
  '(minimap-display-semantic-overlays nil)
  '(minimap-hide-fringes t)

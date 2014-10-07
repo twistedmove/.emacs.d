@@ -7,13 +7,13 @@
 (when init-file-broken-p
     (message "Hooray! It's broken!"))
 
-;; Set default load path for lisp files
+;; Set load paths for lisp files
 (add-to-list 'load-path "~/.emacs.d/site-lisp")
+(add-to-list 'load-path "~/.emacs.d/nispio")
 
 ;; Basic emacs settings
 (show-paren-mode 1)			; Show matching parenthesis
 (setq-default truncate-lines t)         ; Truncate lines by default
-
 
 ;; Basic emacs settings
 (global-font-lock-mode 1)               ; Enable syntax highlighting
@@ -25,13 +25,6 @@
 (electric-pair-mode 1)			; Enable automatic bracket closing
 (setq x-stretch-cursor t)		; Cursor as wide as the glyph under it
 
-;; Configure UI features
-(when window-system
-  (scroll-bar-mode 0)                   ; Disable scroll bars
-  (tooltip-mode 1)			; Disable tooltips
-  (fringe-mode '(nil . 0))		; Left fringes only
-  (tool-bar-mode 0))			; Disable toolbar
-
 ;; Further customization
 (setq scroll-step 1)                    ; Only scroll by one line at top/bottom
 (setq-default truncate-lines t)         ; Truncate lines by default
@@ -40,9 +33,7 @@
 (setq require-final-newline t)          ; Always end a file with a newline
 (setq frame-title-format "emacs - %b")  ; Set frame title to "emacs - <buffer name>"
 
-(load-theme 'manoj-dark)                ; Set color theme
-
-(load-file "~/.emacs.d/init-packages.el")
+(load-file "~/.emacs.d/nispio/init-packages.el")
 
 ;; Use "ido" completion wherever possible
 ;; (source: https://github.com/DarwinAwardWinner/ido-ubiquitous)
@@ -119,8 +110,17 @@
 (defun nispio/other-window (&optional arg)
   "With prefix argument, select the next frame. Otherwise, select the next window"
   (interactive "P")
-  (if arg (other-frame 1) (other-window 1)))
+  (let* ((N (or (and (consp arg) -1) arg 1)))
+    (other-window N t)
+    (select-frame-set-input-focus (selected-frame))))
 (bind-key* "C-\\" 'nispio/other-window)
+
+(defun nispio/show-prefix-arg (&optional arg)
+  (interactive "P")
+  (if (/= 0 (safe-length arg))
+      (message "Prefix: %s (%d)" arg (safe-length arg))
+    (message "Argument: %s (%d)" arg (safe-length arg))
+  ))
 
 (defun nispio/buffer-file-name ()
   "Display the name of the file backing the current buffer"
@@ -128,6 +128,18 @@
   (message (or buffer-file-name "no file"))
   buffer-file-name)
 (define-key ctl-x-map (kbd "<f1>") 'nispio/buffer-file-name)
+
+;; Unbind a local key binding
+(defun nispio/unbind-local-key (key)
+  (interactive "kPress key: ")
+  (let ((name (key-description key))
+	(binding (local-key-binding key)))
+    (if (not binding)
+	(message "Key is not bound locally: %s" name)
+      (local-set-key key nil)
+      (message "Unbinding key: %s (was '%s)" name binding))))
+(bind-key* "C-h C-M-k" 'nispio/unbind-local-key)
+
 
 ;; Other keybindings
 (global-set-key (kbd "M-1") 'delete-other-windows)
@@ -155,10 +167,10 @@
 (use-package buffer-move
   :ensure t
   :bind
-  (("<C-up>" . buf-move-up)
-   ("<C-down>" . buf-move-down)
-   ("<C-left>" . buf-move-left)
-   ("<C-right>" . buf-move-right)))
+  (("C-c <C-up>" . buf-move-up)
+   ("C-c <C-down>" . buf-move-down)
+   ("C-c <C-left>" . buf-move-left)
+   ("C-c <C-right>" . buf-move-right)))
 
 ;; Keybindings to change the window size
 (bind-keys
@@ -267,7 +279,6 @@
 (matlab-cedet-setup)
 (setq matlab-comment-column 50)
 
-(add-to-list 'load-path "~/.emacs.d/nispio")
 (require 'matlab-debug)
 
 ;; Enable column markers at column 81 to warn of long lines
@@ -555,5 +566,7 @@ Recognized window header names are: 'comint, 'locals, 'registers,
 
 
 ;; Settings modified via the Customize interface get their own file
-(setq custom-file "~/.emacs.d/settings.el")
+(if window-system
+    (setq custom-file "~/.emacs.d/nispio/settings.el")
+  (setq custom-file "~/.emacs.d/nispio/settings-tty.el"))
 (load custom-file)
