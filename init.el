@@ -1,5 +1,8 @@
 ;;;; .emacs
 
+(message "Begin initialization file init.el")
+(switch-to-buffer "*Messages*")
+
 ;; parse command line arguments
 (setq init-file-broken-p (member "--broken" command-line-args))
 (setq command-line-args (delete "--broken" command-line-args))
@@ -53,19 +56,23 @@
   :ensure helm
   :init
   (progn
+    (require 'helm)
+    (require 'helm-plugin)
+
     ;; Helm interface for describe bindings
     ;; (source: https://github.com/emacs-helm/helm-descbinds)
     (use-package helm-descbinds
 	  :ensure t
       :bind ("C-h b" . helm-descbinds))
 
+    ;; Turn on follow mode when using multi-occur
     (require 'helm-regexp)
     (eval-after-load "helm-regexp"
       '(setq helm-source-moccur
 	    (helm-make-source "Moccur" 'helm-source-multi-occur :follow 1)))
 
     ;; (source: http://stackoverflow.com/q/14726601)
-    (defun nispio/helm-multi-occur-buffers ()
+    (defun nispio/helm-moccur-buffers ()
       "multi-occur in all buffers backed by files."
       (interactive)
       (helm-multi-occur
@@ -73,11 +80,21 @@
 	     (mapcar (lambda (b)
 		       (when (buffer-file-name b) (buffer-name b)))
 		     (buffer-list)))))
-    
-    (bind-key "C-h a" 'helm-apropos)
-    (bind-key "C-c M-x" 'helm-M-x)
 
-    (bind-key "M-s b" 'nispio/helm-multi-occur-buffers)
+
+    ;; (source: http://emacs.stackexchange.com/a/650/93)
+    (defun nispio/helm-full-frame ()
+      (interactive)
+      (with-selected-window (helm-window)
+	(delete-other-windows)))
+
+    (bind-key "M-1" 'nispio/helm-full-frame helm-map)
+
+    (bind-key "C-c M-x" 'helm-M-x)
+    (bind-key "C-h a" 'helm-apropos)
+    (bind-key "C-h p" 'helm-package)
+
+    (bind-key "M-s b" 'nispio/helm-moccur-buffers)
     (bind-key "M-s a" 'helm-do-grep)
     (bind-key "M-s o" 'helm-occur)
     (bind-key "M-s r" 'helm-register)))
@@ -91,17 +108,20 @@
 	(add-hook 'prog-mode-hook 'linum-mode)
 	(setq linum-format "%3d")))
 
-;; If not in a TTY, Unbind C-m so that we can use it elsewhere
-(unless (not window-system)
-  (define-key input-decode-map [?\C-m] [C-m])
-  ;; In Org Mode, use <C-m> as <M-return>
-  (defun nispio/fake-M-RET ()
-    (interactive)
-    (let ((command (key-binding (kbd "<M-return>"))))
-      (setq last-command-event [M-return])
-      (setq this-command command)
-      (call-interactively command)))
-  (add-hook 'org-mode-hook (lambda () (local-set-key (kbd "<C-m>") 'nispio/fake-M-RET))))
+;; ;; If not in a TTY, Unbind C-m so that we can use it elsewhere
+;; (unless (not window-system)
+;;   (define-key input-decode-map [?\C-m] [C-m])
+;;   ;; In Org Mode, use <C-m> as <M-return>
+;;   (defun nispio/fake-M-RET ()
+;;     (interactive)
+;;     (let ((command (key-binding (kbd "<M-return>"))))
+;;       (setq last-command-event [M-return])
+;;       (setq this-command command)
+;;       (call-interactively command)))
+;;   (add-hook 'org-mode-hook (lambda () (local-set-key (kbd "<C-m>") 'nispio/fake-M-RET))))
+
+;; Modify the behavior of `org-table-align`
+(load-file "~/.emacs.d/nispio/org-table-align.el")
 
 ;; Use unix line endings by default
 (setq default-buffer-file-coding-system 'utf-8-unix)
@@ -140,6 +160,44 @@
       (message "Unbinding key: %s (was '%s)" name binding))))
 (bind-key* "C-h C-M-k" 'nispio/unbind-local-key)
 
+;; Look for special keybindings associated with overlays or text properties
+;; (source: http://emacs.stackexchange.com/a/654/93)
+(defun nispio/key-binding-at-point (key)
+  (mapcar (lambda (keymap) (lookup-key keymap key))
+          (cl-remove-if-not
+           #'keymapp
+           (append
+            (mapcar (lambda (overlay)
+                      (overlay-get overlay 'keymap))
+                    (overlays-at (point)))
+            (get-text-property (point) 'keymap)
+            (get-text-property (point) 'local-map)))))
+
+;; Show a list of all 
+;; (source: http://emacs.stackexchange.com/a/654/93)
+(defun nispio/locate-key-binding (key)
+  "Determine in which keymap KEY is defined."
+  (interactive "kPress key: ")
+  (let ((ret (list (nispio/key-binding-at-point key)
+		   (minor-mode-key-binding key)
+		   (local-key-binding key)
+		   (global-key-binding key))))
+    (when (called-interactively-p 'any)
+      (with-output-to-temp-buffer "*locate-key*"
+	;; (split-window-vertically -4)
+	(princ (format "Key Bindings for %s\n\n" (key-description key)))
+	(princ (format "At Point: %s\n" (or (nth 0 ret) "nil")))
+	(princ (format "Minor-mode: %s\n"
+		       (or (and (nth 1 ret)
+				(mapconcat
+				 (lambda (x) (format "%s: %s" (car x) (cdr x)))
+				 (nth 1 ret) "\n            ")) "nil")))
+	(princ (format "Local: %s\n" (or (nth 2 ret) "nil")))
+	(princ (format "Global: %s" (or (nth 3 ret) "nil")))))
+    ret))
+(bind-key "C-h C-k" 'nispio/locate-key-binding)
+
+;(use-package thing-cmds :ensure t)
 
 ;; Other keybindings
 (global-set-key (kbd "M-1") 'delete-other-windows)
@@ -155,7 +213,8 @@
     (require 'dired-x)
     ;; Command to open all marked files at once
     (bind-keys :map dired-mode-map
-	       ("F" . dired-do-find-marked-files))
+	       ("F" . dired-do-find-marked-files)
+	       ("/" . isearch-forward))
     ;; When opening a directory in dired, reuse the current buffer
     (diredp-toggle-find-file-reuse-dir 1)))
 

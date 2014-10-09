@@ -64,6 +64,7 @@
 	describe-key
 	dired
 	goto-line
+	helm-apropos
 	helm-descbinds
 	helm-do-grep
 	ido-find-file
@@ -73,6 +74,7 @@
 	make-default
 	mouse-save-then-kill
 	multiple-cursors-mode
+	nispio/other-window
 	overwrite-mode
 	scroll-other-window
 	view-lossage
