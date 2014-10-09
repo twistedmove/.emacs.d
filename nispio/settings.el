@@ -14,7 +14,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :stipple nil :background "black" :foreground "WhiteSmoke" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 102 :width normal :foundry "unknown" :family "DejaVu Sans Mono"))))
+ '(default ((t (:inherit nil :stipple nil :background "black" :foreground "WhiteSmoke" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 143 :width normal :foundry "unknown" :family "DejaVu Sans Mono"))))
  '(column-marker-1 ((t (:background "DarkOrange3"))))
  '(diredp-dir-heading ((t (:foreground "orange red"))))
  '(diredp-dir-priv ((t (:background "black"))))
@@ -49,6 +49,7 @@
  ;; If there is more than one, they won't work right.
  '(Buffer-menu-name-width 50)
  '(column-number-mode t)
+ '(display-time-mode t)
  '(font-lock-maximum-decoration (quote ((t . t) (dired-mode . 2))))
  '(ibuffer-elide-long-columns t)
  '(ibuffer-formats (quote ((mark modified read-only " " (name 35 35 :left :elide) " " (size 9 -1 :right) " " (mode 16 16 :left :elide) " " filename-and-process) (mark " " (name 16 -1) " " filename))))

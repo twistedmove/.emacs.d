@@ -100,10 +100,10 @@
 (nispio/locate-key-binding (kbd "C-h C-k"))
 (prin1-to-string (local-key-binding (kbd "C-h C-k"))
 
-(let* ((key (kbd "C-h b"))
+(let* ((key (kbd "C-h k"))
        (desc (key-description key))
        (function (key-binding key))
-       (arglist (help-function-arglist function))
+       (arglist (help-function-arglist function t))
        (usage (help-make-usage function arglist))
        (doc (documentation function))
        (at-point-binding (nispio/key-binding-at-point key))
@@ -112,6 +112,8 @@
        (global-binding (global-key-binding key))
        )
   (with-help-window (help-buffer)
+    (save-excursion
+    (read-only-mode -1)
     (princ (format "Key Bindings for %s\n\n" desc))
     (when at-point-binding
       (princ (format "At Point: %S\n" at-point-binding)))
@@ -123,8 +125,8 @@
       (princ (format "Local: %s\n" local-binding)))
     (when global-binding
       (princ (format "Global: %s\n" global-binding)))
-    (princ (format "\n%s\n\n%s" usage doc))
-    )
+    ;(princ (format "\n%s\n\n%s" usage doc))
+    ))
   nil)
 
 (setq test-dummy t)

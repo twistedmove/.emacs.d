@@ -4,11 +4,12 @@
 (add-to-list
  'package-archives
  '("melpa" . "http://melpa.milkbox.net/packages/"))
-(package-initialize)
+(package-initialize nil)
 
 ;; Simplify loading of packages from the network with use-package.el
 ;; (source: https://github.com/jwiegley/use-package)
 (unless (package-installed-p 'use-package)
+  (message "%s" "Refreshing package database...")
   (package-refresh-contents)
   (package-install 'use-package))
 (require 'use-package)

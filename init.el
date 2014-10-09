@@ -57,7 +57,7 @@
   :init
   (progn
     (require 'helm)
-    (require 'helm-plugin)
+    ;; (require 'helm-plugin)
 
     ;; Helm interface for describe bindings
     ;; (source: https://github.com/emacs-helm/helm-descbinds)
@@ -333,12 +333,12 @@
 
 ;; Add support for editing matlab files
 ;; (source: http://matlab-emacs.cvs.sourceforge.net/viewvc/matlab-emacs/matlab-emacs/?view=tar)
-(add-to-list 'load-path "~/.emacs.d/site-lisp/matlab-emacs")
-(load-library "matlab-load")
-(matlab-cedet-setup)
-(setq matlab-comment-column 50)
-
-(require 'matlab-debug)
+(use-package "matlab-load"
+  :ensure matlab-mode
+  :init
+  (matlab-cedet-setup)
+  (setq matlab-comment-column 50)
+  (require 'matlab-debug))
 
 ;; Enable column markers at column 81 to warn of long lines
 ;; (source: http://www.emacswiki.org/emacs/download/column-marker.el)
