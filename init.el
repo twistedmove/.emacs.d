@@ -351,70 +351,65 @@
 	  (add-hook 'prog-mode-hook 'nispio/column-marker-at-81)
 	  (setq-default fill-column 81)))
 
-;; Set up auto-complete
-;; (source: https://github.com/auto-complete/auto-complete)
-(add-to-list 'load-path "~/.emacs.d/site-lisp/auto-complete")
-(add-to-list 'load-path "~/.emacs.d/site-lisp/auto-complete/lib/popup")
-(add-to-list 'load-path "~/.emacs.d/site-lisp/auto-complete/lib/fuzzy")
-(add-to-list 'load-path "~/.emacs.d/site-lisp/auto-complete/lib/erc")
-(require 'auto-complete-config)
-(ac-config-default)
-;; start after 3 characters were typed
-(setq ac-auto-start 3)
-;; show menu immediately...
-(setq ac-auto-show-menu t)
-;; explicit call to auto-complete
-(define-key ac-mode-map (kbd "C-.") 'auto-complete)
-;; Allow auto-complete with matlab-mode
-(setq ac-modes (cons 'matlab-mode ac-modes))
-;; (add-hook 'matlab-mode-hook 'nispio/auto-complete-mode)
-;;(add-hook 'matlab-mode-hook 'auto-complete-mode)
+;; ;; Set up auto-complete
+;; ;; (source: https://github.com/auto-complete/auto-complete)
+;; (add-to-list 'load-path "~/.emacs.d/site-lisp/auto-complete")
+;; (add-to-list 'load-path "~/.emacs.d/site-lisp/auto-complete/lib/popup")
+;; (add-to-list 'load-path "~/.emacs.d/site-lisp/auto-complete/lib/fuzzy")
+;; (add-to-list 'load-path "~/.emacs.d/site-lisp/auto-complete/lib/erc")
+(use-package auto-complete-config
+  :ensure auto-complete
+  :init
+  (ac-config-default)
+  ;; start after 3 characters were typed
+  (setq ac-auto-start 3)
+  ;; show menu immediately...
+  (setq ac-auto-show-menu t)
+  ;; explicit call to auto-complete
+  (define-key ac-mode-map (kbd "C-.") 'auto-complete)
+  ;; Allow auto-complete with matlab-mode
+  (setq ac-modes (cons 'matlab-mode ac-modes))
+  )
 
+(use-package tex-site
+  :ensure auctex
+  :init
+  (use-package preview-latex)
+  (setq
+   TeX-auto-save t
+   TeX-parse-self t
+   TeX-source-correlate-method (quote synctex)
+   TeX-source-correlate-mode t
+   TeX-source-correlate-start-server t
+   reftex-plug-into-AUCTeX t)
+  ;; (setq
+  ;;  TeX-view-program-list (quote (("Sumatra PDF" "/usr/local/bin/sumatra -reuse-instance %o")))
+  ;;  TeX-view-program-selection (quote ((output-pdf "Sumatra PDF"))))
+  (setq-default TeX-master nil)
+  (add-hook 'LaTeX-mode-hook 'visual-line-mode)
+  (add-hook 'LaTeX-mode-hook 'flyspell-mode)
+  (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
+  (add-hook 'LaTeX-mode-hook 'TeX-PDF-mode)
+  (add-hook 'LaTeX-mode-hook 'turn-on-reftex))
 
-;; Add AUCTeX Mode for generating LaTeX documents
-;; (source: http://ftp.gnu.org/pub/gnu/auctex/auctex-11.87.tar.gz)
-(add-to-list 'load-path "~/.emacs.d/site-lisp/auctex")
-(add-to-list 'load-path "~/.emacs.d/site-lisp/auctex/preview")
-(load "auctex.el" nil t t)
-(load "preview-latex.el" nil t t)
-(setq
-  TeX-auto-save t
-  TeX-parse-self t
-  TeX-source-correlate-method (quote synctex)
-  TeX-source-correlate-mode t
-  TeX-source-correlate-start-server t
-  reftex-plug-into-AUCTeX t
-  TeX-view-program-list (quote (("Sumatra PDF" "/usr/local/bin/sumatra -reuse-instance %o")))
-  TeX-view-program-selection (quote ((output-pdf "Sumatra PDF"))))
-(setq-default TeX-master nil)
-(add-hook 'LaTeX-mode-hook 'visual-line-mode)
-(add-hook 'LaTeX-mode-hook 'flyspell-mode)
-(add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
-(add-hook 'LaTeX-mode-hook 'TeX-PDF-mode)
-(add-hook 'LaTeX-mode-hook 'turn-on-reftex)
-
-;; ;; Add sublimity mode for mini-map
-;; ;; (source: https://github.com/zk-phi/sublimity.git)
-;; (add-to-list 'load-path "~/.emacs.d/site-lisp/sublimity")
-;; (require 'sublimity)
-;; (require 'sublimity-scroll)
-;; (require 'sublimity-map)
-
-;; ;; Add support for Chrome extension "Edit with Emacs"
-;; ;; (source: https://github.com/stsquad/emacs_chrome.git)
-;; (add-to-list 'load-path "~/.emacs.d/site-lisp/emacs_chrome/servers")
-;; (when (require 'edit-server nil t)
-;;     (setq edit-server-new-frame nil)
-;;     (add-hook 'edit-server-start-hook 'flyspell-mode)
-;;     (add-hook 'edit-server-start-hook 'visual-line-mode)
-;;     (add-hook 'edit-server-started-hook 'delete-other-windows)
-;;     (add-hook 'edit-server-buffer-closed-hook 'delete-window)
-;;     (edit-server-start))
+;; Add support for Chrome extension "Edit with Emacs"
+;; (source: https://github.com/stsquad/emacs_chrome.git)
+(use-package edit-server
+  :ensure t
+  :init
+  (setq edit-server-new-frame nil)
+  (add-hook 'edit-server-start-hook 'flyspell-mode)
+  (add-hook 'edit-server-start-hook 'visual-line-mode)
+  (add-hook 'edit-server-started-hook 'delete-other-windows)
+  (add-hook 'edit-server-buffer-closed-hook 'delete-window)
+  (edit-server-start))
 
 ;; SrSpeedbar allows a speedbar that is "docked" in the current frame
-(require 'sr-speedbar)
-(global-set-key (kbd "C-c M-SPC") 'sr-speedbar-toggle)
-(global-set-key (kbd "C-c C-g w") 'sr-speedbar-select-window)
+(use-package sr-speedbar
+  :ensure t
+  :config
+  :bind (("C-c M-SPC" . sr-speedbar-toggle)
+	 ("C-c C-g w" . sr-speedbar-select-window)))
 
 ;; Configure GDB for debugging
 (setq gdb-show-main t)
