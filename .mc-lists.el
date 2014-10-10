@@ -72,6 +72,7 @@
 	ido-switch-buffer-other-window
 	kill-rectangle
 	make-default
+	mark-sexp
 	mouse-save-then-kill
 	multiple-cursors-mode
 	nispio/other-window

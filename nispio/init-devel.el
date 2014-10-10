@@ -4,6 +4,13 @@
 (setq-default tab-width 4)
 (c-set-offset 'inline-open 0)
 
+;; Set up C-mode specific keybindings
+(defun nispio/c-mode-keys-hook ()
+  (local-set-key (kbd "C-c C-c") 'nispio/compile-c)
+  (local-set-key (kbd "<f5>") 'nispio/run-debugger)
+  (local-set-key (kbd "<S-f5>") 'nispio/debug-other-frame))
+(add-hook 'c-mode-common-hook 'nispio/c-mode-keys-hook)
+
 ;; Shortcut for opening and closing braces in c-mode
 (defun nispio/insert-braces ()
   (interactive)

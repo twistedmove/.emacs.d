@@ -15,7 +15,7 @@
 (add-to-list 'load-path "~/.emacs.d/nispio")
 
 ;; Basic emacs settings
-(show-paren-mode 1)			; Show matching parenthesis
+(show-paren-mode 1)						; Show matching parenthesis
 (setq-default truncate-lines t)         ; Truncate lines by default
 
 ;; Basic emacs settings
@@ -25,8 +25,8 @@
 (setq transient-mark-mode t)            ; Enable visual feedback on selections
 (column-number-mode t)                  ; Show column number on mode line
 (show-paren-mode)                       ; Show matching parenthesis
-(electric-pair-mode 1)			; Enable automatic bracket closing
-(setq x-stretch-cursor t)		; Cursor as wide as the glyph under it
+(electric-pair-mode 1)                  ; Enable automatic bracket closing
+(setq x-stretch-cursor t)               ; Cursor as wide as the glyph under it
 
 ;; Further customization
 (setq scroll-step 1)                    ; Only scroll by one line at top/bottom
@@ -38,14 +38,18 @@
 
 (load-file "~/.emacs.d/nispio/init-packages.el")
 
+(de)
+(bind-key "M-" 'find-name-dired)
+
 ;; Use "ido" completion wherever possible
 ;; (source: https://github.com/DarwinAwardWinner/ido-ubiquitous)
 (use-package ido-ubiquitous
   :ensure t
   :init
   (progn
-	(ido-mode 1)			; Enable ido mode (interactively do)
-	(ido-ubiquitous-mode 1)))	; Enable ido mode almost everywhere
+    (iswitchb-mode 1)
+    (ido-mode 1)                        ; Enable ido mode (interactively do)
+    (ido-ubiquitous-mode 1)))           ; Enable ido mode almost everywhere
   
 (bind-key "M-s n" 'find-name-dired)
 (bind-key* "C-h B" 'describe-personal-keybindings)
@@ -62,14 +66,14 @@
     ;; Helm interface for describe bindings
     ;; (source: https://github.com/emacs-helm/helm-descbinds)
     (use-package helm-descbinds
-	  :ensure t
+      :ensure t
       :bind ("C-h b" . helm-descbinds))
 
     ;; Turn on follow mode when using multi-occur
     (require 'helm-regexp)
     (eval-after-load "helm-regexp"
       '(setq helm-source-moccur
-	    (helm-make-source "Moccur" 'helm-source-multi-occur :follow 1)))
+        (helm-make-source "Moccur" 'helm-source-multi-occur :follow 1)))
 
     ;; (source: http://stackoverflow.com/q/14726601)
     (defun nispio/helm-moccur-buffers ()
@@ -77,16 +81,16 @@
       (interactive)
       (helm-multi-occur
        (delq nil
-	     (mapcar (lambda (b)
-		       (when (buffer-file-name b) (buffer-name b)))
-		     (buffer-list)))))
+         (mapcar (lambda (b)
+               (when (buffer-file-name b) (buffer-name b)))
+             (buffer-list)))))
 
 
     ;; (source: http://emacs.stackexchange.com/a/650/93)
     (defun nispio/helm-full-frame ()
       (interactive)
       (with-selected-window (helm-window)
-	(delete-other-windows)))
+    (delete-other-windows)))
 
     (bind-key "M-1" 'nispio/helm-full-frame helm-map)
 
@@ -105,20 +109,20 @@
   :ensure
   :init
   (progn
-	(add-hook 'prog-mode-hook 'linum-mode)
-	(setq linum-format "%3d")))
+    (add-hook 'prog-mode-hook 'linum-mode)
+    (setq linum-format "%3d")))
 
-;; ;; If not in a TTY, Unbind C-m so that we can use it elsewhere
-;; (unless (not window-system)
-;;   (define-key input-decode-map [?\C-m] [C-m])
-;;   ;; In Org Mode, use <C-m> as <M-return>
-;;   (defun nispio/fake-M-RET ()
-;;     (interactive)
-;;     (let ((command (key-binding (kbd "<M-return>"))))
-;;       (setq last-command-event [M-return])
-;;       (setq this-command command)
-;;       (call-interactively command)))
-;;   (add-hook 'org-mode-hook (lambda () (local-set-key (kbd "<C-m>") 'nispio/fake-M-RET))))
+;; If not in a TTY, Unbind C-m so that we can use it elsewhere
+(unless (not window-system)
+  (define-key input-decode-map [?\C-m] [C-m])
+  ;; In Org Mode, use <C-m> as <M-return>
+  (defun nispio/fake-M-RET ()
+    (interactive)
+    (let ((command (key-binding (kbd "<M-return>"))))
+      (setq last-command-event [M-return])
+      (setq this-command command)
+      (call-interactively command)))
+  (add-hook 'org-mode-hook (lambda () (local-set-key (kbd "<C-m>") 'nispio/fake-M-RET))))
 
 ;; Modify the behavior of `org-table-align`
 (load-file "~/.emacs.d/nispio/org-table-align.el")
@@ -153,9 +157,9 @@
 (defun nispio/unbind-local-key (key)
   (interactive "kPress key: ")
   (let ((name (key-description key))
-	(binding (local-key-binding key)))
+    (binding (local-key-binding key)))
     (if (not binding)
-	(message "Key is not bound locally: %s" name)
+    (message "Key is not bound locally: %s" name)
       (local-set-key key nil)
       (message "Unbinding key: %s (was '%s)" name binding))))
 (bind-key* "C-h C-M-k" 'nispio/unbind-local-key)
@@ -179,23 +183,33 @@
   "Determine in which keymap KEY is defined."
   (interactive "kPress key: ")
   (let ((ret (list (nispio/key-binding-at-point key)
-		   (minor-mode-key-binding key)
-		   (local-key-binding key)
-		   (global-key-binding key))))
+           (minor-mode-key-binding key)
+           (local-key-binding key)
+           (global-key-binding key))))
     (when (called-interactively-p 'any)
       (with-output-to-temp-buffer "*locate-key*"
-	;; (split-window-vertically -4)
-	(princ (format "Key Bindings for %s\n\n" (key-description key)))
-	(princ (format "At Point: %s\n" (or (nth 0 ret) "nil")))
-	(princ (format "Minor-mode: %s\n"
-		       (or (and (nth 1 ret)
-				(mapconcat
-				 (lambda (x) (format "%s: %s" (car x) (cdr x)))
-				 (nth 1 ret) "\n            ")) "nil")))
-	(princ (format "Local: %s\n" (or (nth 2 ret) "nil")))
-	(princ (format "Global: %s" (or (nth 3 ret) "nil")))))
+    ;; (split-window-vertically -4)
+    (princ (format "Key Bindings for %s\n\n" (key-description key)))
+    (princ (format "At Point: %s\n" (or (nth 0 ret) "nil")))
+    (princ (format "Minor-mode: %s\n"
+               (or (and (nth 1 ret)
+                (mapconcat
+                 (lambda (x) (format "%s: %s" (car x) (cdr x)))
+                 (nth 1 ret) "\n            ")) "nil")))
+    (princ (format "Local: %s\n" (or (nth 2 ret) "nil")))
+    (princ (format "Global: %s" (or (nth 3 ret) "nil")))))
     ret))
-(bind-key "C-h C-k" 'nispio/locate-key-binding)
+(bind-key "C-h k" 'nispio/locate-key-binding)
+
+
+(defun nispio/insert-key-description (key &optional arg)
+"Capture a keybinding directly from the keyboard and insert its string
+representation at point. With optional ARG, display the key description in the
+minibuffer instead of inserting it at point."
+  (interactive "k\nP")
+  (let ((desc (key-description key)))
+	(if arg (message desc) (insert desc))))
+(bind-key* "C-h C-k" 'nispio/insert-key-description)
 
 ;(use-package thing-cmds :ensure t)
 
@@ -213,8 +227,8 @@
     (require 'dired-x)
     ;; Command to open all marked files at once
     (bind-keys :map dired-mode-map
-	       ("F" . dired-do-find-marked-files)
-	       ("/" . isearch-forward))
+           ("F" . dired-do-find-marked-files)
+           ("/" . isearch-forward))
     ;; When opening a directory in dired, reuse the current buffer
     (diredp-toggle-find-file-reuse-dir 1)))
 
@@ -247,11 +261,11 @@
 (defvar nispio/fullscreen-p t "Check if fullscreen is on or off")
 (defun nispio/restore-frame ()
   (if (fboundp 'w32-send-sys-command) (w32-send-sys-command 61728)
-	(progn (set-frame-parameter nil 'width 82)
-		   (set-frame-parameter nil 'fullscreen 'fullheight))))
+    (progn (set-frame-parameter nil 'width 82)
+           (set-frame-parameter nil 'fullscreen 'fullheight))))
 (defun nispio/maximize-frame ()
   (if (fboundp 'w32-send-sys-command) (w32-send-sys-command 61488)
-	(set-frame-parameter nil 'fullscreen 'fullboth)))
+    (set-frame-parameter nil 'fullscreen 'fullboth)))
 (defun nispio/toggle-fullscreen ()
   "Toggle \"fullscreen\" by maximizing or restoring the current frame."
   (interactive)
@@ -288,17 +302,17 @@
 (use-package multiple-cursors
   :ensure t
   :bind (("C->" . mc/mark-next-like-this)
-	 ("C-<" . mc/mark-previous-like-this)
-	 ("C-c C-<" . mc/mark-all-like-this)
-	 ("C-c C->" . mc/mark-more-like-this-extended)
-	 ("C-S-c C-S-c" . mc/edit-lines)
-	 ("C-S-c C-<" . mc/mark-all-in-region)
-	 ("<f7>" . multiple-cursors-mode)
-	 ;; Keybindings for TTY mode
-	 ("M-[ 1 ; 6 n" . mc/mark-next-like-this)
-	 ("M-[ 1 ; 6 l" . mc/mark-previous-like-this)
-	 ("C-c M-[ 1 ; 6 l" . mc/mark-all-like-this)
-	 ("C-c M-[ 1 ; 6 n" . mc/mark-more-like-this-extended))
+     ("C-<" . mc/mark-previous-like-this)
+     ("C-c C-<" . mc/mark-all-like-this)
+     ("C-c C->" . mc/mark-more-like-this-extended)
+     ("C-S-c C-S-c" . mc/edit-lines)
+     ("C-S-c C-<" . mc/mark-all-in-region)
+     ("<f7>" . multiple-cursors-mode)
+     ;; Keybindings for TTY mode
+     ("M-[ 1 ; 6 n" . mc/mark-next-like-this)
+     ("M-[ 1 ; 6 l" . mc/mark-previous-like-this)
+     ("C-c M-[ 1 ; 6 l" . mc/mark-all-like-this)
+     ("C-c M-[ 1 ; 6 n" . mc/mark-more-like-this-extended))
 
   :init
   (progn
@@ -311,8 +325,8 @@
     ;; (source: https://github.com/knu/phi-search-mc.el)
     (when (package-installed-p 'phi-search)
       (use-package phi-search-mc
-	:ensure t
-	:init (phi-search-mc/setup-keys)))))
+    :ensure t
+    :init (phi-search-mc/setup-keys)))))
 
 (bind-keys
  ("C-c c" . comment-region)
@@ -327,9 +341,9 @@
 (use-package phi-rectangle
   :ensure t
   :bind (("C-c C-SPC" . phi-rectangle-set-mark-command)
-	 ("C-w" . phi-rectangle-kill-region)
-	 ("M-w" . phi-rectangle-kill-ring-save)
-	 ("C-y" . phi-rectangle-yank)))
+     ("C-w" . phi-rectangle-kill-region)
+     ("M-w" . phi-rectangle-kill-ring-save)
+     ("C-y" . phi-rectangle-yank)))
 
 ;; Add support for editing matlab files
 ;; (source: http://matlab-emacs.cvs.sourceforge.net/viewvc/matlab-emacs/matlab-emacs/?view=tar)
@@ -345,11 +359,11 @@
 (use-package column-marker
   :ensure t
   :init (progn
-	  (defun nispio/column-marker-at-81 ()
-	    (interactive)
-	    (column-marker-1 81))
-	  (add-hook 'prog-mode-hook 'nispio/column-marker-at-81)
-	  (setq-default fill-column 81)))
+      (defun nispio/column-marker-at-81 ()
+        (interactive)
+        (column-marker-1 81))
+      (add-hook 'prog-mode-hook 'nispio/column-marker-at-81)
+      (setq-default fill-column 81)))
 
 ;; ;; Set up auto-complete
 ;; ;; (source: https://github.com/auto-complete/auto-complete)
@@ -409,7 +423,9 @@
   :ensure t
   :config
   :bind (("C-c M-SPC" . sr-speedbar-toggle)
-	 ("C-c C-g w" . sr-speedbar-select-window)))
+     ("C-c C-g w" . sr-speedbar-select-window)))
+
+(load-file "~/.emacs.d/nispio/init-devel.el")
 
 ;; Configure GDB for debugging
 (setq gdb-show-main t)
@@ -421,14 +437,14 @@
   (interactive "P")
   (when arg (makunbound 'compile-command))
   (unless (boundp 'compile-command)
-	(let* ((src-file (file-name-nondirectory buffer-file-name))
-		   (src-ext (file-name-extension src-file))
-		   (src-base (file-name-base src-file))
-		   (src-compiler (if (string= src-ext "cpp") "g++" "gcc"))
-		   (my-guess (concat src-compiler " -g3 -ggdb -o " src-base " " src-file)))
-	  (setq-local compile-command (read-string "Compile command: " my-guess))
-	  (when (y-or-n-p "Save file-local variable compile-command?")
-		(add-file-local-variable 'compile-command compile-command))))
+    (let* ((src-file (file-name-nondirectory buffer-file-name))
+           (src-ext (file-name-extension src-file))
+           (src-base (file-name-base src-file))
+           (src-compiler (if (string= src-ext "cpp") "g++" "gcc"))
+           (my-guess (concat src-compiler " -g3 -ggdb -o " src-base " " src-file)))
+      (setq-local compile-command (read-string "Compile command: " my-guess))
+      (when (y-or-n-p "Save file-local variable compile-command?")
+        (add-file-local-variable 'compile-command compile-command))))
   (compile compile-command t))
 
 ;; Run the debugger and save the debug command when in C
@@ -436,11 +452,11 @@
   (interactive "P")
   (when arg (makunbound 'debug-command))
   (unless (boundp 'debug-command)
-	(let* ((src-base (file-name-base buffer-file-name))
-		   (my-guess (concat "gdb -i=mi " src-base)))
-	  (setq-local debug-command (read-string "Run gdb (like this): " my-guess))
-	  (when (y-or-n-p "Save file-local variable debug-command?")
-		(add-file-local-variable 'debug-command debug-command))))
+    (let* ((src-base (file-name-base buffer-file-name))
+           (my-guess (concat "gdb -i=mi " src-base)))
+      (setq-local debug-command (read-string "Run gdb (like this): " my-guess))
+      (when (y-or-n-p "Save file-local variable debug-command?")
+        (add-file-local-variable 'debug-command debug-command))))
   (sr-speedbar-open)
   (gdb debug-command))
 
@@ -456,39 +472,32 @@
 (defun nispio/gud-watch-expression (&optional arg)
   (interactive "P")
   (if arg
-	  (call-interactively gud-watch)
-	(gud-watch '(4))))
-
-;; Set up C-mode specific keybindings
-(defun nispio/c-mode-keys-hook ()
-  (local-set-key (kbd "C-c C-c") 'nispio/compile-c)
-  (local-set-key (kbd "<f5>") 'nispio/run-debugger)
-  (local-set-key (kbd "<S-f5>") 'nispio/debug-other-frame))
-(add-hook 'c-mode-common-hook 'nispio/c-mode-keys-hook)
+      (call-interactively gud-watch)
+    (gud-watch '(4))))
 
 (defun nispio/set-clear-breakpoint (&optional arg)
   "Set/clear breakpoint on current line"
   (interactive "P")
   (if (or (buffer-file-name) (derived-mode-p 'gdb-disassembly-mode))
-	  (if (eq (car (fringe-bitmaps-at-pos (point))) 'breakpoint)
-		  (gud-remove nil)
-		(gud-break nil))))
+      (if (eq (car (fringe-bitmaps-at-pos (point))) 'breakpoint)
+          (gud-remove nil)
+        (gud-break nil))))
 
 (defun nispio/toggle-breakpoint (&optional arg)
   "Enable/disable breakpoint on current line"
   (interactive "P")
   (save-excursion
-	(forward-line 0)
-	(dolist (overlay (overlays-in (point) (point)))
-	  (when (overlay-get overlay 'put-break)
-		(setq obj (overlay-get overlay 'before-string))))
-	(when (and (boundp 'obj) (stringp obj))
-	  (gud-basic-call
-	   (concat
-		(if (get-text-property 0 'gdb-enabled obj)
-			"-break-disable "
-		  "-break-enable ")
-		(get-text-property 0 'gdb-bptno obj))))))
+    (forward-line 0)
+    (dolist (overlay (overlays-in (point) (point)))
+      (when (overlay-get overlay 'put-break)
+        (setq obj (overlay-get overlay 'before-string))))
+    (when (and (boundp 'obj) (stringp obj))
+      (gud-basic-call
+       (concat
+        (if (get-text-property 0 'gdb-enabled obj)
+            "-break-disable "
+          "-break-enable ")
+        (get-text-property 0 'gdb-bptno obj))))))
 
 (defun nispio/clear-all-breakpoints (&optional arg)
   "Clear all breakpoints"
@@ -518,13 +527,13 @@ If not in a source or disassembly buffer just set point."
   (let ((posn (event-end event)))
     (with-selected-window (posn-window posn)
       (if (or (buffer-file-name) (derived-mode-p 'gdb-disassembly-mode))
-	  (if (numberp (posn-point posn))
-	      (save-excursion
-		(goto-char (posn-point posn))
-		(if (eq (car (fringe-bitmaps-at-pos (posn-point posn)))
-			    'breakpoint)
-		    (gud-remove nil)
-		  (gud-break nil)))))
+      (if (numberp (posn-point posn))
+          (save-excursion
+        (goto-char (posn-point posn))
+        (if (eq (car (fringe-bitmaps-at-pos (posn-point posn)))
+                'breakpoint)
+            (gud-remove nil)
+          (gud-break nil)))))
       (posn-set-point posn))))
 
 ;; Set up GUD specific keybindings
@@ -551,9 +560,9 @@ If not in a source or disassembly buffer just set point."
   (define-key gud-minor-mode-map [S-f10] 'gud-stepi)
   (define-key gud-minor-mode-map [f11] 'gud-step) ; "Step into""
   (define-key gud-minor-mode-map [S-f11] 'gud-finish)) ; "Step out of"
-;; gud-jump	      ; Set execution address to current line
-;; gud-refresh	  ; Fix up a possibly garbled display, and redraw the arrow
-;; gud-tbreak	  ; Set temporary breakpoint at current line
+;; gud-jump       ; Set execution address to current line
+;; gud-refresh    ; Fix up a possibly garbled display, and redraw the arrow
+;; gud-tbreak     ; Set temporary breakpoint at current line
 (add-hook 'gdb-mode-hook 'nispio/gdb-mode-keys-hook)
 
 ;; Set up hotkeys for transitioning between windows in gdb

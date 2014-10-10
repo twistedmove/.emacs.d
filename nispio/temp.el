@@ -17,6 +17,44 @@
 ;; 			     (my-trim-string (org-table-get-field))))
 ;; 		 ))
 
+(bind-keys ([remap forward-word] . forward-sexp)
+		   ([remap backward-kill-word] . backward-kill-sexp)
+		   ([remap backward-word] . backward-sexp)
+		   ([remap forward-word] . forward-sexp)
+		   ([remap kill-word] . kill-sexp)
+		   ([remap mark-word] . mark-sexp)
+		   ([remap transpose-words] . transpose-sexps)
+		   )
+
+(global-set-key [remap list-buffers] 'ibuffer)
+
+(bind-keys :map matlab-mode-map
+		   ("C-i" . previous-line)
+		   ("C-k" . next-line)
+		   ("C-j" . backward-char)
+		   ("C-l" . forward-char))
+
+It seems that there
+
+    (defun my-magical-keys ()
+      (local-set-key (kbd "C-i") 'previous-line)
+      (local-set-key (kbd "C-k") 'next-line)
+      (local-set-key (kbd "C-j") 'backward-char)
+      (local-set-key (kbd "C-l") 'forward-char))
+    (add-hook 'my-magical-mode-hook 'my-matlab-keys)
+    
+    (define-key my-magical-mode-map (kbd "C-i") 'previous-line)
+    (define-key my-magical-mode-map (kbd "C-k") 'next-line)
+    (define-key my-magical-mode-map (kbd "C-j") 'backward-char)
+    (define-key my-magical-mode-map (kbd "C-l") 'forward-char)
+
+(setq matlab-mode-map (make-sparse-keymap))
+
+(global-set-key "i" 'self-insert-command)		   
+(global-set-key "j" 'self-insert-command)		   
+(global-set-key "k" 'self-insert-command)		   
+(global-set-key "l" 'self-insert-command)		   
+
 (progn
 
 (defun my-trim-string (arg) 
@@ -91,7 +129,7 @@
 	(princ (format "Local: %s\n" (or (nth 2 ret) "nil")))
 	(princ (format "Global: %s" (or (nth 3 ret) "nil")))))
     ret))
-(bind-key "C-h C-k" 'nispio/locate-key-binding)
+(bind-key "C-h k" 'nispio/locate-key-binding)
 
 (local-key-binding (format "%c" (? (kbd "C-h")) )
 (lookup-key (current-local-map) (kbd "C-h k"))
