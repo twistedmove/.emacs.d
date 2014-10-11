@@ -38,9 +38,6 @@
 
 (load-file "~/.emacs.d/nispio/init-packages.el")
 
-(de)
-(bind-key "M-" 'find-name-dired)
-
 ;; Use "ido" completion wherever possible
 ;; (source: https://github.com/DarwinAwardWinner/ido-ubiquitous)
 (use-package ido-ubiquitous

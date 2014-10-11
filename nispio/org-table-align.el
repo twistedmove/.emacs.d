@@ -1,3 +1,8 @@
+;; This function is meant to replace org-table-align to change the way that
+;; truncation works for right-aligned columns. It was provided as a response to
+;; the following Emacs.SE question:
+;; http://emacs.stackexchange.com/a/746/93
+
 (eval-after-load "org-table"
   (progn
     (defun nispio/org-table-align ()

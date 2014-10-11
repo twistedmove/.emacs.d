@@ -41,7 +41,7 @@
  '(mode-line ((t (:box nil))))
  '(mode-line-highlight ((t (:box nil))))
  '(mode-line-inactive ((t (:box nil))))
- '(org-table ((t (:foreground "DodgerBlue"))) t))
+ '(org-table ((t (:foreground "DodgerBlue")))))
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -49,6 +49,7 @@
  ;; If there is more than one, they won't work right.
  '(Buffer-menu-name-width 50)
  '(column-number-mode t)
+ '(dired-omit-files "^\\.?#")
  '(display-time-mode t)
  '(font-lock-maximum-decoration (quote ((t . t) (dired-mode . 2))))
  '(ibuffer-elide-long-columns t)

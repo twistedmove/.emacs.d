@@ -57,51 +57,15 @@ It seems that there
 
 (progn
 
-(defun my-trim-string (arg) 
-"Simple function for trimming the whitespace from the ends of
+  (defun my-trim-string (arg) 
+	"Simple function for trimming the whitespace from the ends of
  a string. Also removes any string properties such as font faces."
- (let ((str (substring-no-properties arg)))
-    (when (string-match "^[ \t]+" str)
-      (setq str (replace-match "" nil nil str)))
-    (when (string-match "[ \t]+$" str)
-      (setq str (replace-match "" nil nil str)))
-    str))
-
-(defun my-org-table-location (&optional arg)
-"Get the location "
-  (interactive "P")
-  (when (eq 'org-mode major-mode)
-    (org-table-get-specials)
-    (let* ((row (org-table-current-dline))
-	   (col (org-table-current-column))
-	   (loc (if arg
-		    (format "%c%02d" (+ 64 col) row)
-		  (format "@%d$%d" row col))))
-      (when (called-interactively-p 'any)
-	(message "Field Location: %s" loc))
-      loc)))
-
-(defun my-org-table-field (&optional arg)
-  (interactive "P")
-  (when (eq 'org-mode major-mode)
-    (org-table-get-specials)
-    (let* ((formula (org-table-current-field-formula))
-	   (value (my-trim-string (org-table-get-field)))
-	   (field (or (and arg formula) field)))
-      (when (called-interactively-p 'any)
-	(message "Field Value: %s" loc))
-      field)))
-
-;; Define the format 
-(setq my-org-table-header
-  (list '(:eval (let ((loc (my-org-table-location))
-		      (field (my-org-table-field)))
-		  (format " %s: %s" loc field)))))
-
-(defun my-org-mode-setup ()
-  "Apply custom setup to org-mode buffers"
-  (setq-local header-line-format my-org-table-header))
-(add-hook 'org-mode-hook 'my-org-mode-setup)
+	(let ((str (substring-no-properties arg)))
+	  (when (string-match "^[ \t]+" str)
+		(setq str (replace-match "" nil nil str)))
+	  (when (string-match "[ \t]+$" str)
+		(setq str (replace-match "" nil nil str)))
+	  str))
 
 )
 
@@ -117,7 +81,7 @@ It seems that there
 		   (local-key-binding key)
 		   (global-key-binding key))))
     (when (called-interactively-p 'any)
-      (with-output-to-temp-buffer "*locate-key*"
+      (with-output-to-org-buffer "*locate-key*"
 	;; (split-window-vertically -4)
 	(princ (format "Key Bindings for %s\n\n" (key-description key)))
 	(princ (format "At Point: %s\n" (or (nth 0 ret) "nil")))
@@ -170,3 +134,54 @@ It seems that there
 (setq test-dummy t)
 (key-binding (kbd "C-h k"))
 (key-description (kbd "C-h k"))
+
+    (defun my-export-to-parent ()
+      "Exports the table in the current buffer back to its parent TSV file and
+    then closes this buffer."
+      (unless (org-at-table-p)
+        (error "No table at point"))
+      (require 'org-exp)
+      (org-table-align)
+      (let ((buf (current-buffer))
+            (file parent-file)
+            (fmt "orgtbl-to-tsv"))
+        (org-table-export file "orgtbl-to-tsv")
+        (set-buffer-modified-p nil)
+        (switch-to-buffer (find-file-noselect file))
+        (kill-buffer buf)))
+    
+    (defun my-edit-tsv-as-orgtbl ()
+      "Convet the current TSV buffer into an org table in a separate file. Saving
+    the table will convert it back to TSV and jump back to the original file"
+      (interactive)
+      (let* ((buf (current-buffer))
+             (file (buffer-file-name buf))
+             (beg (buffer-end -1))
+             (end (buffer-end 1))
+             (txt (buffer-substring-no-properties beg end))
+             (org-buf (find-file-noselect (concat (buffer-name) ".org"))))
+        (save-buffer buf)
+        (with-current-buffer org-buf
+          (erase-buffer)
+          (insert txt "\n")
+          (org-table-convert-region (buffer-end -1) (buffer-end 1) '(16))
+          (setq-local parent-file file)
+          (add-hook 'after-save-hook 'my-export-to-parent nil t))
+        (switch-to-buffer org-buf)
+        (kill-buffer buf)))
+    
+    ;; Open the current TSV file as an org table
+    (global-set-key (kbd "C-c |") 'my-edit-tsv-as-orgtbl)   
+    
+	  (with-current-buffer (find-file-noselect file)
+	    (setq buf (current-buffer))
+	    (erase-buffer)
+	    (fundamental-mode)
+	    (insert txt "\n")
+	    (save-buffer))
+	  (kill-buffer buf)
+	  (message "Export done."))
+      (error "TABLE_EXPORT_FORMAT invalid"))))
+
+  
+)
