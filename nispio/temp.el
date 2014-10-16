@@ -26,6 +26,8 @@
 		   ([remap transpose-words] . transpose-sexps)
 		   )
 
+(require 'thingatpt)
+
 (global-set-key [remap list-buffers] 'ibuffer)
 
 (bind-keys :map matlab-mode-map
@@ -34,19 +36,18 @@
 		   ("C-j" . backward-char)
 		   ("C-l" . forward-char))
 
-It seems that there
 
-    (defun my-magical-keys ()
-      (local-set-key (kbd "C-i") 'previous-line)
-      (local-set-key (kbd "C-k") 'next-line)
-      (local-set-key (kbd "C-j") 'backward-char)
-      (local-set-key (kbd "C-l") 'forward-char))
-    (add-hook 'my-magical-mode-hook 'my-matlab-keys)
-    
-    (define-key my-magical-mode-map (kbd "C-i") 'previous-line)
-    (define-key my-magical-mode-map (kbd "C-k") 'next-line)
-    (define-key my-magical-mode-map (kbd "C-j") 'backward-char)
-    (define-key my-magical-mode-map (kbd "C-l") 'forward-char)
+(defun my-magical-keys ()
+  (local-set-key (kbd "C-i") 'previous-line)
+  (local-set-key (kbd "C-k") 'next-line)
+  (local-set-key (kbd "C-j") 'backward-char)
+  (local-set-key (kbd "C-l") 'forward-char))
+(add-hook 'my-magical-mode-hook 'my-matlab-keys)
+
+(define-key my-magical-mode-map (kbd "C-i") 'previous-line)
+(define-key my-magical-mode-map (kbd "C-k") 'next-line)
+(define-key my-magical-mode-map (kbd "C-j") 'backward-char)
+(define-key my-magical-mode-map (kbd "C-l") 'forward-char)
 
 (setq matlab-mode-map (make-sparse-keymap))
 
@@ -55,21 +56,6 @@ It seems that there
 (global-set-key "k" 'self-insert-command)		   
 (global-set-key "l" 'self-insert-command)		   
 
-(progn
-
-  (defun my-trim-string (arg) 
-	"Simple function for trimming the whitespace from the ends of
- a string. Also removes any string properties such as font faces."
-	(let ((str (substring-no-properties arg)))
-	  (when (string-match "^[ \t]+" str)
-		(setq str (replace-match "" nil nil str)))
-	  (when (string-match "[ \t]+$" str)
-		(setq str (replace-match "" nil nil str)))
-	  str))
-
-)
-
-;; (bind-key "C-h C-." 'nispio/show-trimmed-help-string)
 
 ;; Show a list of all 
 ;; (source: http://emacs.stackexchange.com/a/654/93)
@@ -95,7 +81,7 @@ It seems that there
     ret))
 (bind-key "C-h k" 'nispio/locate-key-binding)
 
-(local-key-binding (format "%c" (? (kbd "C-h")) )
+(local-key-binding (format "%c" (? (kbd "C-h")))
 (lookup-key (current-local-map) (kbd "C-h k"))
 (local-set-key (kbd "C-M-j") 'eval-print-last-sexp)
 
@@ -135,53 +121,119 @@ It seems that there
 (key-binding (kbd "C-h k"))
 (key-description (kbd "C-h k"))
 
-    (defun my-export-to-parent ()
-      "Exports the table in the current buffer back to its parent TSV file and
+(defun my-export-to-parent ()
+  "Exports the table in the current buffer back to its parent TSV file and
     then closes this buffer."
-      (unless (org-at-table-p)
-        (error "No table at point"))
-      (require 'org-exp)
-      (org-table-align)
-      (let ((buf (current-buffer))
-            (file parent-file)
-            (fmt "orgtbl-to-tsv"))
-        (org-table-export file "orgtbl-to-tsv")
-        (set-buffer-modified-p nil)
-        (switch-to-buffer (find-file-noselect file))
-        (kill-buffer buf)))
-    
-    (defun my-edit-tsv-as-orgtbl ()
-      "Convet the current TSV buffer into an org table in a separate file. Saving
-    the table will convert it back to TSV and jump back to the original file"
-      (interactive)
-      (let* ((buf (current-buffer))
-             (file (buffer-file-name buf))
-             (beg (buffer-end -1))
-             (end (buffer-end 1))
-             (txt (buffer-substring-no-properties beg end))
-             (org-buf (find-file-noselect (concat (buffer-name) ".org"))))
-        (save-buffer buf)
-        (with-current-buffer org-buf
-          (erase-buffer)
-          (insert txt "\n")
-          (org-table-convert-region (buffer-end -1) (buffer-end 1) '(16))
-          (setq-local parent-file file)
-          (add-hook 'after-save-hook 'my-export-to-parent nil t))
-        (switch-to-buffer org-buf)
-        (kill-buffer buf)))
-    
-    ;; Open the current TSV file as an org table
-    (global-set-key (kbd "C-c |") 'my-edit-tsv-as-orgtbl)   
-    
-	  (with-current-buffer (find-file-noselect file)
-	    (setq buf (current-buffer))
-	    (erase-buffer)
-	    (fundamental-mode)
-	    (insert txt "\n")
-	    (save-buffer))
-	  (kill-buffer buf)
-	  (message "Export done."))
-      (error "TABLE_EXPORT_FORMAT invalid"))))
+  (unless (org-at-table-p)
+	(error "No table at point"))
+  (require 'org-exp)
+  (org-table-align)
+  (let ((buf (current-buffer))
+		(file parent-file)
+		(fmt "orgtbl-to-tsv"))
+	(org-table-export file "orgtbl-to-tsv")
+	(set-buffer-modified-p nil)
+	(switch-to-buffer (find-file-noselect file))
+	(kill-buffer buf)))
 
-  
+(defun my-edit-tsv-as-orgtbl ()
+  "Convet the current TSV buffer into an org table in a separate file. Saving
+    the table will convert it back to TSV and jump back to the original file"
+  (interactive)
+  (let* ((buf (current-buffer))
+		 (file (buffer-file-name buf))
+		 (beg (buffer-end -1))
+		 (end (buffer-end 1))
+		 (txt (buffer-substring-no-properties beg end))
+		 (org-buf (find-file-noselect (concat (buffer-name) ".org"))))
+	(save-buffer buf)
+	(with-current-buffer org-buf
+	  (erase-buffer)
+	  (insert txt "\n")
+	  (org-table-convert-region (buffer-end -1) (buffer-end 1) '(16))
+	  (setq-local parent-file file)
+	  (add-hook 'after-save-hook 'my-export-to-parent nil t))
+	(switch-to-buffer org-buf)
+	(kill-buffer buf)))
+
+;; Open the current TSV file as an org table
+(global-set-key (kbd "C-c |") 'my-edit-tsv-as-orgtbl)   
+
+;; (with-current-buffer (find-file-noselect file)
+;;   (setq buf (current-buffer))
+;;   (erase-buffer)
+;;   (fundamental-mode)
+;;   (insert txt "\n")
+;;   (save-buffer))
+;; (kill-buffer buf)
+;; (message "Export done."))
+;; (error "TABLE_EXPORT_FORMAT invalid"))
+
+(require 'cl)
+(defun org-transpose-table-at-point ()
+  "Transpose orgmode table at point, eliminate hlines."
+  (interactive)
+  (let ((contents (apply #'mapcar* #'list    ;; <== LOB magic imported here
+                         (remove-if-not 'listp  ;; remove 'hline from list
+                                        (org-table-to-lisp))))  ;; signals error if not table
+        )
+    (delete-region (org-table-begin) (org-table-end))
+    (insert (mapconcat (lambda(x) (concat "| " (mapconcat 'identity x " | " ) " |\n" ))
+                       contents
+                       ""))
+    (org-table-align)
+    )
 )
+
+;; Make ibuffer auto-update after changes
+;; (source: http://emacs.stackexchange.com/a/2179/93)
+(defun nispio/ibuffer-stale-p (&optional noconfirm)
+  (frame-or-buffer-changed-p 'ibuffer-auto-buffers-changed))
+(defun nispio/ibuffer-auto-revert-setup ()
+  (set (make-local-variable 'buffer-stale-function)
+       'nispio/ibuffer-stale-p)
+  (auto-revert-mode 1))
+(add-hook 'ibuffer-mode-hook 'nispio/ibuffer-auto-revert-setup)
+
+(bind-key (kbd "C-7") 'helm-find-files global-map)
+(bind-key (kbd "C-8") 'helm-buffers-list global-map)
+
+(bind-key (kbd "C-9") 'phi-search-from-isearch-mc/mark-all isearch-mode-map)
+
+
+(defun phi-search-complete-with-selection ()
+  (interactive)
+  (let ((query (buffer-string)))
+    (phi-search-complete)
+    (mc/execute-command-for-all-cursors
+     (lambda ()
+       (interactive)
+       (when (looking-back query)
+         (push-mark (match-beginning 0) t t)
+         (goto-char (match-end 0))
+         (activate-mark))))))
+(bind-key (kbd "C-9") 'phi-search-complete-with-selection)
+
+(bind-key (kbd "C-8") helm-command-map (current-global-map))
+
+;; Show the current function name in the header line
+(which-function-mode)
+(setq-default header-line-format
+              '((which-func-mode ("//" which-func-format " "))))
+(setq mode-line-misc-info
+	  (assq-delete-all 'which-func-mode mode-line-misc-info))
+(set-face-attribute 'which-func nil
+  :foreground nil
+  :background nil
+  :inherit font-lock-comment-face)
+
+
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(which-func ((t (:inherit font-lock-comment-face :foreground nil :background nil)))))
+
+
+(format "%s" (face-id 'which-func))

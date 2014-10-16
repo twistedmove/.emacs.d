@@ -1,0 +1,4 @@
+#! /bin/tcsh
+
+setenv TMP /tmp/tmp.emacspipe && cat > $TMP && emacsclient -n $TMP ; rm $TMP
+

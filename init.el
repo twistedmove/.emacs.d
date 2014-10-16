@@ -3,6 +3,11 @@
 (message "Begin initialization file init.el")
 (switch-to-buffer "*Messages*")
 
+;; Start the server
+(require 'server)
+(unless (server-running-p)
+  (server-start))
+
 ;; parse command line arguments
 (setq init-file-broken-p (member "--broken" command-line-args))
 (setq command-line-args (delete "--broken" command-line-args))
@@ -37,6 +42,14 @@
 (setq frame-title-format "emacs - %b")  ; Set frame title to "emacs - <buffer name>"
 
 (load-file "~/.emacs.d/nispio/init-packages.el")
+(load-file "~/.emacs.d/nispio/xmidas.el")
+(load-file "~/.emacs.d/nispio/dsv-to-orgtbl.el")
+(load-file "~/.emacs.d/nispio/org-table-header.el")
+(load-file "~/.emacs.d/nispio/org-table-align.el")
+
+;; Use a more powerful alternative to ido-mode's flex matching.
+;; (source: https://github.com/lewang/flx.git)
+(use-package flx-ido :ensure t)
 
 ;; Use "ido" completion wherever possible
 ;; (source: https://github.com/DarwinAwardWinner/ido-ubiquitous)
@@ -93,12 +106,31 @@
 
     (bind-key "C-c M-x" 'helm-M-x)
     (bind-key "C-h a" 'helm-apropos)
-    (bind-key "C-h p" 'helm-package)
+    (bind-key "C-h p" 'helm-list-elisp-packages)
 
     (bind-key "M-s b" 'nispio/helm-moccur-buffers)
     (bind-key "M-s a" 'helm-do-grep)
     (bind-key "M-s o" 'helm-occur)
     (bind-key "M-s r" 'helm-register)))
+
+
+;; Manage and navigate projects easily in Emacs
+;; (source: https://github.com/bbatsov/projectile.git)
+(use-package projectile
+  :ensure t
+  :init
+  (projectile-global-mode)
+  (setq projectile-enable-caching t)
+
+  ;; Emacs frontend to GNU Global source code tagging system.
+  ;; (source: https://github.com/leoliu/ggtags)
+  (use-package ggtags :ensure t)
+
+  ;; Use helm for projectile
+  (use-package helm-projectile
+	:ensure t
+	:init
+	(helm-projectile-on)))
 
 
 ;; Display line numbers in all programming buffers
@@ -150,53 +182,6 @@
   buffer-file-name)
 (define-key ctl-x-map (kbd "<f1>") 'nispio/buffer-file-name)
 
-;; Unbind a local key binding
-(defun nispio/unbind-local-key (key)
-  (interactive "kPress key: ")
-  (let ((name (key-description key))
-    (binding (local-key-binding key)))
-    (if (not binding)
-    (message "Key is not bound locally: %s" name)
-      (local-set-key key nil)
-      (message "Unbinding key: %s (was '%s)" name binding))))
-(bind-key* "C-h C-M-k" 'nispio/unbind-local-key)
-
-;; Look for special keybindings associated with overlays or text properties
-;; (source: http://emacs.stackexchange.com/a/654/93)
-(defun nispio/key-binding-at-point (key)
-  (mapcar (lambda (keymap) (lookup-key keymap key))
-          (cl-remove-if-not
-           #'keymapp
-           (append
-            (mapcar (lambda (overlay)
-                      (overlay-get overlay 'keymap))
-                    (overlays-at (point)))
-            (get-text-property (point) 'keymap)
-            (get-text-property (point) 'local-map)))))
-
-;; Show a list of all 
-;; (source: http://emacs.stackexchange.com/a/654/93)
-(defun nispio/locate-key-binding (key)
-  "Determine in which keymap KEY is defined."
-  (interactive "kPress key: ")
-  (let ((ret (list (nispio/key-binding-at-point key)
-           (minor-mode-key-binding key)
-           (local-key-binding key)
-           (global-key-binding key))))
-    (when (called-interactively-p 'any)
-      (with-output-to-temp-buffer "*locate-key*"
-    ;; (split-window-vertically -4)
-    (princ (format "Key Bindings for %s\n\n" (key-description key)))
-    (princ (format "At Point: %s\n" (or (nth 0 ret) "nil")))
-    (princ (format "Minor-mode: %s\n"
-               (or (and (nth 1 ret)
-                (mapconcat
-                 (lambda (x) (format "%s: %s" (car x) (cdr x)))
-                 (nth 1 ret) "\n            ")) "nil")))
-    (princ (format "Local: %s\n" (or (nth 2 ret) "nil")))
-    (princ (format "Global: %s" (or (nth 3 ret) "nil")))))
-    ret))
-(bind-key "C-h k" 'nispio/locate-key-binding)
 
 
 (defun nispio/insert-key-description (key &optional arg)
@@ -225,12 +210,25 @@ minibuffer instead of inserting it at point."
     ;; Command to open all marked files at once
     (bind-keys :map dired-mode-map
            ("F" . dired-do-find-marked-files)
-           ("/" . isearch-forward))
+           ("/" . phi-search))
     ;; When opening a directory in dired, reuse the current buffer
     (diredp-toggle-find-file-reuse-dir 1)))
 
-;; Use ibuffer in place of the standard list-buffers
+
+;; Make ibuffer auto-update after changes
+;; (source: http://emacs.stackexchange.com/a/2179/93)
+(defun nispio/ibuffer-stale-p (&optional noconfirm)
+  (frame-or-buffer-changed-p 'ibuffer-auto-buffers-changed))
+(defun nispio/ibuffer-auto-revert-setup ()
+  (set (make-local-variable 'buffer-stale-function)
+       'nispio/ibuffer-stale-p)
+  (setq-local auto-revert-verbose nil)
+  (auto-revert-mode 1))
+(add-hook 'ibuffer-mode-hook 'nispio/ibuffer-auto-revert-setup)
+
+;; Use ibuffer in place of the standard list-buffers command
 (bind-key "C-x C-b" 'ibuffer)
+
 
 ;; Easily re-arrange buffers within the frame
 ;; (source: http://www.emacswiki.org/emacs/download/buffer-move.el)
@@ -623,7 +621,6 @@ Recognized window header names are: 'comint, 'locals, 'registers,
           ("s" . stack)
           ("b" . breakpoints)
           ("t" . threads)))
-
 
 ;; Settings modified via the Customize interface get their own file
 (if window-system

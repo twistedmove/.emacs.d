@@ -14,7 +14,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :stipple nil :background "black" :foreground "WhiteSmoke" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 113 :width normal :foundry "unknown" :family "DejaVu Sans Mono"))))
+ '(default ((t (:inherit nil :stipple nil :background "black" :foreground "WhiteSmoke" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 98 :width normal :foundry "unknown" :family "DejaVu Sans Mono"))))
  '(column-marker-1 ((t (:background "DarkOrange3"))))
  '(diredp-dir-heading ((t (:foreground "orange red"))))
  '(diredp-dir-priv ((t (:background "black"))))
@@ -41,7 +41,8 @@
  '(mode-line ((t (:box nil))))
  '(mode-line-highlight ((t (:box nil))))
  '(mode-line-inactive ((t (:box nil))))
- '(org-table ((t (:foreground "DodgerBlue")))))
+ '(org-table ((t (:foreground "DodgerBlue"))) t)
+ '(which-func ((t (:foreground "deep sky blue")))))
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -52,6 +53,9 @@
  '(dired-omit-files "^\\.?#")
  '(display-time-mode t)
  '(font-lock-maximum-decoration (quote ((t . t) (dired-mode . 2))))
+ '(font-use-system-font t)
+ '(helm-buffer-max-length 30)
+ '(helm-truncate-lines t)
  '(ibuffer-elide-long-columns t)
  '(ibuffer-formats (quote ((mark modified read-only " " (name 35 35 :left :elide) " " (size 9 -1 :right) " " (mode 16 16 :left :elide) " " filename-and-process) (mark " " (name 16 -1) " " filename))))
  '(ibuffer-saved-filter-groups (quote (("default" ("File Buffers" (filename . ".+")) ("Dired Buffers" (used-mode . dired-mode)) ("Special Buffers" (name . "\\b\\*.*\\*\\b"))))))
@@ -63,6 +67,7 @@
  '(minimap-recenter-type (quote relative))
  '(minimap-resizes-buffer t)
  '(mlint-programs (quote ("/usr/local/MATLAB/R2014a/bin/glnxa64/mlint")))
+ '(projectile-mode-line (quote (:eval (format " Prj[%s]" (projectile-project-name)))))
  '(safe-local-variable-values (quote ((visual-line-mode . t) (auto-fill-mode . 0))))
  '(save-interprogram-paste-before-kill t)
  '(show-paren-mode t)

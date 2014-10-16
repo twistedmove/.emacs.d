@@ -8,6 +8,7 @@
 		TeX-insert-backslash
 		TeX-insert-dollar
 		TeX-insert-sub-or-superscript
+		backward-sexp
 		beginning-of-visual-line
 		c-electric-brace
 		c-electric-colon
@@ -38,6 +39,7 @@
 		matlab-comment
 		matlab-electric-comment
 		matlab-linefeed
+		org-backward-sentence
 		org-beginning-of-line
 		org-delete-char
 		org-end-of-line
@@ -78,6 +80,7 @@
 		mouse-save-then-kill
 		multiple-cursors-mode
 		nispio/other-window
+		org-ctrl-c-ctrl-c
 		overwrite-mode
 		scroll-other-window
 		view-lossage
