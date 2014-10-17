@@ -3,10 +3,21 @@
 (message "Begin initialization file init.el")
 (switch-to-buffer "*Messages*")
 
+;; Set load paths for lisp files
+(add-to-list 'load-path "~/.emacs.d/site-lisp")
+(add-to-list 'load-path "~/.emacs.d/nispio")
+
+;; Load my own minor mode for personal keybindings
+(require 'my-mode)
+(enable-my-global-mode)
+(global-set-key (kbd "C-M-&") 'enable-my-global-mode)
+(define-key my-map (kbd "C-1") my-map)
+
 ;; Start the server
 (require 'server)
-(unless (server-running-p)
-  (server-start))
+(when (server-running-p)
+	(server-force-delete))
+(server-start)
 
 ;; parse command line arguments
 (setq init-file-broken-p (member "--broken" command-line-args))
@@ -14,10 +25,6 @@
 
 (when init-file-broken-p
     (message "Hooray! It's broken!"))
-
-;; Set load paths for lisp files
-(add-to-list 'load-path "~/.emacs.d/site-lisp")
-(add-to-list 'load-path "~/.emacs.d/nispio")
 
 ;; Basic emacs settings
 (show-paren-mode 1)						; Show matching parenthesis
@@ -42,6 +49,7 @@
 (setq frame-title-format "emacs - %b")  ; Set frame title to "emacs - <buffer name>"
 
 (load-file "~/.emacs.d/nispio/init-packages.el")
+(load-file "~/.emacs.d/nispio/bindings.el")
 (load-file "~/.emacs.d/nispio/xmidas.el")
 (load-file "~/.emacs.d/nispio/dsv-to-orgtbl.el")
 (load-file "~/.emacs.d/nispio/org-table-header.el")
@@ -61,8 +69,8 @@
     (ido-mode 1)                        ; Enable ido mode (interactively do)
     (ido-ubiquitous-mode 1)))           ; Enable ido mode almost everywhere
   
-(bind-key "M-s n" 'find-name-dired)
-(bind-key* "C-h B" 'describe-personal-keybindings)
+(define-key my-map (kbd "M-s n") 'find-name-dired)
+(define-key my-map (kbd "C-h B") 'describe-personal-keybindings)
 
 ;; Use incremental completion and selection narrowing
 ;; (source: https://github.com/emacs-helm/helm)
@@ -77,7 +85,10 @@
     ;; (source: https://github.com/emacs-helm/helm-descbinds)
     (use-package helm-descbinds
       :ensure t
-      :bind ("C-h b" . helm-descbinds))
+      :config
+	  (define-key my-map (kbd "C-h b") 'helm-descbinds))
+
+	(use-package helm-helm-commands :ensure t)
 
     ;; Turn on follow mode when using multi-occur
     (require 'helm-regexp)
@@ -102,16 +113,18 @@
       (with-selected-window (helm-window)
     (delete-other-windows)))
 
-    (bind-key "M-1" 'nispio/helm-full-frame helm-map)
+	(define-key my-map (kbd "C-8") helm-command-map)
+	(define-key helm-command-map (kbd "C-8") 'helm-helm-commands)
 
-    (bind-key "C-c M-x" 'helm-M-x)
-    (bind-key "C-h a" 'helm-apropos)
-    (bind-key "C-h p" 'helm-list-elisp-packages)
+    (define-key helm-map (kbd "M-1") 'nispio/helm-full-frame)
 
-    (bind-key "M-s b" 'nispio/helm-moccur-buffers)
-    (bind-key "M-s a" 'helm-do-grep)
-    (bind-key "M-s o" 'helm-occur)
-    (bind-key "M-s r" 'helm-register)))
+    (define-key my-map (kbd "C-h a") 'helm-apropos) ;; Replaces apropos-command
+    (define-key my-map (kbd "C-h p") 'helm-list-elisp-packages)
+
+    (define-key my-map (kbd "M-s b") 'nispio/helm-moccur-buffers)
+    (define-key my-map (kbd "M-s a") 'helm-do-grep)
+    (define-key my-map (kbd "M-s o") 'helm-occur) ;; Replaces occur
+    (define-key my-map (kbd "M-s r") 'helm-register)))
 
 
 ;; Manage and navigate projects easily in Emacs
@@ -130,7 +143,10 @@
   (use-package helm-projectile
 	:ensure t
 	:init
-	(helm-projectile-on)))
+	(helm-projectile-on))
+  
+  (define-key my-map (kbd "C-7") projectile-command-map)
+  (define-key projectile-command-map (kbd "\\") 'projectile-find-other-file))
 
 
 ;; Display line numbers in all programming buffers
@@ -161,12 +177,12 @@
 
 ;; Easier navigation between windows/frames
 (defun nispio/other-window (&optional arg)
-  "With prefix argument, select the next frame. Otherwise, select the next window"
+  "Cycle through windows. With prefix arg, cycle backwards"
   (interactive "P")
   (let* ((N (or (and (consp arg) -1) arg 1)))
-    (other-window N t)
+    (other-window N 'visible)
     (select-frame-set-input-focus (selected-frame))))
-(bind-key* "C-\\" 'nispio/other-window)
+(define-key my-map (kbd "C-\\") 'nispio/other-window)
 
 (defun nispio/show-prefix-arg (&optional arg)
   (interactive "P")
@@ -180,24 +196,8 @@
   (interactive)
   (message (or buffer-file-name "no file"))
   buffer-file-name)
-(define-key ctl-x-map (kbd "<f1>") 'nispio/buffer-file-name)
+(define-key my-map (kbd "C-x <f1>") 'nispio/buffer-file-name)
 
-
-
-(defun nispio/insert-key-description (key &optional arg)
-"Capture a keybinding directly from the keyboard and insert its string
-representation at point. With optional ARG, display the key description in the
-minibuffer instead of inserting it at point."
-  (interactive "k\nP")
-  (let ((desc (key-description key)))
-	(if arg (message desc) (insert desc))))
-(bind-key* "C-h C-k" 'nispio/insert-key-description)
-
-;(use-package thing-cmds :ensure t)
-
-;; Other keybindings
-(global-set-key (kbd "M-1") 'delete-other-windows)
-(global-set-key (kbd "M-0") 'kill-buffer-and-window)
 
 ;; Extend dired functionality
 (use-package dired+
@@ -208,9 +208,8 @@ minibuffer instead of inserting it at point."
     
     (require 'dired-x)
     ;; Command to open all marked files at once
-    (bind-keys :map dired-mode-map
-           ("F" . dired-do-find-marked-files)
-           ("/" . phi-search))
+    (define-key dired-mode-map (kbd "F") 'dired-do-find-marked-files)
+    (define-key dired-mode-map (kbd "/") 'phi-search)
     ;; When opening a directory in dired, reuse the current buffer
     (diredp-toggle-find-file-reuse-dir 1)))
 
@@ -226,31 +225,26 @@ minibuffer instead of inserting it at point."
   (auto-revert-mode 1))
 (add-hook 'ibuffer-mode-hook 'nispio/ibuffer-auto-revert-setup)
 
-;; Use ibuffer in place of the standard list-buffers command
-(bind-key "C-x C-b" 'ibuffer)
-
 
 ;; Easily re-arrange buffers within the frame
 ;; (source: http://www.emacswiki.org/emacs/download/buffer-move.el)
 (use-package buffer-move
   :ensure t
-  :bind
-  (("C-c <C-up>" . buf-move-up)
-   ("C-c <C-down>" . buf-move-down)
-   ("C-c <C-left>" . buf-move-left)
-   ("C-c <C-right>" . buf-move-right)))
+  :config
+  (define-key my-map (kbd "C-c <C-up>") 'buf-move-up)
+  (define-key my-map (kbd "C-c <C-down>") 'buf-move-down)
+  (define-key my-map (kbd "C-c <C-left>") 'buf-move-left)
+  (define-key my-map (kbd "C-c <C-right>") 'buf-move-right))
 
 ;; Keybindings to change the window size
-(bind-keys
- ("C-S-<left>" . shrink-window-horizontally)
- ("C-S-<right>" . enlarge-window-horizontally)
- ("C-S-<up>" . shrink-window)
- ("C-S-<down>" . enlarge-window)
- ;; Repeat the same bindings for TTY mode
- ("M-o 6 d" . shrink-window-horizontally)
- ("M-o 6 c" . enlarge-window-horizontally)
- ("M-o 6 a" . shrink-window)
- ("M-o 6 b" . enlarge-window))
+(define-key my-map (kbd "C-S-<left>") 'shrink-window-horizontally)
+(define-key my-map (kbd "C-S-<right>") 'enlarge-window-horizontally)
+(define-key my-map (kbd "C-S-<up>") 'shrink-window)
+(define-key my-map (kbd "C-S-<down>") 'enlarge-window)
+(define-key my-map (kbd "M-o 6 d") 'shrink-window-horizontally)
+(define-key my-map (kbd "M-o 6 c") 'enlarge-window-horizontally)
+(define-key my-map (kbd "M-o 6 a") 'shrink-window)
+(define-key my-map (kbd "M-o 6 b") 'enlarge-window)
 
 ;; Custom function to toggle fullscreen by maximizing or restoring the current frame.
 (defvar nispio/fullscreen-p t "Check if fullscreen is on or off")
@@ -267,8 +261,8 @@ minibuffer instead of inserting it at point."
   (setq nispio/fullscreen-p (not nispio/fullscreen-p))
   (if nispio/fullscreen-p (nispio/restore-frame) (nispio/maximize-frame)))
 
-(bind-key "<f12>" 'nispio/toggle-fullscreen)
-(bind-key "<S-f12>" 'delete-frame)
+(define-key my-map (kbd "<f12>") 'nispio/toggle-fullscreen)
+(define-key my-map (kbd "<S-f12>") 'delete-frame)
 
 ;; Make sure that the cygwin bash executable can be found (Windows Emacs)
 (when (eq system-type 'windows-nt)
@@ -280,65 +274,61 @@ minibuffer instead of inserting it at point."
 ;; (source: http://www.emacswiki.org/emacs/download/lorem-ipsum.el)
 (use-package lorem-ipsum
   :ensure t
-  :bind ("C-c C-l" . Lorem-ipsum-insert-paragraphs))
+  :init
+  (define-key my-map (kbd "C-c C-l")  'Lorem-ipsum-insert-paragraphs))
 
 ;; Add support for isearch functionality with multiple cursors
 ;; (source: https://github.com/zk-phi/phi-search)
 (use-package phi-search
   :ensure t
-  :bind 
-  (("C-s" . phi-search)
-   ("C-r" . phi-search-backward))
   :config
-  (customize-set-value 'phi-search-case-sensitive 'guess))
+  (customize-set-value 'phi-search-case-sensitive 'guess)
+  (define-key my-map (kbd "C-s") 'phi-search)
+  (define-key my-map (kbd "C-r") 'phi-search-backward))
+
 
 ;; Add support for editing with multiple cursors
 ;; (source: https://github.com/magnars/multiple-cursors.el)
 (use-package multiple-cursors
   :ensure t
-  :bind (("C->" . mc/mark-next-like-this)
-     ("C-<" . mc/mark-previous-like-this)
-     ("C-c C-<" . mc/mark-all-like-this)
-     ("C-c C->" . mc/mark-more-like-this-extended)
-     ("C-S-c C-S-c" . mc/edit-lines)
-     ("C-S-c C-<" . mc/mark-all-in-region)
-     ("<f7>" . multiple-cursors-mode)
-     ;; Keybindings for TTY mode
-     ("M-[ 1 ; 6 n" . mc/mark-next-like-this)
-     ("M-[ 1 ; 6 l" . mc/mark-previous-like-this)
-     ("C-c M-[ 1 ; 6 l" . mc/mark-all-like-this)
-     ("C-c M-[ 1 ; 6 n" . mc/mark-more-like-this-extended))
-
   :init
   (progn
     (defun nispio/fake-cursor-at-point ()
       (interactive)
       (mc/create-fake-cursor-at-point))
-    (bind-key "C-c C-SPC" 'nispio/fake-cursor-at-point)
+
+    (define-key my-map (kbd "C-c C-SPC") 'nispio/fake-cursor-at-point)
+	(define-key my-map (kbd "C->") 'mc/mark-next-like-this)
+	(define-key my-map (kbd "C-<") 'mc/mark-previous-like-this)
+	(define-key my-map (kbd "C-c C-<") 'mc/mark-all-like-this)
+	(define-key my-map (kbd "C-c C->") 'mc/mark-more-like-this-extended)
+	(define-key my-map (kbd "C-S-c C-S-c") 'mc/edit-lines)
+	(define-key my-map (kbd "C-S-c C-<") 'mc/mark-all-in-region)
+	(define-key my-map (kbd "<f7>") 'multiple-cursors-mode)
 
     ;; Add extended interoperability between phi-search and multiple cursors
     ;; (source: https://github.com/knu/phi-search-mc.el)
     (when (package-installed-p 'phi-search)
       (use-package phi-search-mc
-    :ensure t
-    :init (phi-search-mc/setup-keys)))))
+		:ensure t
+		:init (phi-search-mc/setup-keys)))))
 
-(bind-keys
- ("C-c c" . comment-region)
- ("C-c u" . uncomment-region))
+(define-key my-map (kbd "C-c c") 'comment-region)
+(define-key my-map (kbd "C-c u") 'uncomment-region)
 
-(define-key ctl-x-map (kbd "<f5>") 'revert-buffer)
-(define-key ctl-x-map (kbd "<f6>") 'add-file-local-variable)
+(define-key my-map (kbd "C-x <f5>") 'revert-buffer)
+(define-key my-map (kbd "C-x <f6>") 'add-file-local-variable)
 
 ;; Unfortunately, multiple-cursors falls short on rectangular selection
 ;;   so I use rect-mark.el to fill in the gaps for now
 ;; (source: http://www.emacswiki.org/emacs/rect-mark.el)
 (use-package phi-rectangle
   :ensure t
-  :bind (("C-c C-SPC" . phi-rectangle-set-mark-command)
-     ("C-w" . phi-rectangle-kill-region)
-     ("M-w" . phi-rectangle-kill-ring-save)
-     ("C-y" . phi-rectangle-yank)))
+  :init 
+  (define-key my-map (kbd "C-c C-SPC") 'phi-rectangle-set-mark-command)
+  (define-key my-map (kbd "C-w") 'phi-rectangle-kill-region)
+  (define-key my-map (kbd "M-w") 'phi-rectangle-kill-ring-save)
+  (define-key my-map (kbd "C-y") 'phi-rectangle-yank))
 
 ;; Add support for editing matlab files
 ;; (source: http://matlab-emacs.cvs.sourceforge.net/viewvc/matlab-emacs/matlab-emacs/?view=tar)
@@ -383,7 +373,6 @@ minibuffer instead of inserting it at point."
 (use-package tex-site
   :ensure auctex
   :init
-  (use-package preview-latex)
   (setq
    TeX-auto-save t
    TeX-parse-self t
@@ -417,8 +406,9 @@ minibuffer instead of inserting it at point."
 (use-package sr-speedbar
   :ensure t
   :config
-  :bind (("C-c M-SPC" . sr-speedbar-toggle)
-     ("C-c C-g w" . sr-speedbar-select-window)))
+  (define-key my-map (kbd "C-c M-SPC") 'sr-speedbar-toggle)
+  (define-key my-map (kbd "C-c C-g w") 'sr-speedbar-select-window))
+
 
 (load-file "~/.emacs.d/nispio/init-devel.el")
 

@@ -58,5 +58,14 @@
 		function)
 	(message "%s is undefined" (key-description key))))
 
+(defun nispio/insert-key-description (key &optional arg)
+"Capture a keybinding directly from the keyboard and insert its string
+representation at point. With optional ARG, display the key description in the
+minibuffer instead of inserting it at point."
+  (interactive "k\nP")
+  (let ((desc (key-description key)))
+	(if arg (message desc) (insert desc))))
+
+(bind-key* "C-h C-k" 'nispio/insert-key-description)
 (bind-key "C-h k" 'nispio/locate-key-binding)
 (bind-key* "C-h C-M-k" 'nispio/unbind-local-key)

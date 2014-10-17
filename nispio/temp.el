@@ -195,10 +195,10 @@
   (auto-revert-mode 1))
 (add-hook 'ibuffer-mode-hook 'nispio/ibuffer-auto-revert-setup)
 
-(bind-key (kbd "C-7") 'helm-find-files global-map)
-(bind-key (kbd "C-8") 'helm-buffers-list global-map)
+;; (bind-key (kbd "C-7") 'helm-find-files global-map)
+;; (bind-key (kbd "C-8") 'helm-buffers-list global-map)
 
-(bind-key (kbd "C-9") 'phi-search-from-isearch-mc/mark-all isearch-mode-map)
+;; (bind-key (kbd "C-9") 'phi-search-from-isearch-mc/mark-all isearch-mode-map)
 
 
 (defun phi-search-complete-with-selection ()
@@ -213,6 +213,7 @@
          (goto-char (match-end 0))
          (activate-mark))))))
 (bind-key (kbd "C-9") 'phi-search-complete-with-selection)
+
 
 (bind-key (kbd "C-8") helm-command-map (current-global-map))
 
@@ -237,3 +238,31 @@
 
 
 (format "%s" (face-id 'which-func))
+
+(require 'scroll-restore)
+(scroll-restore-mode 1)
+;; Allow scroll-restore to modify the cursor face
+(setq scroll-restore-handle-cursor t)
+;; Make the cursor invisible while POINT is off-screen
+(setq scroll-restore-cursor-type nil)
+;; Jump back to the original cursor position after scrolling
+(setq scroll-restore-jump-back t)
+;; Toggle scroll-restore-mode with the Scroll Lock key
+(global-set-key (kbd "<Scroll_Lock>") 'scroll-restore-mode)
+
+
+(defun kill-back-to-indentation ()
+  "Kill from point back to the first non-whitespace character on the line."
+  (interactive)
+  (let ((prev-pos (point)))
+    (back-to-indentation)
+    (kill-region (point) prev-pos)))
+
+(define-key ido-completion-map (kbd "C-l") 'kill-back-to-indentation)
+
+(global-unset-key (kbd "C-8"))
+(require 'helm-helm-commands)
+(global-set-key (kbd "C-8 C-8") 'helm-helm-commands)
+
+
+

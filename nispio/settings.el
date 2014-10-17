@@ -42,7 +42,7 @@
  '(mode-line-highlight ((t (:box nil))))
  '(mode-line-inactive ((t (:box nil))))
  '(org-table ((t (:foreground "DodgerBlue"))) t)
- '(which-func ((t (:foreground "deep sky blue")))))
+ '(which-func ((t (:foreground "deep sky blue"))) t))
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -60,6 +60,8 @@
  '(ibuffer-formats (quote ((mark modified read-only " " (name 35 35 :left :elide) " " (size 9 -1 :right) " " (mode 16 16 :left :elide) " " filename-and-process) (mark " " (name 16 -1) " " filename))))
  '(ibuffer-saved-filter-groups (quote (("default" ("File Buffers" (filename . ".+")) ("Dired Buffers" (used-mode . dired-mode)) ("Special Buffers" (name . "\\b\\*.*\\*\\b"))))))
  '(ibuffer-saved-filters (quote (("gnus" ((or (mode . message-mode) (mode . mail-mode) (mode . gnus-group-mode) (mode . gnus-summary-mode) (mode . gnus-article-mode)))) ("programming" ((or (mode . emacs-lisp-mode) (mode . cperl-mode) (mode . c-mode) (mode . java-mode) (mode . idl-mode) (mode . lisp-mode)))))))
+ '(ido-default-buffer-method (quote selected-window))
+ '(ido-default-file-method (quote selected-window))
  '(ido-max-window-height 2)
  '(minimap-dedicated-window nil)
  '(minimap-display-semantic-overlays nil)
