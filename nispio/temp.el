@@ -266,3 +266,46 @@
 
 
 
+(defun take-that-repeat () (interactive)
+  (message "And that! (%d)" (cl-incf my-repeat-count)))
+
+(defun take-that-start ()
+  (interactive)
+  (message "Take that!")
+  (setq my-repeat-count 1)
+  (let ((map (make-sparse-keymap)))
+	 (define-key map (kbd "=") 'take-that-repeat)
+	 (set-temporary-overlay-map map t)))
+
+(define-key my-map (kbd "C-x =") 'take-that-start)
+
+(defun gud-watch (&optional arg event)
+  "Watch expression at point.
+With arg, enter name of variable to be watched in the minibuffer."
+  (interactive (list current-prefix-arg last-input-event))
+  (let ((minor-mode (buffer-local-value 'gud-minor-mode gud-comint-buffer)))
+    (if (eq minor-mode 'gdbmi)
+	(progn
+	  (if event (posn-set-point (event-end event)))
+	  (require 'tooltip)
+	  (save-selected-window
+	    (let ((expr
+		   (if arg
+		       (completing-read "Name of variable: "
+					'gud-gdb-complete-command)
+		     (if (and transient-mark-mode mark-active)
+			 (buffer-substring (region-beginning) (region-end))
+		       (concat (if (derived-mode-p 'gdb-registers-mode) "$")
+			       (tooltip-identifier-from-point (point)))))))
+	      (set-text-properties 0 (length expr) nil expr)
+	      (gdb-input (concat "-var-create - * "  expr "")
+			 `(lambda () (gdb-var-create-handler ,expr))))))
+      (message "gud-watch is a no-op in this mode."))))
+
+(custom-set-faces
+ '(mode-line ((t (:box nil))))
+ '(mode-line-buffer-id ((t (:foreground "firebrick" :background nil))))
+ '(mode-line-inactive ((t (:box nil)))))
+
+ '(mode-line-highlight ((t (:box nil))))
+ '(mode-line-inactive ((t (:box nil)))))

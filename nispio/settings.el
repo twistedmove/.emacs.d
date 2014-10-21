@@ -4,45 +4,12 @@
 (fringe-mode '(nil . 0))		; Left fringes only
 (tool-bar-mode 0)			; Disable toolbar
 
-(load-theme 'manoj-dark)                ; Set color theme
+(load-file "~/.emacs.d/nispio/themes/nispio-dark.el")
 
-;; Use DejaVu Sans Mono as default font
-;; (source: http://sourceforge.net/projects/dejavu/files/dejavu/2.34/dejavu-fonts-ttf-2.34.tar.bz2)
+;; Use powerline for a nifty mode line
+(powerline-default-theme)
+(setq powerline-default-separator 'wave)
 
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :stipple nil :background "black" :foreground "WhiteSmoke" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 98 :width normal :foundry "unknown" :family "DejaVu Sans Mono"))))
- '(column-marker-1 ((t (:background "DarkOrange3"))))
- '(diredp-dir-heading ((t (:foreground "orange red"))))
- '(diredp-dir-priv ((t (:background "black"))))
- '(diredp-exec-priv ((t nil)))
- '(diredp-executable-tag ((t nil)))
- '(diredp-ignored-file-name ((t (:foreground "#444444"))))
- '(diredp-link-priv ((t nil)))
- '(diredp-no-priv ((t nil)))
- '(diredp-other-priv ((t nil)))
- '(diredp-rare-priv ((t nil)))
- '(diredp-read-priv ((t nil)))
- '(diredp-write-priv ((t (:foreground "RosyBrown2"))))
- '(font-lock-comment-face ((t (:foreground "green1"))))
- '(font-lock-constant-face ((t (:foreground "gray100"))))
- '(font-lock-function-name-face ((t (:foreground "gray100"))))
- '(font-lock-keyword-face ((t (:foreground "DodgerBlue"))))
- '(font-lock-preprocessor-face ((t (:foreground "DodgerBlue"))))
- '(font-lock-string-face ((t (:foreground "red3"))))
- '(font-lock-type-face ((t (:foreground "DodgerBlue"))))
- '(font-lock-variable-name-face ((t (:foreground "gray100"))))
- '(fringe ((t (:background "black" :foreground "Wheat"))))
- '(matlab-operator-face ((t (:foreground "gray100"))) t)
- '(minibuffer-prompt ((t (:foreground "cyan1"))))
- '(mode-line ((t (:box nil))))
- '(mode-line-highlight ((t (:box nil))))
- '(mode-line-inactive ((t (:box nil))))
- '(org-table ((t (:foreground "DodgerBlue"))) t)
- '(which-func ((t (:foreground "deep sky blue"))) t))
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -73,6 +40,12 @@
  '(safe-local-variable-values (quote ((visual-line-mode . t) (auto-fill-mode . 0))))
  '(save-interprogram-paste-before-kill t)
  '(show-paren-mode t)
- '(tool-bar-mode nil)
+ '(sr-speedbar-skip-other-window-p t)
  '(yank-pop-change-selection t))
 (put 'dired-find-alternate-file 'disabled nil)
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )

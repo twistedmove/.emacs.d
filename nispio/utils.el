@@ -1,4 +1,3 @@
-
 (defun nispio/describe-keymap (keymap)
   "List the binding in KEYMAP in a human-readable format"
   (interactive
@@ -13,3 +12,11 @@
 		(princ (format "Key bindings in keymap `%s':\n\n" name))
 		(princ (substitute-command-keys (concat "\\{" name "}")))
 		))))
+
+(defun nispio/show-prefix-arg (&optional arg)
+  (interactive "P")
+  (if (/= 0 (safe-length arg))
+      (message "Prefix: %s (%d)" arg (safe-length arg))
+    (message "Argument: %s (%d)" arg (safe-length arg))))
+
+
