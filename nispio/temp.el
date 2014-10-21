@@ -309,3 +309,5 @@ With arg, enter name of variable to be watched in the minibuffer."
 
  '(mode-line-highlight ((t (:box nil))))
  '(mode-line-inactive ((t (:box nil)))))
+
+
