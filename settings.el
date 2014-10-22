@@ -4,7 +4,7 @@
 (fringe-mode '(nil . 0))		; Left fringes only
 (tool-bar-mode 0)			; Disable toolbar
 
-(load-file "~/.emacs.d/nispio/themes/nispio-dark.el")
+(load-file "~/.emacs.d/site-lisp/nispio/themes/nispio-dark.el")
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.

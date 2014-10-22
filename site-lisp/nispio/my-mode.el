@@ -40,6 +40,7 @@
 (define-key my-map (kbd "C-\\") 'nispio/other-window)
 (define-key my-map (kbd "C-x <f1>") 'nispio/buffer-file-name)
 (define-key my-map (kbd "<f11>") 'nispio/toggle-fullscreen)
+(define-key my-map (kbd "C-j") 'newline-and-indent)
 
 
 (defun nispio/other-window (&optional arg)
@@ -77,6 +78,6 @@
 
 
 
-(provide 'my-mode)
+(provide 'nispio/my-mode)
 
 

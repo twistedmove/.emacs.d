@@ -18,3 +18,4 @@
 ;; (source: https://github.com/jwiegley/emacs-async)
 (use-package async :ensure t)
 
+(provide 'nispio/package-config)
