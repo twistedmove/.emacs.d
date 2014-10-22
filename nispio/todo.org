@@ -14,15 +14,19 @@
 ** TODO Learn to use Magit
 * Dired+
 ** TODO multi-occur/grep recursively in selected
-*** consider ack or ag instead of grep
+   consider ack or ag instead of grep
 * X-Midas
 ** TODO Send commands to comint
 ** TODO Get blue file status and statistics from Dired
 * Misc
 ** TODO Scroll the cursor off the screen
-*** I asked about this on Emacs.SE: http://emacs.stackexchange.com/q/2204/93
+   I asked about this on Emacs.SE: http://emacs.stackexchange.com/q/2204/93
 ** TODO Set dedicated windows (source: http://emacs.stackexchange.com/q/2189/93)
 ** TODO Ido up one level
+** TODO Fix how and when emacsclient/emacspipe are called
+** TODO Find out about auto-revert
+** TODO Turn off bold fonts in a theme
 * Issues
 ** TODO Auto-Complete has offset lines
 ** TODO Exclude files with .projectile
+** TODO File bug report for missing `-e` documentation

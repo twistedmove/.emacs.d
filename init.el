@@ -182,14 +182,13 @@
   :ensure t
   :config
   (progn
-    (use-package image-dired :ensure t)
-    
     (require 'dired-x)
     ;; Command to open all marked files at once
     (define-key dired-mode-map (kbd "F") 'dired-do-find-marked-files)
     (define-key dired-mode-map (kbd "/") 'phi-search)
     ;; When opening a directory in dired, reuse the current buffer
-    (diredp-toggle-find-file-reuse-dir 1)))
+    (diredp-toggle-find-file-reuse-dir 1)
+	(customize-set-variable 'diredp-hide-details-initially-flag nil)))
 
 
 ;; Make ibuffer auto-update after changes
@@ -370,10 +369,21 @@
   (define-key my-map (kbd "C-c C-g w") 'sr-speedbar-select-window))
 
 
+;; Display ^L as a horizontal line
+(use-package page-break-lines
+  :ensure t
+  :init
+  (require 'page-break-lines)
+  (global-page-break-lines-mode)
+  (diminish 'page-break-lines-mode ""))
+
+;; Use powerline for a nifty mode line
 (use-package powerline
   :ensure t
   :init
-  (require 'powerline))
+  (require 'powerline)
+  (powerline-default-theme)
+  (setq powerline-default-separator 'wave))
 
 (load-file "~/.emacs.d/nispio/init-devel.el")
 

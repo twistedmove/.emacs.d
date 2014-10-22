@@ -6,10 +6,6 @@
 
 (load-file "~/.emacs.d/nispio/themes/nispio-dark.el")
 
-;; Use powerline for a nifty mode line
-(powerline-default-theme)
-(setq powerline-default-separator 'wave)
-
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -24,9 +20,44 @@
  '(helm-buffer-max-length 30)
  '(helm-truncate-lines t)
  '(ibuffer-elide-long-columns t)
- '(ibuffer-formats (quote ((mark modified read-only " " (name 35 35 :left :elide) " " (size 9 -1 :right) " " (mode 16 16 :left :elide) " " filename-and-process) (mark " " (name 16 -1) " " filename))))
- '(ibuffer-saved-filter-groups (quote (("default" ("File Buffers" (filename . ".+")) ("Dired Buffers" (used-mode . dired-mode)) ("Special Buffers" (name . "\\b\\*.*\\*\\b"))))))
- '(ibuffer-saved-filters (quote (("gnus" ((or (mode . message-mode) (mode . mail-mode) (mode . gnus-group-mode) (mode . gnus-summary-mode) (mode . gnus-article-mode)))) ("programming" ((or (mode . emacs-lisp-mode) (mode . cperl-mode) (mode . c-mode) (mode . java-mode) (mode . idl-mode) (mode . lisp-mode)))))))
+ '(ibuffer-formats
+   (quote
+	((mark modified read-only " "
+		   (name 35 35 :left :elide)
+		   " "
+		   (size 9 -1 :right)
+		   " "
+		   (mode 16 16 :left :elide)
+		   " " filename-and-process)
+	 (mark " "
+		   (name 16 -1)
+		   " " filename))))
+ '(ibuffer-saved-filter-groups
+   (quote
+	(("default"
+	  ("File Buffers"
+	   (filename . ".+"))
+	  ("Dired Buffers"
+	   (used-mode . dired-mode))
+	  ("Special Buffers"
+	   (name . "\\b\\*.*\\*\\b"))))))
+ '(ibuffer-saved-filters
+   (quote
+	(("gnus"
+	  ((or
+		(mode . message-mode)
+		(mode . mail-mode)
+		(mode . gnus-group-mode)
+		(mode . gnus-summary-mode)
+		(mode . gnus-article-mode))))
+	 ("programming"
+	  ((or
+		(mode . emacs-lisp-mode)
+		(mode . cperl-mode)
+		(mode . c-mode)
+		(mode . java-mode)
+		(mode . idl-mode)
+		(mode . lisp-mode)))))))
  '(ido-default-buffer-method (quote selected-window))
  '(ido-default-file-method (quote selected-window))
  '(ido-max-window-height 2)
@@ -36,7 +67,11 @@
  '(minimap-recenter-type (quote relative))
  '(minimap-resizes-buffer t)
  '(mlint-programs (quote ("/usr/local/MATLAB/R2014a/bin/glnxa64/mlint")))
- '(projectile-mode-line (quote (:eval (format " Prj[%s]" (projectile-project-name)))))
+ '(projectile-mode-line
+   (quote
+	(:eval
+	 (format " Prj[%s]"
+			 (projectile-project-name)))))
  '(safe-local-variable-values (quote ((visual-line-mode . t) (auto-fill-mode . 0))))
  '(save-interprogram-paste-before-kill t)
  '(show-paren-mode t)
