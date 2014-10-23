@@ -8,6 +8,7 @@
 		TeX-insert-backslash
 		TeX-insert-dollar
 		TeX-insert-sub-or-superscript
+		backward-sexp
 		beginning-of-visual-line
 		c-electric-brace
 		c-electric-colon
@@ -22,6 +23,8 @@
 		comment-dwim
 		comment-region
 		delete-horizontal-space
+		dired-flag-file-deletion
+		dired-mark
 		dired-next-line
 		dired-previous-line
 		end-of-buffer
@@ -29,6 +32,7 @@
 		eval-last-sexp
 		eval-print-last-sexp
 		forward-sentence
+		forward-sexp
 		indent-for-tab-command
 		kill-region
 		kill-visual-line
@@ -36,12 +40,25 @@
 		matlab-comment
 		matlab-electric-comment
 		matlab-linefeed
+		org-backward-sentence
+		org-beginning-of-line
+		org-delete-char
+		org-end-of-line
+		org-force-self-insert
+		org-self-insert-command
+		org-todo
+		org-yank
+		phi-rectangle-kill-region
+		phi-rectangle-kill-ring-save
+		phi-rectangle-yank
 		phi-search
+		phi-search-backward
 		reindent-then-newline-and-indent
 		rm-kill-region
 		semantic-complete-self-insert
 		sgml-slash
 		sh-end-of-command
+		uncomment-region
 		wdired-upcase-word
 		))
 
@@ -51,14 +68,22 @@
 		compile
 		describe-key
 		dired
+		eval-defun
 		goto-line
+		helm-apropos
+		helm-descbinds
+		helm-do-grep
 		ido-find-file
 		ido-switch-buffer
 		ido-switch-buffer-other-window
 		kill-rectangle
 		make-default
+		mark-sexp
 		mouse-save-then-kill
 		multiple-cursors-mode
+		nispio/other-window
+		org-ctrl-c-ctrl-c
+		overwrite-mode
 		scroll-other-window
 		view-lossage
 		wdired-finish-edit
