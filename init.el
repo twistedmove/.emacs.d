@@ -107,14 +107,14 @@
 
     ;; Use helm for projectile
     (use-package helm-projectile :ensure t)
-    (eval-after-load "helm"
+    (eval-after-load "helm-config"
       (progn
-	(require 'helm-projectile)
-	(helm-projectile-on)
-	(define-key my-map (kbd "C-7") projectile-command-map)
-	(define-key projectile-command-map (kbd "\\") 'projectile-find-other-file)
-	nil))
-
+		(require 'helm-projectile)
+		(helm-projectile-on)
+		(define-key my-map (kbd "C-7") projectile-command-map)
+		(define-key projectile-command-map (kbd "\\") 'projectile-find-other-file)
+		nil))
+	
     ;; Emacs frontend to GNU Global source code tagging system.
     ;; SOURCE: https://github.com/leoliu/ggtags
     (use-package ggtags :ensure t)
