@@ -30,12 +30,15 @@
   (interactive)
   (message "This key is not bound"))
 
-;; If not in a TTY, Unbind C-m so that we can use it elsewhere
+;; If not in a TTY, Unbind C-m, C-i, and C-[ so we can use them elsewhere
 (if (not (display-graphic-p))
     (setq tty-keys t)
-  ;; (define-key input-decode-map [?\C-m] [C-m])
-  ;; (define-key input-decode-map [?\C-i] [C-i])
-  ;; (define-key input-decode-map [?\C-\[] [C-\[])
+  (define-key input-decode-map [?\C-m] [C-m])
+  (define-key input-decode-map [?\C-i] [C-i])
+  (define-key input-decode-map [?\C-\[] [C-\[])
+  (define-key local-function-key-map [C-m] [?\C-m])
+  (define-key local-function-key-map [C-i] [?\C-i])
+  (define-key local-function-key-map [C-\[] [?\C-\[])
   (setq tty-keys nil))
 
 ;(define-key my-map [remap digit-argument] 'my-key-do-nothing)
@@ -49,8 +52,6 @@
 (define-key my-map (kbd "C-x <f1>") 'nispio/buffer-file-name)
 (define-key my-map (kbd "<f11>") 'nispio/toggle-fullscreen)
 (define-key my-map (kbd "C-j") 'newline-and-indent)
-
-
 
 (provide 'nispio/my-mode)
 
