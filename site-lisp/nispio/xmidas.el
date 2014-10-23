@@ -169,3 +169,4 @@
    `(,(concat "\\_<" (regexp-opt xmidas-keywords) "\\_>") . font-lock-keyword-face))
   "Additional expressions to highlight in `xmidas-mode'.")
 
+(provide 'nispio/xmidas)

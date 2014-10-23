@@ -42,7 +42,7 @@ If not in a source or disassembly buffer just set point."
   " ml-dbg"
   matlab-debug-map)
 
-(provide 'matlab-debug)
+(provide 'nispio/matlab-debug)
 
 ;; (progn
 ;;   (define-key matlab-debug-map [left-margin mouse-1] 'nispio/mouse-toggle-breakpoint)

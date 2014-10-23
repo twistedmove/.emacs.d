@@ -121,43 +121,6 @@
 (key-binding (kbd "C-h k"))
 (key-description (kbd "C-h k"))
 
-(defun my-export-to-parent ()
-  "Exports the table in the current buffer back to its parent TSV file and
-    then closes this buffer."
-  (unless (org-at-table-p)
-	(error "No table at point"))
-  (require 'org-exp)
-  (org-table-align)
-  (let ((buf (current-buffer))
-		(file parent-file)
-		(fmt "orgtbl-to-tsv"))
-	(org-table-export file "orgtbl-to-tsv")
-	(set-buffer-modified-p nil)
-	(switch-to-buffer (find-file-noselect file))
-	(kill-buffer buf)))
-
-(defun my-edit-tsv-as-orgtbl ()
-  "Convet the current TSV buffer into an org table in a separate file. Saving
-    the table will convert it back to TSV and jump back to the original file"
-  (interactive)
-  (let* ((buf (current-buffer))
-		 (file (buffer-file-name buf))
-		 (beg (buffer-end -1))
-		 (end (buffer-end 1))
-		 (txt (buffer-substring-no-properties beg end))
-		 (org-buf (find-file-noselect (concat (buffer-name) ".org"))))
-	(save-buffer buf)
-	(with-current-buffer org-buf
-	  (erase-buffer)
-	  (insert txt "\n")
-	  (org-table-convert-region (buffer-end -1) (buffer-end 1) '(16))
-	  (setq-local parent-file file)
-	  (add-hook 'after-save-hook 'my-export-to-parent nil t))
-	(switch-to-buffer org-buf)
-	(kill-buffer buf)))
-
-;; Open the current TSV file as an org table
-(global-set-key (kbd "C-c |") 'my-edit-tsv-as-orgtbl)   
 
 ;; (with-current-buffer (find-file-noselect file)
 ;;   (setq buf (current-buffer))
@@ -311,3 +274,198 @@ With arg, enter name of variable to be watched in the minibuffer."
  '(mode-line-inactive ((t (:box nil)))))
 
 
+;; If not in a TTY, Unbind C-m so that we can use it elsewhere
+(if (not (display-graphic-p))
+    (setq tty-keys t)
+  (define-key input-decode-map [?\C-m] [C-m])
+  (define-key local-function-key-map [C-m] [?\C-m])
+  (define-key input-decode-map [?\C-i] [C-i])
+  (define-key input-decode-map [?\C-\[] [C-\[])
+  (setq tty-keys nil))
+
+(define-key emacs-lisp-mode-map [C-m] 'newline-and-indent)
+
+(define-key input-decode-map [?\C-m] (kbd "<C-m>"))
+
+
+(listify-key-sequence (kbd "C-c ESC"))
+(listify-key-sequence [?\C-m])
+(listify-key-sequence [C-m])
+(listify-key-sequence (kbd "<C-m>"))
+
+(defun nispio/fake-M-RET ()
+  (interactive)
+  (let ((command (key-binding (kbd "<M-return>"))))
+  	(setq last-command-event [M-return])
+  	(setq this-command command)
+  	(call-interactively command)))
+(add-hook 'org-mode-hook (lambda () (local-set-key (kbd "<C-m>") 'nispio/fake-M-RET))))
+
+
+(defmacro my-fake-keypress (key)
+  "Simulate a keypress event"
+  (interactive)
+  `(let ((command (key-binding ,key)))
+	 (nconc unread-command-events ,key)
+	 (setq last-command-event ,key)
+	 (setq this-command command)
+	 (call-interactively command)
+	 (message "%s" command)))
+
+
+(key-binding (kbd "M-g"))
+
+(insert (nispio/describe-keymap (key-binding (kbd "M-g"))))
+
+(keymap (9 . move-to-column) (112 . previous-error) (110 . next-error) (27 keymap (112 . previous-error) (110 . next-error) (103 . goto-line)) (103 . goto-line) (99 . goto-char))
+
+
+(keymap (keymap (119 . phi-rectangle-kill-ring-save) (111 keymap (54 keymap (98 . enlarge-window) (97 . shrink-window) (99 . enlarge-window-horizontally) (100 . shrink-window-horizontally))) (115 keymap (114 . helm-register) (111 . helm-occur) (97 . helm-do-grep) (98 . nispio/helm-moccur-buffers) (110 . find-name-dired)) (49 . delete-other-windows) (48 . delete-window) (67108902 . disable-my-global-mode)) (keymap (keymap (17 . indent-pp-sexp) (24 . eval-defun) (9 . completion-at-point)) keymap (keymap (17 . indent-sexp)) keymap (17 . prog-indent-sexp)) ESC-prefix)
+
+(substitute-command-keys (format "%s" (key-binding (kbd "M-g"))))
+
+
+(keymap (32 . sr-speedbar-toggle))
+
+
+
+
+(global-set-key (kbd "C-3") 'ESC-prefix)
+(global-set-key (kbd "<C-m>") (lambda () (interactive) (my-fake-keypress (kbd "T"))))
+
+(defun nispio/press-esc () (interactive)
+	(nconc unread-command-events (kbd "Q")))
+
+(add-to-list 'jo-mama (kbd "ESC"))
+(add-to-list 'jo-mama (kbd "C-i"))
+
+(setq list1 '(alpha beta gamma))
+(setq list2 '(delta epsilon theta))
+(nconc nil '(iota))
+(append list1 list2)
+
+input-decode-map
+
+
+(keymapp '(keymap (13 . [C-m]) (27 keymap (C-backspace) (C-delete))` (C-M-backspace) (C-M-delete) (M-backspace) (M-delete)))
+
+(global-set-key (kbd "C-`") esc-map)
+
+
+(defun nispio/describe-keymap (keymap)
+  "List the binding in KEYMAP in a human-readable format"
+  (interactive
+   (list (intern (completing-read "Keymap: " obarray
+     (lambda (m) (and (boundp m) (keymapp (symbol-value m)))) t nil nil))))
+  (unless (and (symbolp keymap) (boundp keymap) (keymapp (symbol-value keymap)))
+    (error "`%S' is not a keymapp" keymap))
+  (let ((name (symbol-name keymap)))
+	(with-help-window (help-buffer)
+	  (save-excursion
+		(read-only-mode -1)
+		(princ (format "Key bindings in keymap `%s':\n\n" name))
+		(princ (substitute-command-keys (concat "\\{" name "}")))
+		))))
+
+
+
+(let* ((map (key-binding (kbd "M-g")))
+	   (name "the-map")
+	   )
+  (setq nispio/temp-map map)
+  (with-help-window (help-buffer)
+  	(save-excursion
+  	  (read-only-mode -1)
+  	  (princ (format "Key bindings in keymap `%s':\n\n" name))
+  	  (princ (substitute-command-keys (concat "\\{nispio/temp-map}")))
+  	  ))
+)
+
+(defun nispio/simulate-esc ()
+  (interactive)
+  (let ((keys (listify-key-sequence (this-command-keys)))
+		(esc (listify-key-sequence (kbd "ESC"))))
+	(nbutlast keys)
+	(nconc keys esc)
+	(insert (format "Prefix: %s (%s)" keys (key-description keys)))
+	(setq the-keys keys)
+	(setq unread-command-events keys)))
+
+(global-set-key (kbd "C-`") 'nispio/simulate-esc)
+(global-set-key (kbd "M-g C-c C-`") 'nispio/simulate-esc)
+(global-set-key (kbd "C-c C-2 C-3 C-4 C-5") 'nispio/simulate-esc)
+
+(setq list1 '(A B C D E F G))
+(nbutlast list1)
+
+
+Prefix: (3 67108914 67108915 67108916 27) (C-c C-2 C-3 C-4 ESC)
+
+(global-set-key (kbd "C-c C-x `") 'nispio/simulate-esc)
+(global-set-key (kbd "C-c C-x M-g") 'view-hello-file)
+
+Prefix: (3 24 27) (C-c C-x ESC)
+
+Prefix: (3 24 27) (C-c C-x ESC)
+
+
+(defmacro simulate-key-event (event &optional N)
+  `(let ((prefix (listify-key-sequence (this-command-keys)))
+		 (key (listify-key-sequence ,event))
+		 (n (prefix-numeric-value ,N)))
+	 (if (< n 0)
+		 (setq prefix key)
+	   (nbutlast prefix n)
+	   (nconc prefix key))
+	 (setq unread-command-events prefix)))
+
+
+(defun nispio/simulate-key-event (event &optional N)
+  "Simulate an arbitrary keypress event.
+
+This function sets the `unread-command-events' variable in order to simulate a
+series of key events given by EVENT. Can also For negative N, simulate the
+specified key EVENT directly.  For positive N, removes the last N elements from
+the list of key events in `this-command-keys' and then appends EVENT.  For N nil,
+treat as N=1."
+  (let ((prefix (listify-key-sequence (this-command-keys)))
+		 (key (listify-key-sequence event))
+		 (n (prefix-numeric-value N)))
+	 (if (< n 0)
+		 (setq prefix key)
+	   (nbutlast prefix n)
+	   (nconc prefix key))
+	   (setq unread-command-events prefix)))
+
+
+(defun simulate-esc ()
+  (interactive)
+  (simulate-key-event (kbd "ESC")))
+
+(defun simulate-Cxh ()
+  (interactive)
+  (simulate-key-event (kbd "C-x h")))
+
+(defun simulate-C-c-caret ()
+  (interactive)
+  (my-simulate-key-event (kbd "C-c"))
+  (my-simulate-key-event (kbd "^") -1))
+
+(defun simulate-C-c ()
+  (interactive)
+  (my-simulate-key-event (kbd "C-c")))
+
+(define-key ctl-x-5-map (kbd "M-h") 'view-hello-file)
+(define-key ctl-x-5-map (kbd "C-`") 'simulate-esc)
+
+(define-key ctl-x-r-map (kbd "C-x h") 'view-hello-file)
+(define-key ctl-x-r-map (kbd "C-`") 'simulate-Cxh)
+
+(define-key ctl-x-4-map (kbd "C-c ^ T") 'view-hello-file)
+(define-key ctl-x-4-map (kbd "C-`") 'simulate-C-c-caret)
+(define-key ctl-x-4-map (kbd "C-f") 'simulate-C-c)
+
+(setq list1 '(alpha beta delta gamma epsilon))
+(nbutlast list1 99)
+
+(global-set-key (kbd "C-`") (kbd "<escape>"))

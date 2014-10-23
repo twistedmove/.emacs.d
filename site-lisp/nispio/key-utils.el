@@ -66,6 +66,36 @@ minibuffer instead of inserting it at point."
   (let ((desc (key-description key)))
 	(if arg (message desc) (insert desc))))
 
-(bind-key* "C-h C-k" 'nispio/insert-key-description)
-(bind-key "C-h k" 'nispio/locate-key-binding)
-(bind-key* "C-h C-M-k" 'nispio/unbind-local-key)
+(defun nispio/describe-keymap (keymap)
+  "List the binding in KEYMAP in a human-readable format"
+  (interactive
+   (list (intern (completing-read "Keymap: " obarray
+     (lambda (m) (and (boundp m) (keymapp (symbol-value m)))) t nil nil))))
+  (unless (and (symbolp keymap) (boundp keymap) (keymapp (symbol-value keymap)))
+    (error "`%S' is not a keymapp" keymap))
+  (let ((name (symbol-name keymap)))
+	(with-help-window (help-buffer)
+	  (save-excursion
+		(read-only-mode -1)
+		(princ (format "Key bindings in keymap `%s':\n\n" name))
+		(princ (substitute-command-keys (concat "\\{" name "}")))
+		))))
+
+(defun nispio/simulate-key-event (event &optional N)
+  "Simulate an arbitrary keypress event.
+
+This function sets the `unread-command-events' variable in order to simulate a
+series of key events given by EVENT. Can also For negative N, simulate the
+specified key EVENT directly.  For positive N, removes the last N elements from
+the list of key events in `this-command-keys' and then appends EVENT.  For N nil,
+treat as N=1."
+  (let ((prefix (listify-key-sequence (this-command-keys)))
+		 (key (listify-key-sequence event))
+		 (n (prefix-numeric-value N)))
+	 (if (< n 0)
+		 (setq prefix key)
+	   (nbutlast prefix n)
+	   (nconc prefix key))
+	   (setq unread-command-events prefix)))
+
+(provide 'nispio/key-utils)

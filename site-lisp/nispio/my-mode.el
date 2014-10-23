@@ -30,7 +30,15 @@
   (interactive)
   (message "This key is not bound"))
 
-(define-key my-map [remap digit-argument] 'my-key-do-nothing)
+;; If not in a TTY, Unbind C-m so that we can use it elsewhere
+(if (not (display-graphic-p))
+    (setq tty-keys t)
+  ;; (define-key input-decode-map [?\C-m] [C-m])
+  ;; (define-key input-decode-map [?\C-i] [C-i])
+  ;; (define-key input-decode-map [?\C-\[] [C-\[])
+  (setq tty-keys nil))
+
+;(define-key my-map [remap digit-argument] 'my-key-do-nothing)
 (define-key my-map [remap list-buffers] 'ibuffer)
 (define-key my-map (kbd "C-M-&") 'disable-my-global-mode)
 (define-key my-map (kbd "C--") 'delete-window)
@@ -41,40 +49,6 @@
 (define-key my-map (kbd "C-x <f1>") 'nispio/buffer-file-name)
 (define-key my-map (kbd "<f11>") 'nispio/toggle-fullscreen)
 (define-key my-map (kbd "C-j") 'newline-and-indent)
-
-
-(defun nispio/other-window (&optional arg)
-  "Cycle through windows. With prefix arg, cycle backwards"
-  (interactive "P")
-  (let* ((N (or (and (consp arg) -1) arg 1)))
-    (other-window N 'visible)
-    (select-frame-set-input-focus (selected-frame))))
-
-(defun nispio/buffer-file-name ()
-  "Display the name of the file backing the current buffer"
-  (interactive)
-  (message (or buffer-file-name "no file"))
-  buffer-file-name)
-
-;; Custom function to toggle fullscreen by maximizing or restoring the current frame.
-(defvar nispio/fullscreen-p t "Check if fullscreen is on or off")
-
-(defun nispio/restore-frame ()
-  (if (fboundp 'w32-send-sys-command) (w32-send-sys-command 61728)
-    (set-frame-parameter nil 'width 82)
-	(set-frame-parameter nil 'fullscreen 'fullheight)))
-(defun nispio/maximize-frame ()
-  (if (fboundp 'w32-send-sys-command) (w32-send-sys-command 61488)
-    (set-frame-parameter nil 'fullscreen 'fullboth)))
-(defun nispio/toggle-fullscreen (&optional DEL)
-  "Toggle \"fullscreen\" by maximizing or restoring the current frame.
-  If optional argument DEL is non-nil, delete the current frame."
-  (interactive "P")
-  (if DEL (delete-frame)
-	(setq nispio/fullscreen-p (not nispio/fullscreen-p))
-	(if nispio/fullscreen-p
-		(nispio/restore-frame)
-	  (nispio/maximize-frame))))
 
 
 
