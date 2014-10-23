@@ -1,6 +1,6 @@
 ;; Use incremental completion and selection narrowing
 ;; (source: https://github.com/emacs-helm/helm)
-;; (use-package helm :ensure t)
+(use-package helm :ensure t)
 (require 'helm-config)
 
 ;; Turn on follow mode when using multi-occur
@@ -27,14 +27,14 @@
     (delete-other-windows)))
 
 
-;; ;; (use-package helm-helm-commands :ensure t)
+;; (use-package helm-helm-commands :ensure t)
 ;; (require 'helm-helm-commands)
 ;; (define-key helm-command-map (kbd "C-8") 'helm-helm-commands)
 
 
 ;; Helm interface for describe bindings
 ;; (source: https://github.com/emacs-helm/helm-descbinds)
-;; (use-package helm-descbinds  :ensure t)
+(use-package helm-descbinds  :ensure t)
 (require 'helm-descbinds)
 
 (provide 'nispio/helm-config)

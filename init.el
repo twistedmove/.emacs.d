@@ -80,7 +80,7 @@
   (when (and (>= emacs-major-version 24) (>= emacs-minor-version 4))
     (electric-pair-mode 1) ; Enable automatic bracket closing
 
-    ;; (require 'nispio/package-config)
+    (require 'nispio/package-config)
     (require 'diminish)
     
     (require 'nispio/helm-config)
@@ -97,18 +97,18 @@
 
     ;; Use a more powerful alternative to ido-mode's flex matching.
     ;; SOURCE: https://github.com/lewang/flx.git
-    ;; (use-package flx-ido :ensure t)
+    (use-package flx-ido :ensure t)
     (require 'flx-ido)
 
     ;; Manage and navigate projects easily in Emacs
     ;; SOURCE: https://github.com/bbatsov/projectile.git
-    ;; (use-package projectile :ensure t)
+    (use-package projectile :ensure t)
     (require 'projectile)
     (projectile-global-mode)
     (setq projectile-enable-caching t)
 
     ;; Use helm for projectile
-    ;; (use-package helm-projectile :ensure t)
+    (use-package helm-projectile :ensure t)
     (eval-after-load "helm"
       (progn
 	(require 'helm-projectile)
@@ -119,9 +119,12 @@
 
     ;; Emacs frontend to GNU Global source code tagging system.
     ;; SOURCE: https://github.com/leoliu/ggtags
-    ;; (use-package ggtags :ensure t)
+    (use-package ggtags :ensure t)
     (require 'ggtags)
 
+    ;; Set up auto-complete
+    ;; (source: https://github.com/auto-complete/auto-complete)
+    (use-package auto-complete :ensure t)
     (require 'auto-complete-config)
     (ac-config-default)
     (setq ac-auto-start 3)				; start after 3 characters were typed
@@ -129,6 +132,9 @@
     (setq ac-modes (cons 'matlab-mode ac-modes))  ; Allow auto-complete with matlab-mode
     (define-key ac-mode-map (kbd "C-.") 'auto-complete)
 
+    ;; Add support for Chrome extension "Edit with Emacs"
+    ;; (source: https://github.com/stsquad/emacs_chrome.git)
+    (use-package edit-server :ensure t)
     (require 'edit-server)
     (setq edit-server-new-frame nil)
     (add-hook 'edit-server-start-hook 'flyspell-mode)
@@ -138,7 +144,7 @@
     (edit-server-start)
 
     ;; Use powerline for a nifty mode line
-    ;; (use-package powerline :ensure t)
+    (use-package powerline :ensure t)
     (require 'powerline)
     (powerline-default-theme)
     (setq powerline-default-separator 'wave)
@@ -146,7 +152,7 @@
   ) ;; end emacs 24+ customizations
   
   ;; Display line numbers in all programming buffers
-  ;; (use-package linum :ensure t)
+  (use-package linum :ensure t)
   (require 'linum)
   (global-linum-mode 1)
   (add-hook 'prog-mode-hook 'linum-mode)
@@ -166,7 +172,7 @@
   (setq default-buffer-file-coding-system 'utf-8-unix)
 
   ;; Extend dired functionality
-  ;; (use-package dired+ :ensure t)
+  (use-package dired+ :ensure t)
   (require 'dired-x)
   (require 'dired+)
   ;; Command to open all marked files at once
@@ -190,7 +196,7 @@
 
   ;; Easily re-arrange buffers within the frame
   ;; (source: http://www.emacswiki.org/emacs/download/buffer-move.el)
-  ;; (use-package buffer-move :ensure t)
+  (use-package buffer-move :ensure t)
   (require 'buffer-move)
   (define-key my-map (kbd "C-c <C-up>") 'buf-move-up)
   (define-key my-map (kbd "C-c <C-down>") 'buf-move-down)
@@ -215,13 +221,13 @@
 
   ;; Add an easy way to produce dummy text
   ;; (source: http://www.emacswiki.org/emacs/download/lorem-ipsum.el)
-  ;; (use-package lorem-ipsum :ensure t)
+  (use-package lorem-ipsum :ensure t)
   (require 'lorem-ipsum)
   (define-key my-map (kbd "C-c C-l")  'Lorem-ipsum-insert-paragraphs)
 
   ;; Add support for isearch functionality with multiple cursors
   ;; (source: https://github.com/zk-phi/phi-search)
-  ;; (use-package phi-search :ensure t)
+  (use-package phi-search :ensure t)
   (require 'phi-search)
   (customize-set-value 'phi-search-case-sensitive 'guess)
   (define-key my-map (kbd "C-s") 'phi-search)
@@ -229,7 +235,7 @@
 
   ;; Add support for editing with multiple cursors
   ;; (source: https://github.com/magnars/multiple-cursors.el)
-  ;; (use-package multiple-cursors	:ensure t)
+  (use-package multiple-cursors	:ensure t)
   (require 'multiple-cursors)
   (defun nispio/fake-cursor-at-point ()
 	(interactive)
@@ -246,7 +252,7 @@
 
   ;; Add extended interoperability between phi-search and multiple cursors
   ;; (source: https://github.com/knu/phi-search-mc.el)
-  ;; (use-package phi-search-mc :ensure t)
+  (use-package phi-search-mc :ensure t)
   (eval-after-load "phi-search"
     (progn
       (require 'phi-search-mc)
@@ -261,7 +267,7 @@
 
   ;; Use phi-rectangle for rectangular selections
   ;; (source: http://www.emacswiki.org/emacs/rect-mark.el)
-  ;; (use-package phi-rectangle :ensure t)
+  (use-package phi-rectangle :ensure t)
   (require 'phi-rectangle)
   (define-key my-map (kbd "C-c C-SPC") 'phi-rectangle-set-mark-command)
   (define-key my-map (kbd "C-w") 'phi-rectangle-kill-region)
@@ -270,7 +276,7 @@
 
   ;; Add support for editing matlab files
   ;; (source: http://matlab-emacs.cvs.sourceforge.net/viewvc/matlab-emacs/matlab-emacs/?view=tar)
-  ;; (use-package "matlab-load" :ensure matlab-mode)
+  (use-package "matlab-load" :ensure matlab-mode)
   (require 'matlab-load)
   (require 'nispio/matlab-debug)
   (setq matlab-comment-column 50)
@@ -281,7 +287,7 @@
 
   ;; Enable column markers at column 81 to warn of long lines
   ;; (source: http://www.emacswiki.org/emacs/download/column-marker.el)
-  ;; (use-package column-marker :ensure t)
+  (use-package column-marker :ensure t)
   (require 'column-marker)
   (defun nispio/column-marker-at-81 ()
 	(interactive)
@@ -289,16 +295,8 @@
   (add-hook 'prog-mode-hook 'nispio/column-marker-at-81)
   (setq-default fill-column 80)
 
-  ;; ;; Set up auto-complete
-  ;; ;; (source: https://github.com/auto-complete/auto-complete)
-  ;; (add-to-list 'load-path "~/.emacs.d/site-lisp/auto-complete")
-  ;; (add-to-list 'load-path "~/.emacs.d/site-lisp/auto-complete/lib/popup")
-  ;; (add-to-list 'load-path "~/.emacs.d/site-lisp/auto-complete/lib/fuzzy")
-  ;; (add-to-list 'load-path "~/.emacs.d/site-lisp/auto-complete/lib/erc")
-  ;; (use-package auto-complete-config	:ensure auto-complete)
-  
 
-  ;; (use-package tex-site	:ensure auctex)
+  (use-package tex-site	:ensure auctex)
   (require 'tex-site)
   (setq
    TeX-auto-save t
@@ -317,19 +315,14 @@
   (add-hook 'LaTeX-mode-hook 'TeX-PDF-mode)
   (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
 
-  ;; Add support for Chrome extension "Edit with Emacs"
-  ;; (source: https://github.com/stsquad/emacs_chrome.git)
-  ;; (use-package edit-server :ensure t)
-  
-
   ;; SrSpeedbar allows a speedbar that is "docked" in the current frame
-  ;; (use-package sr-speedbar :ensure t)
+  (use-package sr-speedbar :ensure t)
   (require 'sr-speedbar)
   (define-key my-map (kbd "C-c M-SPC") 'sr-speedbar-toggle)
   (define-key my-map (kbd "C-c C-g w") 'sr-speedbar-select-window)
 
   ;; Display ^L as a horizontal line
-  ;; (use-package page-break-lines	:ensure t)
+  (use-package page-break-lines	:ensure t)
   (require 'page-break-lines)
   (global-page-break-lines-mode)
   (diminish 'page-break-lines-mode "")
