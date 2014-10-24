@@ -141,12 +141,6 @@
     (add-hook 'edit-server-buffer-closed-hook 'delete-window)
     (edit-server-start)
 
-    ;; Use powerline for a nifty mode line
-    (use-package powerline :ensure t)
-    (require 'powerline)
-    (powerline-default-theme)
-    (setq powerline-default-separator 'wave)
-
   ) ;; end emacs 24+ customizations
   
   ;; Display line numbers in all programming buffers

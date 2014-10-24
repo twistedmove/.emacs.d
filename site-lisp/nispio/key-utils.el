@@ -96,6 +96,20 @@ treat as N=1."
 		 (setq prefix key)
 	   (nbutlast prefix n)
 	   (nconc prefix key))
-	   (setq unread-command-events prefix)))
+	 (setq unread-command-events prefix)))
+
+(defun nispio/unbind-digit-arguments ()
+  "Unbind modified digit keys from the global map"
+  (let ((prefix-list '("C-M-" "M-" "C-"))
+		(digit-list (number-sequence 0 9))
+		digit-string key)
+	(dolist (digit digit-list)
+	  (setq digit-string (format "%d" digit))
+	  (mapc
+	   (lambda (prefix-string)
+		 (setq key (kbd (concat prefix-string digit-string)))
+		 (when (eq (global-key-binding key) 'digit-argument)
+		   (global-unset-key key)))
+	   prefix-list))))
 
 (provide 'nispio/key-utils)

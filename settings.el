@@ -4,6 +4,13 @@
 (fringe-mode '(nil . 0))		; Left fringes only
 (tool-bar-mode 0)			; Disable toolbar
 
+(when (>= emacs-major-version 24)
+  ;; Use powerline for a nifty mode line
+  (use-package powerline :ensure t)
+  (require 'powerline)
+  (powerline-default-theme)
+  (setq powerline-default-separator 'wave))
+
 (load-file "~/.emacs.d/site-lisp/nispio/themes/nispio-dark.el")
 
 (custom-set-variables

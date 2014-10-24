@@ -469,3 +469,92 @@ treat as N=1."
 (nbutlast list1 99)
 
 (global-set-key (kbd "C-`") (kbd "<escape>"))
+
+
+;; Lisp specific defuns
+(defun eval-and-replace ()
+  "Replace the preceding sexp with its value."
+  (interactive)
+  (backward-kill-sexp)
+  (condition-case nil
+	  (prin1 (eval (read (current-kill 0)))
+			 (current-buffer))
+	(error (message "Invalid expression")
+		   (insert (current-kill 0)))))
+
+(define-key input-decode-map [menu] )
+(global-set-key (kbd "C-c C-x H-t") 'view-hello-file)
+
+(global-unset-key [menu])
+(define-key local-function-key-map [menu] 'menu-bar-open)
+
+;(global-set-key (kbd "C-]") 'abort-recursive-edit)
+
+(global-set-key (kbd "H-C-]") (global-key-binding (kbd "C-]")))
+(global-unset-key (kbd "C-]"))
+(define-key local-function-key-map (kbd "C-]") 'hyperize)
+
+
+(defun hyperize (prompt)
+  (let ((e (read-event)))
+	(vector (if (numberp e)
+				(logior (lsh 1 24) e)
+			  (if (memq 'hyper (event-modifiers e))
+				  e
+				(add-event-modifier "H-" e))))))
+
+(defun superize (prompt)
+  (let ((e (read-event)))
+	(vector (if (numberp e)
+				(logior (lsh 1 24) e)
+			  (if (memq 'hyper (event-modifiers e))
+				  e
+				(add-event-modifier "s-" e))))))
+
+(defun add-event-modifier (string e)
+  (let ((symbol (if (symbolp e) e (car e))))
+	(setq symbol (intern (concat string
+								 (symbol-name symbol))))
+	(if (symbolp e)
+		symbol
+	  (cons symbol (cdr e)))))
+
+(define-key local-function-key-map "\C-ch" 'hyperify)
+
+(let ((prefix-list '("C-M-" "M-" "C-"))
+	  (digit-list (number-sequence 0 9))
+	  digit-string key-string)
+  (dolist (digit digit-list)
+	(setq digit-string (format "%d" digit))
+	(mapcar
+	 (lambda (prefix-string)
+	   (setq key-string (concat prefix-string digit-string))
+	   ;(message "(global-unset-key (kbd \"%s\"))" key-string)
+	   (global-unset-key (kbd key-string)))
+	 prefix-list)
+	))
+
+(defun nispio/simulate-super ()
+  (interactive)
+  (setq unread-command-events '(24 64 115)))
+
+(defun nispio/simulate-hyper ()
+  (interactive)
+  (setq unread-command-events '(24 64 104)))
+
+(defun nispio/simulate-meta ()
+  (interactive)
+  (setq unread-command-events '(24 64 109)))
+
+(defun nispio/simulate-control ()
+  (interactive)
+  (setq unread-command-events '(24 64 99)))
+
+(defun nispio/simulate-alt ()
+  (interactive)
+  (setq unread-command-events '(24 64 97)))
+
+(defun event-apply-meta-modifier (_ignore-prompt)
+  "\\<function-key-map>Add the Meta modifier to the following event.
+For example, type \\[event-apply-meta-modifier] & to enter Meta-&."
+  (vector (event-apply-modifier (read-event) 'meta 27 "M-")))
