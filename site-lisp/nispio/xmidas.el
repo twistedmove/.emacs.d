@@ -62,11 +62,11 @@
 
 (set (make-local-variable 'font-lock-defaults) '(xmidas-font-lock-keywords t))
 
-(defvar emacspipe-file "/tmp/tmp.emacspipe"
-  "Path to the program used by `run-xmidas'")
+(defvar emacspipe-regexp "tmp\\.[A-Za-z0-9]\\{10\\}"
+  "Regexp describing the name of temp buffers")
 
 (add-to-list 'auto-mode-alist
-  (cons (regexp-opt (list (file-name-nondirectory emacspipe-file))) 'view-mode))
+  (cons emacspipe-regexp 'view-mode))
 
 (defconst xmidas-keywords
   '("abscissa" "fastfilter" "parse" "ttcmd" "acqmod" "fcalculator" "passfilt"

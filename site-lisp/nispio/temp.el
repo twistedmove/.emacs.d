@@ -558,3 +558,25 @@ treat as N=1."
   "\\<function-key-map>Add the Meta modifier to the following event.
 For example, type \\[event-apply-meta-modifier] & to enter Meta-&."
   (vector (event-apply-modifier (read-event) 'meta 27 "M-")))
+
+	
+(nispio/directory-subdirs "~/.emacs.d/site-lisp" '(".git"))
+
+(setq list1 '("1" "2" "3" "." ".."))
+(append '(".git" ".hg") list1)
+	
+			  (insert "\n" file)
+			  (unless (or (string= "." (substring file -1))
+						  (not (file-directory-p el)))
+				)
+			  
+			files
+			))
+		 ;; remove '.', '..' and all non-directories
+		 (filtered-files (remove-if (lambda (el)
+									  (or (string= "." (substring el -1))
+										  (not (file-directory-p el))))
+									all-files)))
+	filtered-files))
+
+(prune-directory-list '("~/.emacs.d" "~/.emacs.d/init.el" "~/.emacs.d/site-lisp"))

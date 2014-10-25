@@ -47,4 +47,15 @@
 	  (setq str (replace-match "" nil nil str)))
 	str))
 
+(defun nispio/directory-subdirs (directory &optional reject)
+  "Returns a list of all subdirectories contained in DIRECTORY.
+Optional argument REJECT can specify a list of subdirectory names
+to ignore."
+  (let* ((dir (file-name-as-directory directory))
+		 (ls (directory-files (file-name-as-directory dir)))
+		 (files (mapcar (lambda (el) (concat dir el)) ls))
+		 (reject (append reject '("." "..")))
+		 (prunes (mapcar (lambda (el) (concat dir el)) reject)))
+	(prune-directory-list files nil prunes)))
+
 (provide 'nispio/misc-utils)
