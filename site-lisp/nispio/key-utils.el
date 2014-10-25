@@ -112,4 +112,18 @@ treat as N=1."
 		   (global-unset-key key)))
 	   prefix-list))))
 
+(defun nispio/rebind-digit-arguments ()
+  "Unbind modified digit keys from the global map"
+  (let ((prefix-list '("C-M-" "M-" "C-"))
+		(digit-list (number-sequence 0 9))
+		digit-string key)
+	(dolist (digit digit-list)
+	  (setq digit-string (format "%d" digit))
+	  (mapc
+	   (lambda (prefix-string)
+		 (setq key (kbd (concat prefix-string digit-string)))
+		 (unless (global-key-binding key)
+		   (global-set-key key 'digit-argument)))
+	   prefix-list))))
+
 (provide 'nispio/key-utils)

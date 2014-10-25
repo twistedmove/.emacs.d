@@ -42,8 +42,8 @@
   (define-key local-function-key-map [C-\[] [?\C-\[])
   (setq tty-keys nil))
 
-;; Unbind modified digit keys (e.g C-1, M-2, C-M-3, etc.)
-(nispio/unbind-digit-arguments)
+(define-key local-function-key-map [?\C-\]] 'event-apply-hyper-modifier)
+(define-key global-map [?\C-\]] nil)
 
 ;; Set up basic keybindings
 (define-key my-map (kbd "C-M-&") 'disable-my-global-mode)
@@ -55,6 +55,7 @@
 (define-key my-map (kbd "C-x <f1>") 'nispio/buffer-file-name)
 (define-key my-map (kbd "<f11>") 'nispio/toggle-fullscreen)
 (define-key my-map (kbd "C-j") 'newline-and-indent)
+(define-key my-map [remap list-buffers] 'ibuffer)
 (define-key my-map (kbd "<menu>") 'menu-bar-open)
 
 (provide 'nispio/my-mode)
