@@ -267,6 +267,10 @@
     (define-key my-map (kbd "M-s o") 'helm-occur) ;; Replaces occur
     (define-key my-map (kbd "M-s r") 'helm-register)
 
+	(use-package helm-swoop :ensure t)
+	(global-set-key (kbd "M-s i") 'helm-swoop)
+	(global-set-key (kbd "M-s I") 'helm-multi-swoop-all)
+
     ;; Use a more powerful alternative to ido-mode's flex matching.
     ;; SOURCE: https://github.com/lewang/flx.git
     (use-package flx-ido :ensure t)
