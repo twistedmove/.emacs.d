@@ -79,16 +79,26 @@
   ;; Use unix line endings by default
   (setq default-buffer-file-coding-system 'utf-8-unix)
 
+  (require 'dired-x)
+  ;; Open all marked files at once, but only show one
+  (defun nispio/find-marked-files ()
+	(interactive)
+	(let ((file (dired-get-filename nil t))
+		  buf)
+	  (dired-do-find-marked-files t)
+	  (quit-window)
+	  (setq buf (and file (get-file-buffer file)))
+	  (and buf (show-buffer nil buf))))
+  (define-key dired-mode-map "F" 'nispio/find-marked-files)
+  ;; Start search in dired buffer with "/"
+  (define-key dired-mode-map (kbd "/") 'isearch-forward)
+
   ;; Extend dired functionality
   (use-package dired+ :ensure t)
-  (require 'dired-x)
-  ;; Command to open all marked files at once
-  (define-key dired-mode-map (kbd "F") 'dired-do-find-marked-files)
-  (define-key dired-mode-map (kbd "/") 'phi-search)
+
   ;; When opening a directory in dired, reuse the current buffer
   (diredp-toggle-find-file-reuse-dir 1)
   (customize-set-variable 'diredp-hide-details-initially-flag nil)
-
 
   ;; Make ibuffer auto-update after changes
   ;; (source: http://emacs.stackexchange.com/a/2179/93)
