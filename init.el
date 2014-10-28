@@ -154,15 +154,23 @@
     (interactive)
     (mc/create-fake-cursor-at-point))
 
-  (define-key my-map (kbd "C-c C-SPC") 'nispio/fake-cursor-at-point)
   (define-key my-map (kbd "C->") 'mc/mark-next-like-this)
   (define-key my-map (kbd "C-<") 'mc/mark-previous-like-this)
   (define-key my-map (kbd "C-c C-<") 'mc/mark-all-like-this)
   (define-key my-map (kbd "C-c C->") 'mc/mark-more-like-this-extended)
   (define-key my-map (kbd "C-S-c C-S-c") 'mc/edit-lines)
   (define-key my-map (kbd "C-S-c C-<") 'mc/mark-all-in-region)
-  (define-key my-map (kbd "<f7>") 'multiple-cursors-mode)
+  (define-key my-map (kbd "H-C-SPC") 'nispio/fake-cursor-at-point)
+  (define-key my-map (kbd "<H-return>") 'multiple-cursors-mode)
 
+  ;; TODO: find a better way to set these bindings in special cases
+  (global-set-key (kbd "C->") 'mc/mark-next-like-this)
+  (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+  (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
+  (global-set-key (kbd "C-c C->") 'mc/mark-more-like-this-extended)
+  (global-set-key (kbd "H-C-SPC") 'nispio/fake-cursor-at-point)
+  (global-set-key (kbd "<H-return>") 'multiple-cursors-mode)
+  
   ;; Add extended interoperability between phi-search and multiple cursors
   ;; (source: https://github.com/knu/phi-search-mc.el)
   (eval-after-load "phi-search"
@@ -230,7 +238,7 @@
   ;; (use-package sr-speedbar :ensure t)
   (require 'sr-speedbar)
   (define-key my-map (kbd "C-c M-SPC") 'sr-speedbar-toggle)
-  (define-key my-map (kbd "C-c C-g w") 'sr-speedbar-select-window)
+  ;(define-key nispio/gdb-window-map (kbd "w") 'sr-speedbar-select-window)
 
   ;; Display ^L as a horizontal line
   ;; (use-package page-break-lines :ensure t)
@@ -239,8 +247,9 @@
   (diminish 'page-break-lines-mode "")
   
   ;; TODO: require devel-utils
-  (load-file "~/.emacs.d/site-lisp/nispio/init-devel.el")
-
+  (require 'nispio/dev-utils)
+  (define-key nispio/gdb-window-map (kbd "w") 'sr-speedbar-select-window)
+  (define-key my-map (kbd "H-g") nispio/gdb-window-map)
   
   (require 'nispio/xmidas)
 
@@ -341,3 +350,4 @@
 (load custom-file)
 
 (put 'narrow-to-page 'disabled nil)
+(put 'narrow-to-region 'disabled nil)

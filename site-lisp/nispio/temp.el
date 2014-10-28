@@ -227,20 +227,28 @@
 (require 'helm-helm-commands)
 (global-set-key (kbd "C-8 C-8") 'helm-helm-commands)
 
-
-
-(defun take-that-repeat () (interactive)
-  (message "And that! (%d)" (cl-incf my-repeat-count)))
-
-(defun take-that-start ()
+(defun my-repeatable-command ()
   (interactive)
-  (message "Take that!")
-  (setq my-repeat-count 1)
+  (message "Now press TAB to repeat")
+  (setq my-repeat-count 0)
   (let ((map (make-sparse-keymap)))
-	 (define-key map (kbd "=") 'take-that-repeat)
-	 (set-temporary-overlay-map map t)))
+	 (define-key map (kbd "<tab>") 'my-forward-command)
+	 (define-key map (kbd "<backtab>") 'my-backward-command)
+	 (define-key map (kbd "<return>") 'my-end-repeatable-command)
+	 (set-transient-map map t)))
 
-(define-key my-map (kbd "C-x =") 'take-that-start)
+(defun my-forward-command () (interactive)
+  (setq my-repeat-count (+ 1 my-repeat-count))
+  (message "Number is %d" my-repeat-count))
+
+(defun my-backward-command () (interactive)
+  (setq my-repeat-count (+ -1 my-repeat-count))
+  (message "Number is %d" my-repeat-count))
+
+(defun my-end-repeatable-command () (interactive)
+  (message "You ended on %d" my-repeat-count))
+
+(global-set-key (kbd "<C-tab>") 'my-repeatable-command)
 
 (defun gud-watch (&optional arg event)
   "Watch expression at point.

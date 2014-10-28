@@ -58,6 +58,7 @@
 		semantic-complete-self-insert
 		sgml-slash
 		sh-end-of-command
+		transpose-sexps
 		uncomment-region
 		wdired-upcase-word
 		))
