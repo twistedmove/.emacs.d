@@ -57,6 +57,7 @@
 (define-key my-map (kbd "C-j") 'newline-and-indent)
 (define-key my-map [remap list-buffers] 'ibuffer)
 (define-key my-map (kbd "<menu>") 'menu-bar-open)
+(define-key my-map (kbd "C-H-]") 'abort-recursive-edit)
 
 (provide 'nispio/my-mode)
 

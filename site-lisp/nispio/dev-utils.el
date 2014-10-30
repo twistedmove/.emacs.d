@@ -1,8 +1,13 @@
+(require 'nispio/misc-utils)
+
 ;; Set up indenting in C/C++
 (setq c-default-style "linux")
 (setq-default c-basic-offset 4)
 (setq-default tab-width 4)
 (c-set-offset 'inline-open 0)
+
+(setq comint-scroll-to-bottom-on-input t)
+(setq-default comint-move-point-for-output 'others)
 
 ;; Set up C-mode specific keybindings
 (defun nispio/c-mode-keys-hook ()
@@ -24,7 +29,7 @@
 
 ;; Configure GDB for debugging
 (setq gdb-show-main t)
-(setq gdb-many-windows t)
+;;(setq gdb-many-windows t)
 (put 'debug-command 'safe-local-variable 'stringp)
 
 ;; Call the compiler and save the compile command when in C
@@ -52,8 +57,27 @@
       (setq-local debug-command (read-string "Run gdb (like this): " my-guess))
       (when (y-or-n-p "Save file-local variable debug-command?")
         (add-file-local-variable 'debug-command debug-command))))
-  (sr-speedbar-open)
-  (gdb debug-command))
+  (unless (window-resizable-p nil 1)
+	(split-window-below))
+  (gdb debug-command)
+  (with-current-buffer gud-comint-buffer
+	(nispio/set-window-size nil 12)
+	(set-window-dedicated-p nil t)
+	(when (display-graphic-p)
+	  (tool-bar-mode 1)
+	  (add-hook 'kill-buffer-hook (lambda () (tool-bar-mode -1)) t t)))
+  (add-hook 'kill-buffer-hook 'nispio/delete-window-maybe t t))
+
+(defun nispio/stop-debugging ()
+  (interactive)
+  (let* ((buffer (get-buffer gud-comint-buffer))
+		 (proc (and buffer (get-buffer-process buffer))))
+	(when (and proc (process-live-p proc))
+	  (message "Killing GUD comint buffer process...")
+	  (kill-process proc)
+	  (while (process-live-p proc) nil)
+	  (message "Exit debugger"))
+	(kill-buffer buffer)))
 
 ;; Run debugger in another (maximized) frame
 (defun nispio/debug-other-frame ()
@@ -109,11 +133,6 @@
   (interactive "P")
   (gud-basic-call "disable breakpoints"))
 
-(defun nispio/stop-debugging (&optional arg)
-  "Kill the process being debugged"
-  (interactive "P")
-  (kill-buffer gud-comint-buffer))
-
 (defun nispio/mouse-toggle-breakpoint (event)
   "Set/clear breakpoint in left fringe/margin at mouse click.
 If not in a source or disassembly buffer just set point."
@@ -130,6 +149,13 @@ If not in a source or disassembly buffer just set point."
             (gud-remove nil)
           (gud-break nil)))))
       (posn-set-point posn))))
+
+(defun nispio/attach (pid)
+  "Attach gdb to a running process"
+  (interactive "nAttach to process id: ")
+  (comint-send-string gud-comint-buffer (format "attach %d\n" pid))
+  (sit-for 3)
+  (gud-cont nil))
 
 ;; Set up GUD specific keybindings
 (defun nispio/gdb-mode-keys-hook ()
@@ -159,6 +185,48 @@ If not in a source or disassembly buffer just set point."
 ;; gud-refresh    ; Fix up a possibly garbled display, and redraw the arrow
 ;; gud-tbreak     ; Set temporary breakpoint at current line
 (add-hook 'gdb-mode-hook 'nispio/gdb-mode-keys-hook)
+
+
+
+(defun nispio/setup-gud-toolbar ()
+  ;; Modify existing buttons in the GUD toolbar
+  (let ((menu gud-tool-bar-map))
+	(dolist (x '((go :visible nil)
+				 (cont :visible t)
+				 (cont :help "Continue (gud-cont)" )
+				 (next menu-item "Step Over")
+				 (next :help "Step Over (gud-next)")
+				 (step menu-item "Step Into")
+				 (step :help "Step Into (gud-step)")
+				 (finish :help "Step Out (gud-finish)")
+				 (finish menu-item "Step Out")
+				 (finish :vert-only nil)
+				 (up :vert-only t)
+				 (down :vert-only t))
+			   gud-tool-bar-map)
+	  (nispio/menu-item-property menu (car x) (cadr x) (caddr x)))
+
+	;; Add Attach to Process button to GUD toolbar
+	(define-key-after menu [attach]
+	  '(menu-item "Attach" nispio/attach
+				  :help "Attach To Running Process"
+				  :enable (not gud-running)
+				  :image (image :type xpm :file "attach.xpm")
+				  :vert-only t)
+	  'watch)
+
+	;; Add Stop Debugging button to GUD toolbar
+	(define-key-after menu [exit]
+	  '(menu-item "Quit Debugging" nispio/stop-debugging
+				  :help (let ((key (where-is-internal 'nispio/stop-debugging nil t)))
+						  (format "Exit GUD %s" (key-description key)))
+				  :image (image :type xpm :file "exit.xpm")
+				  :vert-only t))))
+
+(add-hook 'gdb-mode-hook 'nispio/setup-gud-toolbar)
+
+
+
 
 ;; Set up hotkeys for transitioning between windows in gdb
 ;; (source: http://markshroyer.com/2012/11/emacs-gdb-keyboard-navigation/)
@@ -225,5 +293,14 @@ Recognized window header names are: 'comint, 'locals, 'registers,
 			("s" . stack)
 			("b" . breakpoints)
 			("t" . threads))))
+
+
+
+(require 'semantic/ia)
+(require 'semantic/bovine/gcc)
+(semantic-mode 1)
+(define-key my-map (kbd "H-j")'semantic-ia-fast-jump)
+
+
 
 (provide 'nispio/dev-utils)

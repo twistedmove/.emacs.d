@@ -32,10 +32,9 @@
 	  (nispio/maximize-frame))))
 
 (defun nispio/show-prefix-arg (&optional arg)
+  "Show the raw prefix arg"
   (interactive "P")
-  (if (/= 0 (safe-length arg))
-      (message "Prefix: %s (%d)" arg (safe-length arg))
-    (message "Argument: %s (%d)" arg (safe-length arg))))
+  (message "%s" arg))
 
 (defun nispio/trim-string (arg) 
   "Simple function for trimming the whitespace from the ends of
@@ -57,5 +56,49 @@ to ignore."
 		 (reject (append reject '("." "..")))
 		 (prunes (mapcar (lambda (el) (concat dir el)) reject)))
 	(prune-directory-list files nil prunes)))
+
+
+(defun nispio/set-window-size (window length &optional horizontal ignore)
+  "Resize WINDOW vertically to length lines.
+WINDOW can be an arbitrary window and defaults to the selected
+one.  An attempt to resize the root window of a frame will raise
+an error though.
+
+For more information, refer to the doc string of
+`window-resize'.
+"
+  (interactive (list nil (prefix-numeric-value current-prefix-arg) nil nil))
+  (setq window (window-normalize-window window))
+  (let* ((cur-height (window-body-height window))
+		(cur-width (window-body-width window))
+		(delta (if horizontal
+				   (- length cur-width)
+				 (- length cur-height))))
+	(window-resize window delta horizontal ignore)))
+
+
+(defun nispio/delete-window-maybe (&optional window)
+  "Delete WINDOW.
+WINDOW must be a valid window and defaults to the selected one.
+Return nil.
+
+If WINDOW is the root window of its frame, then make sure the
+window is not dedicated to its buffer.
+
+For more information see `delete-window'.
+"
+  (setq window (window-normalize-window window))
+  (if (frame-root-window-p window)
+	  (set-window-dedicated-p window nil)
+	(delete-window window)))
+
+(defun nispio/menu-item-property (menu item property value)
+  "Set VALUE of named PROPERTY in menu item ITEM from MENU"
+  (let* ((map (assoc item (cdr menu)))
+		 (n (position property map)))
+	(if (numberp n)
+		 (setf (elt map (+ 1 n)) value)
+	   (nconc map (list property value)))
+	 map))
 
 (provide 'nispio/misc-utils)

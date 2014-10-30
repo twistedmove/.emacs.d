@@ -588,3 +588,23 @@ For example, type \\[event-apply-meta-modifier] & to enter Meta-&."
 	filtered-files))
 
 (prune-directory-list '("~/.emacs.d" "~/.emacs.d/init.el" "~/.emacs.d/site-lisp"))
+
+
+(nispio/set-buffer-window-height "dev-utils.el" 15)
+
+
+
+(mapconcat (lambda (x) (format "%S" (car x))) (cdr gud-tool-bar-map) "\n")
+(assoc 'go (cdr gud-tool-bar-map))
+(assoc 'GDB (cdr tool-bar-map))
+
+(find-image '((:type xpm :file "attach.xpm")))
+
+(define-key-after tool-bar-map [GDB]
+  '(menu-item "GDB" gdb-init-buffer
+			  :visible (and (boundp 'gud-comint-buffer)
+							(buffer-live-p gud-comint-buffer))
+			  :image (image :type xpm :file "attach.xpm")
+			  :help "Switch to GDB toolbar in current buffer"))
+
+

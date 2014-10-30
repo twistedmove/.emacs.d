@@ -36,6 +36,7 @@
 		indent-for-tab-command
 		kill-region
 		kill-visual-line
+		mark-sexp
 		mark-word
 		matlab-comment
 		matlab-electric-comment
@@ -69,7 +70,6 @@
 		compile
 		describe-key
 		dired
-		eval-defun
 		goto-line
 		helm-apropos
 		helm-descbinds
@@ -79,7 +79,6 @@
 		ido-switch-buffer-other-window
 		kill-rectangle
 		make-default
-		mark-sexp
 		mouse-save-then-kill
 		multiple-cursors-mode
 		nispio/other-window

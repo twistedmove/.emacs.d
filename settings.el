@@ -81,8 +81,11 @@
 			 (projectile-project-name)))))
  '(safe-local-variable-values (quote ((visual-line-mode . t) (auto-fill-mode . 0))))
  '(save-interprogram-paste-before-kill t)
+ '(semantic-default-submodes
+   (quote
+	(global-semantic-highlight-func-mode global-semantic-stickyfunc-mode global-semanticdb-minor-mode global-semantic-idle-summary-mode global-semantic-idle-local-symbol-highlight-mode)))
  '(show-paren-mode t)
- '(sr-speedbar-skip-other-window-p t)
+ '(sr-speedbar-skip-other-window-p nil)
  '(yank-pop-change-selection t))
 (put 'dired-find-alternate-file 'disabled nil)
 (custom-set-faces
