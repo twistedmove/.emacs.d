@@ -5,6 +5,11 @@
     (other-window N 'visible)
     (select-frame-set-input-focus (selected-frame))))
 
+(defun nispio/previous-window (&optional arg)
+  "Cycle through windows backwards"
+  (interactive)
+  (nispio/other-window -1))
+
 (defun nispio/buffer-file-name ()
   "Display the name of the file backing the current buffer"
   (interactive)
@@ -99,6 +104,18 @@ For more information see `delete-window'.
 	(if (numberp n)
 		 (setf (elt map (+ 1 n)) value)
 	   (nconc map (list property value)))
-	 map))
+	map))
+
+;; (source: https://github.com/magnars/.emacs.d/blob/master/defuns/lisp-defuns.el)
+(defun nispio/eval-and-replace ()
+  "Replace the preceding sexp with its value."
+  (interactive)
+  (backward-kill-sexp)
+  (condition-case nil
+	  (prin1 (eval (read (current-kill 0)))
+			 (current-buffer))
+	(error (message "Invalid expression")
+		   (insert (current-kill 0)))))
+
 
 (provide 'nispio/misc-utils)

@@ -23,6 +23,7 @@
 		comment-dwim
 		comment-region
 		delete-horizontal-space
+		delete-rectangle
 		dired-flag-file-deletion
 		dired-mark
 		dired-next-line
@@ -33,6 +34,7 @@
 		eval-print-last-sexp
 		forward-sentence
 		forward-sexp
+		highlight-symbol-at-point
 		indent-for-tab-command
 		kill-region
 		kill-visual-line
@@ -41,6 +43,7 @@
 		matlab-comment
 		matlab-electric-comment
 		matlab-linefeed
+		nispio/eval-and-replace
 		org-backward-sentence
 		org-beginning-of-line
 		org-delete-char
@@ -70,6 +73,7 @@
 		compile
 		describe-key
 		dired
+		eval-expression
 		goto-line
 		helm-apropos
 		helm-descbinds
@@ -85,6 +89,7 @@
 		org-ctrl-c-ctrl-c
 		overwrite-mode
 		scroll-other-window
+		suspend-frame
 		view-lossage
 		wdired-finish-edit
 		))

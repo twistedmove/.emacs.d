@@ -164,20 +164,6 @@
 ;; (bind-key (kbd "C-9") 'phi-search-from-isearch-mc/mark-all isearch-mode-map)
 
 
-(defun phi-search-complete-with-selection ()
-  (interactive)
-  (let ((query (buffer-string)))
-    (phi-search-complete)
-    (mc/execute-command-for-all-cursors
-     (lambda ()
-       (interactive)
-       (when (looking-back query)
-         (push-mark (match-beginning 0) t t)
-         (goto-char (match-end 0))
-         (activate-mark))))))
-(bind-key (kbd "C-9") 'phi-search-complete-with-selection)
-
-
 (bind-key (kbd "C-8") helm-command-map (current-global-map))
 
 ;; Show the current function name in the header line
@@ -606,5 +592,60 @@ For example, type \\[event-apply-meta-modifier] & to enter Meta-&."
 							(buffer-live-p gud-comint-buffer))
 			  :image (image :type xpm :file "attach.xpm")
 			  :help "Switch to GDB toolbar in current buffer"))
+
 
 
+;; (source: http://emacs.stackexchange.com/a/81/93)
+(defun switch-to-scratch-and-back ()
+  "Toggle between *scratch-MODE* buffer and the current buffer.
+If a scratch buffer does not exist, create it with the major mode set to that
+of the buffer from where this function is called."
+  (interactive)
+  (if (string-match "*scratch" (format "%s" (current-buffer)))
+      (switch-to-buffer (other-buffer))
+    (let ((mode-str (format "%s" major-mode)))
+      (let ((scratch-buffer-name (get-buffer-create (concat "*scratch-" mode-str "*"))))
+        (switch-to-buffer scratch-buffer-name)
+        ; (source: http://stackoverflow.com/q/7539615)
+        (funcall (intern mode-str))))))
+(define-key my-map (kbd "C-H-\\") 'switch-to-scratch-and-back)
+
+
+
+
+
+(setq projectile-require-project-root t)
+
+(eval-after-load "projectile"
+  (progn 
+	;; (source: https://github.com/bbatsov/projectile/issues/364#issuecomment-61296248)
+	(defun projectile-root-child-of (dir &optional list)
+	  (projectile-locate-dominating-file
+	   dir
+	   (lambda (dir)
+		 (--first
+		  (if (and
+			   (s-equals? (file-remote-p it) (file-remote-p dir))
+			   (string-match-p (expand-file-name it) (expand-file-name dir)))
+			  dir)
+		  (or list project-root-regexps (list))))))
+	(defvar project-root-regexps ()
+	  "List of regexps to match against when projectile is searching
+    for project root directories.")
+	(nconc projectile-project-root-files-functions '(projectile-root-child-of))
+	nil))
+
+
+
+
+(require 'hideshow)
+(global-set-key (kbd "C-c @") 'hs-minor-mode)
+
+
+
+(defun nispio/add-killed-rectangle-to-kill-ring ()
+  (interactive)
+  (when killed-rectangle
+	(kill-new killed-rectangle)
+	(setq phi-rectangle--last-killed-is-rectangle nil)))
+(define-key my-map (kbd "C-c C-M-w") 'nispio/add-killed-rectangle-to-kill-ring)

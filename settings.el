@@ -1,7 +1,7 @@
 ;; Configure UI features
 (scroll-bar-mode 0)			; Disable scroll bars
-(tooltip-mode 1)			; Disable tooltips
-(fringe-mode '(nil . 0))		; Left fringes only
+(tooltip-mode 1)			; Enable tooltips
+(fringe-mode '(nil . 0))	; Left fringes only
 (tool-bar-mode 0)			; Disable toolbar
 
 (when (>= emacs-major-version 24)
@@ -25,6 +25,8 @@
  '(font-lock-maximum-decoration (quote ((t . t) (dired-mode . 2))))
  '(font-use-system-font t)
  '(helm-buffer-max-length 30)
+ '(helm-match-plugin-mode t nil (helm-match-plugin))
+ '(helm-split-window-in-side-p t)
  '(helm-truncate-lines t)
  '(ibuffer-elide-long-columns t)
  '(ibuffer-formats
@@ -68,6 +70,7 @@
  '(ido-default-buffer-method (quote selected-window))
  '(ido-default-file-method (quote selected-window))
  '(ido-max-window-height 2)
+ '(mc/edit-lines-empty-lines (quote ignore))
  '(minimap-dedicated-window nil)
  '(minimap-display-semantic-overlays nil)
  '(minimap-hide-fringes t)
@@ -79,6 +82,7 @@
 	(:eval
 	 (format " Prj[%s]"
 			 (projectile-project-name)))))
+ '(projectile-require-project-root nil)
  '(safe-local-variable-values (quote ((visual-line-mode . t) (auto-fill-mode . 0))))
  '(save-interprogram-paste-before-kill t)
  '(semantic-default-submodes
@@ -93,4 +97,6 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(default ((t (:background "black" :foreground "WhiteSmoke"))))
+ '(linemark-funny-face ((t (:background "gray14" :foreground "light yellow"))))
+ '(linemark-go-face ((t (:background "gray14" :foreground "honeydew1")))))

@@ -6,37 +6,16 @@
 (message "Loading init file...")
 (switch-to-buffer "*Messages*")
 
+;; My "must-have" key bindings
 (global-set-key (kbd "C-\\") 'other-window)
 (global-set-key (kbd "M-1") 'delete-other-windows)
+
 
 ;; Set load paths for lisp files
 (setq site-lisp "~/.emacs.d/site-lisp")
 (add-to-list 'load-path site-lisp)
 
-;; Load my own minor mode for personal keybindings
-(require 'nispio/my-mode)
-(enable-my-global-mode)
-(global-set-key (kbd "C-M-&") 'enable-my-global-mode)
-
 (require 'nispio/misc-utils)
-(require 'nispio/key-utils)
-(nispio/unbind-digit-arguments)
-(define-key my-map (kbd "C-h C-k") 'nispio/insert-key-description)
-(define-key my-map (kbd "C-h k") 'nispio/locate-key-binding)
-(global-set-key (kbd "C-h C-M-k") 'nispio/unbind-local-key)
-
-(require 'nispio/org-table-utils)
-(global-set-key (kbd "C-c |") 'nispio/edit-dsv-as-orgtbl)
-
-(setq-default truncate-lines t)        ; Truncate lines by default
-(setq inhibit-startup-screen t)        ; Disable splash screen
-(setq visible-bell t)                  ; Disable system beep
-(setq transient-mark-mode t)           ; Enable visual feedback on selections
-(setq x-stretch-cursor t)              ; Cursor as wide as the glyph under it
-(setq scroll-step 1)                   ; Only scroll by one line at top/bottom
-(setq require-final-newline t)         ; Always end a file with a newline
-(setq frame-title-format "emacs - %b") ; Set frame title to "emacs - <buffer name>"
-
 (setq load-path
 	  (append
 	   ;; Add all folders from site-lisp (except explicitly rejected dirs).
@@ -45,6 +24,29 @@
 	   (nispio/directory-subdirs site-lisp '(".git" "nispio"))
 	   ;; Put the current load-path at the end
 	   load-path))
+
+
+;; Load my own minor mode for personal keybindings
+(require 'nispio/my-mode)
+(enable-my-global-mode)
+(global-set-key (kbd "C-M-&") 'enable-my-global-mode)
+
+(require 'nispio/key-utils)
+(nispio/unbind-digit-arguments)
+(define-key my-map (kbd "C-h C-k") 'nispio/insert-key-description)
+(define-key my-map (kbd "C-h k") 'nispio/locate-key-binding)
+(global-set-key (kbd "C-h C-M-k") 'nispio/unbind-local-key)
+
+
+;; Basic editor configuration
+(setq-default truncate-lines t)        ; Truncate lines by default
+(setq inhibit-startup-screen t)        ; Disable splash screen
+(setq visible-bell t)                  ; Disable system beep
+(setq transient-mark-mode t)           ; Enable visual feedback on selections
+(setq x-stretch-cursor t)              ; Cursor as wide as the glyph under it
+(setq scroll-step 1)                   ; Only scroll by one line at top/bottom
+(setq require-final-newline t)         ; Always end a file with a newline
+(setq frame-title-format "emacs - %b") ; Set frame title to "emacs - <buffer name>"
 
 
 
@@ -62,7 +64,7 @@
 
   ;; Display line numbers in all programming buffers
   (use-package linum :ensure t)
-  (global-linum-mode 1)
+  ;(global-linum-mode -1)
   (add-hook 'prog-mode-hook 'linum-mode)
   (setq linum-format "%3d")
 
@@ -91,7 +93,7 @@
 	  (and buf (show-buffer nil buf))))
   (define-key dired-mode-map "F" 'nispio/find-marked-files)
   ;; Start search in dired buffer with "/"
-  (define-key dired-mode-map (kbd "/") 'isearch-forward)
+  (define-key dired-mode-map (kbd "/") 'dired-isearch-filenames)
 
   ;; Extend dired functionality
   (use-package dired+ :ensure t)
@@ -147,6 +149,20 @@
   (define-key my-map (kbd "C-s") 'phi-search)
   (define-key my-map (kbd "C-r") 'phi-search-backward)
 
+  ;; Complete phi-search with the match selected
+  (defun phi-search-complete-with-selection ()
+  (interactive)
+  (let ((query (buffer-string)))
+    (phi-search-complete)
+    (mc/execute-command-for-all-cursors
+     (lambda ()
+       (interactive)
+       (when (looking-back query)
+         (push-mark (match-beginning 0) t t)
+         (goto-char (match-end 0))
+         (activate-mark))))))
+  (define-key phi-search-default-map (kbd "<S-return>") 'phi-search-complete-with-selection)
+
   ;; Add support for editing with multiple cursors
   ;; (source: https://github.com/magnars/multiple-cursors.el)
   (use-package multiple-cursors :ensure t)
@@ -177,6 +193,7 @@
     (progn
 	  (use-package phi-search-mc :ensure t)
       (phi-search-mc/setup-keys)
+	  (define-key my-map (kbd "C-H-s") 'phi-search-from-isearch)
       nil))
 
   (define-key my-map (kbd "C-c c") 'comment-region)
@@ -250,7 +267,7 @@
   (require 'nispio/dev-utils)
   (define-key nispio/gdb-window-map (kbd "w") 'sr-speedbar-select-window)
   (define-key my-map (kbd "H-g") nispio/gdb-window-map)
-  
+
   (require 'nispio/xmidas)
 
   ) ;; end with-demoted-errors
@@ -277,8 +294,8 @@
     (define-key my-map (kbd "M-s r") 'helm-register)
 
 	(use-package helm-swoop :ensure t)
-	(global-set-key (kbd "M-s i") 'helm-swoop)
-	(global-set-key (kbd "M-s I") 'helm-multi-swoop-all)
+	(define-key my-map (kbd "M-s i") 'helm-swoop)
+	(define-key my-map (kbd "M-s I") 'helm-multi-swoop-all)
 
     ;; Use a more powerful alternative to ido-mode's flex matching.
     ;; SOURCE: https://github.com/lewang/flx.git
@@ -291,6 +308,34 @@
     (require 'projectile)
     (projectile-global-mode)
     (setq projectile-enable-caching t)
+
+	(defvar project-root-regexps ()
+	  "List of regexps to match against when projectile is searching
+for project root directories.")
+
+	;; File containing local project roots on this machine
+	(let ((file "~/.emacs.d/local-projects.el"))
+	  (when (file-exists-p file)
+		(load-file file)))
+  
+	;; Add the ability to use projects that are not 
+	(eval-after-load 'projectile
+	  (progn 
+		;; (source: https://github.com/bbatsov/projectile/issues/364#issuecomment-61296248)
+		(defun projectile-root-child-of (dir &optional list)
+		  (projectile-locate-dominating-file
+		   dir
+		   (lambda (dir)
+			 (--first
+			  (if (and
+				   (s-equals? (file-remote-p it) (file-remote-p dir))
+				   (string-match-p (expand-file-name it) (expand-file-name dir)))
+				  dir)
+			  (or list project-root-regexps (list))))))
+		(nconc projectile-project-root-files-functions '(projectile-root-child-of))
+		nil))
+
+
 
     ;; Use helm for projectile
     (use-package helm-projectile :ensure t)
@@ -333,6 +378,23 @@
 
 
 
+;; Function to turn a delimiter-separated value file into an org table
+(autoload 'nispio/edit-dsv-as-orgtbl "nispio/org-table-utils")
+(global-set-key (kbd "C-c |") 'nispio/edit-dsv-as-orgtbl)
+
+;; Add some personal org-mode tweaks centered around editing org tables
+(autoload 'nispio/org-mode-setup "nispio/org-table-utils")
+(add-hook 'org-mode-hook 'nispio/org-mode-setup)
+
+;; Make hide-show mode available, turn it on it a buffer with C-c @
+(autoload 'hs-minor-mode "hideshow")
+(global-set-key (kbd "C-c @") 'hs-minor-mode)
+
+;; Enable disabled commands
+(put 'narrow-to-page 'disabled nil)
+(put 'narrow-to-region 'disabled nil)
+
+
 (setq no-server-start-p (member "--no-server" command-line-args))
 (setq command-line-args (delete "--no-server" command-line-args))
 
@@ -343,11 +405,10 @@
 	(server-force-delete)
 	(server-start)))
 
+
+
 ;; Settings modified via the Customize interface get their own file
 (if (display-graphic-p)
     (setq custom-file "~/.emacs.d/settings.el")
   (setq custom-file "~/.emacs.d/settings-tty.el"))
 (load custom-file)
-
-(put 'narrow-to-page 'disabled nil)
-(put 'narrow-to-region 'disabled nil)

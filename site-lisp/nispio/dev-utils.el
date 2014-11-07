@@ -7,7 +7,9 @@
 (c-set-offset 'inline-open 0)
 
 (setq comint-scroll-to-bottom-on-input t)
-(setq-default comint-move-point-for-output 'others)
+(setq compilation-scroll-output 'first-error)
+;(setq-default comint-move-point-for-output 'others)
+(setq-default comint-move-point-for-output nil)
 
 ;; Set up C-mode specific keybindings
 (defun nispio/c-mode-keys-hook ()
@@ -302,5 +304,6 @@ Recognized window header names are: 'comint, 'locals, 'registers,
 (define-key my-map (kbd "H-j")'semantic-ia-fast-jump)
 
 
+
 
 (provide 'nispio/dev-utils)

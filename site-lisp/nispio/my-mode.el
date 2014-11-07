@@ -27,10 +27,6 @@
   (my-global-mode -1)
   (message "my-global-mode disabled"))
 
-(defun my-key-do-nothing ()
-  (interactive)
-  (message "This key is not bound"))
-
 ;; If not in a TTY, Unbind C-m, C-i, and C-[ so we can use them elsewhere
 (if (not (display-graphic-p))
     (setq tty-keys t)
@@ -44,20 +40,28 @@
 
 (define-key local-function-key-map [?\C-\]] 'event-apply-hyper-modifier)
 (define-key global-map [?\C-\]] nil)
+(define-key global-map (kbd "<pause>") my-map)
 
 ;; Set up basic keybindings
+(define-key my-map (kbd "<pause>") global-map)
 (define-key my-map (kbd "C-M-&") 'disable-my-global-mode)
 (define-key my-map (kbd "C--") 'delete-window)
 (define-key my-map (kbd "C-0") 'delete-window)
 (define-key my-map (kbd "M-0") 'delete-window)
 (define-key my-map (kbd "M-1") 'delete-other-windows)
 (define-key my-map (kbd "C-\\") 'nispio/other-window)
+(define-key my-map (kbd "<M-tab>") 'nispio/other-window)
+(define-key my-map (kbd "<M-iso-lefttab>") 'nispio/previous-window)
+(define-key my-map (kbd "<C-tab>") 'nispio/other-window)
+(define-key my-map (kbd "<C-iso-lefttab>") 'nispio/previous-window)
 (define-key my-map (kbd "C-x <f1>") 'nispio/buffer-file-name)
 (define-key my-map (kbd "<f11>") 'nispio/toggle-fullscreen)
 (define-key my-map (kbd "C-j") 'newline-and-indent)
 (define-key my-map [remap list-buffers] 'ibuffer)
 (define-key my-map (kbd "<menu>") 'menu-bar-open)
 (define-key my-map (kbd "C-H-]") 'abort-recursive-edit)
+(define-key my-map (kbd "H-e") 'nispio/eval-and-replace)
+(define-key my-map (kbd "C-h o") 'describe-face)
 
 (provide 'nispio/my-mode)
 
