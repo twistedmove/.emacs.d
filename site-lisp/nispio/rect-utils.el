@@ -39,8 +39,4 @@
 ;;   (phi-rectangle-set-mark-command)
 ;;   (exchange-point-and-mark))
 
-(define-key my-map (kbd "C-x r Y") 'nispio/yank-rectangle-from-kill-ring)
-(define-key my-map (kbd "C-x r D") 'delete-whitespace-rectangle)
-(define-key my-map (kbd "C-c C-S-SPC") 'nispio/region-to-phi-rectangle)
-
 (provide 'nispio/rect-utils)

@@ -1,7 +1,5 @@
 (deftheme nispio-dark
-  "Very high contrast faces with a black background.
-This theme avoids subtle color variations, while avoiding the
-jarring angry fruit salad look to reduce eye fatigue.")
+  "High contrast faces with a black background.")
 
 (custom-theme-set-faces
  'nispio-dark

@@ -305,5 +305,8 @@ Recognized window header names are: 'comint, 'locals, 'registers,
 
 
 
+(autoload 'doxymacs-mode "doxymacs")
+(add-hook 'c-mode-common-hook 'doxymacs-mode)
 
+
 (provide 'nispio/dev-utils)

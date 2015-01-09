@@ -22,6 +22,7 @@
  '(column-number-mode t)
  '(dired-omit-files "^\\.?#")
  '(display-time-mode t)
+ '(doxymacs-doxygen-style "C++")
  '(font-lock-maximum-decoration (quote ((t . t) (dired-mode . 2))))
  '(font-use-system-font t)
  '(helm-buffer-max-length 30)
@@ -46,8 +47,6 @@
 	(("default"
 	  ("File Buffers"
 	   (filename . ".+"))
-	  ("Dired Buffers"
-	   (used-mode . dired-mode))
 	  ("Special Buffers"
 	   (name . "\\b\\*.*\\*\\b"))))))
  '(ibuffer-saved-filters
@@ -77,6 +76,9 @@
  '(minimap-recenter-type (quote relative))
  '(minimap-resizes-buffer t)
  '(mlint-programs (quote ("/usr/local/MATLAB/R2014a/bin/glnxa64/mlint")))
+ '(page-break-lines-modes
+   (quote
+	(emacs-lisp-mode lisp-mode scheme-mode compilation-mode outline-mode help-mode c-mode c++-mode python-mode)))
  '(projectile-mode-line
    (quote
 	(:eval

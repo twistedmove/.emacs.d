@@ -16,7 +16,7 @@
     map)
   "Basic mode map for `run-xmidas'")
 
-(defvar xmidas-prompt-regexp "^[PSX]-Midas>"
+(defvar xmidas-prompt-regexp "^[PSX].Midas>"
   "Prompt for `run-xmidas'.")
 
 (defun run-xmidas ()

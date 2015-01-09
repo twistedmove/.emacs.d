@@ -7,9 +7,8 @@
 (switch-to-buffer "*Messages*")
 
 ;; My "must-have" key bindings
-(global-set-key (kbd "C-\\") 'other-window)
+(global-set-key (kbd "<C-tab>") 'other-window)
 (global-set-key (kbd "M-1") 'delete-other-windows)
-
 
 ;; Set load paths for lisp files
 (setq site-lisp "~/.emacs.d/site-lisp")
@@ -25,11 +24,12 @@
 	   ;; Put the current load-path at the end
 	   load-path))
 
-
 ;; Load my own minor mode for personal keybindings
 (require 'nispio/my-mode)
 (enable-my-global-mode)
 (global-set-key (kbd "C-M-&") 'enable-my-global-mode)
+
+(define-key my-map (kbd "C-H-\\") 'nispio/switch-to-scratch-and-back)
 
 (require 'nispio/key-utils)
 (nispio/unbind-digit-arguments)
@@ -37,6 +37,17 @@
 (define-key my-map (kbd "C-h k") 'nispio/locate-key-binding)
 (global-set-key (kbd "C-h C-M-k") 'nispio/unbind-local-key)
 
+;; This is a hack because my M-s keybinding disappear in some modes
+(define-key my-map (kbd "M-s") (key-binding (kbd "M-s")))
+
+(require 'nispio/rect-utils)
+(define-key my-map (kbd "C-x r Y") 'nispio/yank-rectangle-from-kill-ring)
+(define-key my-map (kbd "C-x r D") 'delete-whitespace-rectangle)
+
+(define-key my-map (kbd "C-c c") 'comment-region)
+(define-key my-map (kbd "C-c u") 'uncomment-region)
+(define-key my-map (kbd "C-x <f5>") 'revert-buffer)
+(define-key my-map (kbd "C-x <f6>") 'add-file-local-variable)
 
 ;; Basic editor configuration
 (setq-default truncate-lines t)        ; Truncate lines by default
@@ -47,6 +58,10 @@
 (setq scroll-step 1)                   ; Only scroll by one line at top/bottom
 (setq require-final-newline t)         ; Always end a file with a newline
 (setq frame-title-format "emacs - %b") ; Set frame title to "emacs - <buffer name>"
+
+;; Set tab width to 4 and put tab stops every 4 characters
+(setq tab-width 4)
+(setq tab-stop-list (number-sequence 4 100 4))
 
 
 
@@ -68,15 +83,14 @@
   (add-hook 'prog-mode-hook 'linum-mode)
   (setq linum-format "%3d")
 
-  ;; (unless tty-keys
-  ;;   ;; In Org Mode, use <C-m> as <M-return>
-  ;;   (defun nispio/fake-M-RET ()
-  ;;     (interactive)
-  ;;     (let ((command (key-binding (kbd "<M-return>"))))
-  ;;    (setq last-command-event [M-return])
-  ;;    (setq this-command command)
-  ;;    (call-interactively command)))
-  ;;   (add-hook 'org-mode-hook (lambda () (local-set-key (kbd "<C-m>") 'nispio/fake-M-RET))))
+  ;; In Org Mode, use <C-m> as <M-return>
+  (defun nispio/fake-M-RET ()
+	(interactive)
+	(let ((command (key-binding (kbd "<M-return>"))))
+	  (setq last-command-event [M-return])
+	  (setq this-command command)
+	  (call-interactively command)))
+  (add-hook 'org-mode-hook (lambda () (local-set-key (kbd "<C-m>") 'nispio/fake-M-RET)))
 
   ;; Use unix line endings by default
   (setq default-buffer-file-coding-system 'utf-8-unix)
@@ -146,8 +160,8 @@
   ;; (source: https://github.com/zk-phi/phi-search)
   (use-package phi-search :ensure t)
   (customize-set-value 'phi-search-case-sensitive 'guess)
-  (define-key my-map (kbd "C-s") 'phi-search)
-  (define-key my-map (kbd "C-r") 'phi-search-backward)
+  (define-key my-map (kbd "H-C-s") 'phi-search)
+  (define-key my-map (kbd "H-C-r") 'phi-search-backward)
 
   ;; Complete phi-search with the match selected
   (defun phi-search-complete-with-selection ()
@@ -193,17 +207,10 @@
     (progn
 	  (use-package phi-search-mc :ensure t)
       (phi-search-mc/setup-keys)
-	  (define-key my-map (kbd "C-H-s") 'phi-search-from-isearch)
+      (phi-search-from-isearch-mc/setup-keys)
       nil))
 
-  (define-key my-map (kbd "C-c c") 'comment-region)
-  (define-key my-map (kbd "C-c u") 'uncomment-region)
-
-  (define-key my-map (kbd "C-x <f5>") 'revert-buffer)
-  (define-key my-map (kbd "C-x <f6>") 'add-file-local-variable)
-
   ;; Use phi-rectangle for rectangular selections
-  ;; (source: http://www.emacswiki.org/emacs/rect-mark.el)
   (use-package phi-rectangle :ensure t)
   (define-key my-map (kbd "C-c C-SPC") 'phi-rectangle-set-mark-command)
   (define-key my-map (kbd "C-w") 'phi-rectangle-kill-region)
@@ -219,7 +226,7 @@
   ;; Use CEDET tools for matlab-mode
   (when (>= emacs-major-version 24)
     (matlab-cedet-setup)
-  )
+	)
 
   ;; Enable column markers at column 81 to warn of long lines
   ;; (source: http://www.emacswiki.org/emacs/download/column-marker.el)
@@ -263,7 +270,6 @@
   (global-page-break-lines-mode)
   (diminish 'page-break-lines-mode "")
   
-  ;; TODO: require devel-utils
   (require 'nispio/dev-utils)
   (define-key nispio/gdb-window-map (kbd "w") 'sr-speedbar-select-window)
   (define-key my-map (kbd "H-g") nispio/gdb-window-map)
@@ -291,11 +297,21 @@
     (define-key my-map (kbd "M-s b") 'nispio/helm-moccur-buffers)
     (define-key my-map (kbd "M-s a") 'helm-do-grep)
     (define-key my-map (kbd "M-s o") 'helm-occur) ;; Replaces occur
+    (define-key my-map (kbd "M-s O") 'helm-multi-occur)
     (define-key my-map (kbd "M-s r") 'helm-register)
 
 	(use-package helm-swoop :ensure t)
 	(define-key my-map (kbd "M-s i") 'helm-swoop)
-	(define-key my-map (kbd "M-s I") 'helm-multi-swoop-all)
+	(define-key my-map (kbd "M-s I") 'helm-multi-swoop)
+	(define-key my-map (kbd "M-s B") 'helm-multi-swoop-all)
+
+	(let ((map isearch-mode-map))
+	  (define-key map [remap isearch-occur] 'helm-occur-from-isearch)
+	  (define-key map (kbd "H-M-s o") 'helm-occur-from-isearch)
+	  (define-key map (kbd "H-M-s O") 'helm-multi-occur-from-isearch)
+	  (define-key map (kbd "H-M-s i") 'helm-swoop-from-isearch)
+	  (define-key map (kbd "H-M-s B") 'helm-multi-swoop-all-from-isearch))
+
 
     ;; Use a more powerful alternative to ido-mode's flex matching.
     ;; SOURCE: https://github.com/lewang/flx.git
@@ -378,6 +394,16 @@ for project root directories.")
 
 
 
+;; isearch automatically wraps upon failure
+;; (source: http://stackoverflow.com/q/285660/1590790)
+(defadvice isearch-search (after isearch-no-fail activate)
+  (unless isearch-success
+    (ad-disable-advice 'isearch-search 'after 'isearch-no-fail)
+    (ad-activate 'isearch-search)
+    (isearch-repeat (if isearch-forward 'forward))
+    (ad-enable-advice 'isearch-search 'after 'isearch-no-fail)
+    (ad-activate 'isearch-search)))
+
 ;; Function to turn a delimiter-separated value file into an org table
 (autoload 'nispio/edit-dsv-as-orgtbl "nispio/org-table-utils")
 (global-set-key (kbd "C-c |") 'nispio/edit-dsv-as-orgtbl)
@@ -390,10 +416,14 @@ for project root directories.")
 (autoload 'hs-minor-mode "hideshow")
 (global-set-key (kbd "C-c @") 'hs-minor-mode)
 
+;; Key bindings for calc
+(require 'calc)
+(define-key calc-mode-map (kbd "<backtab>") 'calc-roll-up)
+(define-key my-map (kbd "H-*") 'nispio/calc-grab-number)
+
 ;; Enable disabled commands
 (put 'narrow-to-page 'disabled nil)
 (put 'narrow-to-region 'disabled nil)
-
 
 (setq no-server-start-p (member "--no-server" command-line-args))
 (setq command-line-args (delete "--no-server" command-line-args))
@@ -412,3 +442,4 @@ for project root directories.")
     (setq custom-file "~/.emacs.d/settings.el")
   (setq custom-file "~/.emacs.d/settings-tty.el"))
 (load custom-file)
+(put 'set-goal-column 'disabled nil)

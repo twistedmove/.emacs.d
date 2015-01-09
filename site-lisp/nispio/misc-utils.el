@@ -117,5 +117,25 @@ For more information see `delete-window'.
 	(error (message "Invalid expression")
 		   (insert (current-kill 0)))))
 
+(defun nispio/calc-grab-number (top bot)
+  "Parse the region as a single number and push it on the Calculator stack."
+  (interactive "r")
+  (require 'calc-ext)
+  (calc-do-grab-region top bot '(4)))
+
+
+;; (source: http://emacs.stackexchange.com/a/81/93)
+(defun nispio/switch-to-scratch-and-back ()
+  "Toggle between *scratch-MODE* buffer and the current buffer.
+If a scratch buffer does not exist, create it with the major mode set to that
+of the buffer from where this function is called."
+  (interactive)
+  (if (string-match "*scratch" (format "%s" (current-buffer)))
+      (switch-to-buffer (other-buffer))
+    (let ((mode-str (format "%s" major-mode)))
+      (let ((scratch-buffer-name (get-buffer-create (concat "*scratch-" mode-str "*"))))
+        (switch-to-buffer scratch-buffer-name)
+        ; (source: http://stackoverflow.com/q/7539615)
+        (funcall (intern mode-str))))))
 
 (provide 'nispio/misc-utils)

@@ -595,25 +595,6 @@ For example, type \\[event-apply-meta-modifier] & to enter Meta-&."
 
 
 
-;; (source: http://emacs.stackexchange.com/a/81/93)
-(defun switch-to-scratch-and-back ()
-  "Toggle between *scratch-MODE* buffer and the current buffer.
-If a scratch buffer does not exist, create it with the major mode set to that
-of the buffer from where this function is called."
-  (interactive)
-  (if (string-match "*scratch" (format "%s" (current-buffer)))
-      (switch-to-buffer (other-buffer))
-    (let ((mode-str (format "%s" major-mode)))
-      (let ((scratch-buffer-name (get-buffer-create (concat "*scratch-" mode-str "*"))))
-        (switch-to-buffer scratch-buffer-name)
-        ; (source: http://stackoverflow.com/q/7539615)
-        (funcall (intern mode-str))))))
-(define-key my-map (kbd "C-H-\\") 'switch-to-scratch-and-back)
-
-
-
-
-
 (setq projectile-require-project-root t)
 
 (eval-after-load "projectile"
@@ -638,14 +619,49 @@ of the buffer from where this function is called."
 
 
 
-(require 'hideshow)
-(global-set-key (kbd "C-c @") 'hs-minor-mode)
-
-
-
 (defun nispio/add-killed-rectangle-to-kill-ring ()
   (interactive)
   (when killed-rectangle
 	(kill-new killed-rectangle)
 	(setq phi-rectangle--last-killed-is-rectangle nil)))
 (define-key my-map (kbd "C-c C-M-w") 'nispio/add-killed-rectangle-to-kill-ring)
+
+
+
+(defun nispio/shell-command (command &optional name dir)
+  (interactive "sCommand: ")
+  (let* ((program shell-file-name)
+		 (cmd command)
+		 (name (or name (car (split-string cmd))))
+		 (outbuf (get-buffer-create (concat "*" name "*")))
+		 (dir (or dir default-directory))
+		 (timestamp (substring (current-time-string) 0 19)))
+	(with-current-buffer outbuf
+	  (setq-local default-directory dir)
+	  (buffer-disable-undo)
+	  (let ((inhibit-read-only t))
+		(insert (format "\n%s started at %s\n\n%s> %s\n"
+						program timestamp (directory-file-name dir) cmd)))
+	  (set-buffer-modified-p nil))
+	(display-buffer outbuf '(nil (allow-no-window . t)))
+	(make-comint-in-buffer name outbuf shell-file-name nil "-c" cmd)
+	))
+
+(defun nispio/run-xmidas ()
+  (interactive)
+  (let ((cmd "xmstart ; eval xm")
+		(name "X-Midas")
+		(dir "/home/jph/xmidas/"))
+	(nispio/shell-command cmd name dir)
+	(select-window (get-buffer-window (concat "*" name "*")))))
+
+(defvar my-pylint-history nil)
+
+(defun my-run-pylint (&optional arg)
+  (interactive "P")
+  (let* ((cmd (concat "pylint " buffer-file-name)))
+	(when arg
+	  (setq cmd (read-string "Command: " cmd 'my-pylint-history)))
+	(shell-command cmd (get-buffer-create "*pylint*"))))
+
+

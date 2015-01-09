@@ -45,7 +45,6 @@
 ;; Set up basic keybindings
 (define-key my-map (kbd "<pause>") global-map)
 (define-key my-map (kbd "C-M-&") 'disable-my-global-mode)
-(define-key my-map (kbd "C--") 'delete-window)
 (define-key my-map (kbd "C-0") 'delete-window)
 (define-key my-map (kbd "M-0") 'delete-window)
 (define-key my-map (kbd "M-1") 'delete-other-windows)

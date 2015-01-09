@@ -9,6 +9,7 @@
 		TeX-insert-dollar
 		TeX-insert-sub-or-superscript
 		backward-sexp
+		backward-up-list
 		beginning-of-visual-line
 		c-electric-brace
 		c-electric-colon
@@ -28,6 +29,7 @@
 		dired-mark
 		dired-next-line
 		dired-previous-line
+		electric-pair-delete-pair
 		end-of-buffer
 		end-of-visual-line
 		eval-last-sexp
@@ -42,6 +44,7 @@
 		mark-word
 		matlab-comment
 		matlab-electric-comment
+		matlab-forward-sexp
 		matlab-linefeed
 		nispio/eval-and-replace
 		org-backward-sentence
@@ -50,6 +53,7 @@
 		org-end-of-line
 		org-force-self-insert
 		org-self-insert-command
+		org-set-tags-command
 		org-todo
 		org-yank
 		phi-rectangle-kill-region
@@ -72,24 +76,31 @@
 		beginning-of-buffer
 		compile
 		describe-key
+		describe-key-briefly
 		dired
+		end-of-defun
 		eval-expression
 		goto-line
+		handle-switch-frame
 		helm-apropos
 		helm-descbinds
 		helm-do-grep
 		ido-find-file
 		ido-switch-buffer
 		ido-switch-buffer-other-window
+		isearch-printing-char
 		kill-rectangle
 		make-default
 		mouse-save-then-kill
 		multiple-cursors-mode
+		nispio/compile-c
 		nispio/other-window
 		org-ctrl-c-ctrl-c
 		overwrite-mode
 		scroll-other-window
 		suspend-frame
+		term-char-mode
 		view-lossage
 		wdired-finish-edit
+		widen
 		))
