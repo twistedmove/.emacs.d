@@ -85,7 +85,12 @@
 	 (format " Prj[%s]"
 			 (projectile-project-name)))))
  '(projectile-require-project-root nil)
- '(safe-local-variable-values (quote ((visual-line-mode . t) (auto-fill-mode . 0))))
+ '(python-fill-docstring-style (quote django))
+ '(safe-local-variable-values
+   (quote
+	((py-indent-offset . 4)
+	 (visual-line-mode . t)
+	 (auto-fill-mode . 0))))
  '(save-interprogram-paste-before-kill t)
  '(semantic-default-submodes
    (quote
@@ -100,5 +105,6 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(default ((t (:background "black" :foreground "WhiteSmoke"))))
+ '(flymake-warnline ((t (:underline (:color "#555500" :style wave)))))
  '(linemark-funny-face ((t (:background "gray14" :foreground "light yellow"))))
  '(linemark-go-face ((t (:background "gray14" :foreground "honeydew1")))))

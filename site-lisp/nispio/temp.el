@@ -665,3 +665,58 @@ For example, type \\[event-apply-meta-modifier] & to enter Meta-&."
 	(shell-command cmd (get-buffer-create "*pylint*"))))
 
 
+
+	(when (load "flymake" t)
+	  (defun flymake-pylint-init ()
+		(let* ((temp-file (flymake-init-create-temp-buffer-copy
+						   'flymake-create-temp-inplace))
+			   (local-file (file-relative-name
+							temp-file
+							(file-name-directory buffer-file-name))))
+		  (list "epylint" (list local-file))))
+
+	  (add-to-list 'flymake-allowed-file-name-masks
+				   '("\\.py\\'" flymake-pylint-init)))
+
+
+
+;; code checking via flymake
+(setq pycodechecker "epylint.py")
+(when (load "flymake" t)
+  (defun flymake-pycodecheck-init ()
+    (let* ((temp-file (flymake-init-create-temp-buffer-copy
+                       'flymake-create-temp-inplace))
+           (local-file (file-relative-name
+                        temp-file
+                        (file-name-directory buffer-file-name))))
+      (list pycodechecker (list local-file))))
+  (add-to-list 'flymake-allowed-file-name-masks
+               '("\\.py\\'" flymake-pycodecheck-init)))
+
+
+
+(defvar find-exts "c cc h hh py m el"
+  "Last arguments given to `find' by \\[nispio/dired-find-exts].")
+
+(defvar find-exts-history nil)
+
+(defun nispio/dired-find-exts (dir exts)
+  (interactive (list (read-directory-name "Run find in directory: " nil "" t)
+					 (read-string "Find extensions (no . or *): " find-exts
+								  '(find-exts-history . 1))))
+  (let* ((dir (file-name-as-directory (expand-file-name dir)))
+		 (ext-list (split-string exts))
+		 (ext-glob (lambda (x) (concat "\\*." x)))
+		 (find-args (mapconcat ext-glob ext-list " -o -name "))
+		 (find-args (concat "\\( -path \\*/.git -prune -o \\( -name " find-args " \\) \\) -a -type f")))
+	;; Store this time's input for next time
+	(setq find-exts exts)
+	;; Call `find-dired' to do the rest of the work
+	(find-dired dir find-args)))
+
+(define-key my-map (kbd "M-s N") 'nispio/dired-find-exts)
+
+;; (setq find-exts "c cc h hh py m el")
+
+
+(require 'hideshowvis)

@@ -6,8 +6,9 @@
 (message "Loading init file...")
 (switch-to-buffer "*Messages*")
 
-;; My "must-have" key bindings
-(global-set-key (kbd "<C-tab>") 'other-window)
+;; My "must-have" key bindings get set before anything can go wrong.
+(global-set-key (kbd "<C-tab>") 'next-multiframe-window)
+(global-set-key (kbd "<C-iso-lefttab>") 'previous-multiframe-window)
 (global-set-key (kbd "M-1") 'delete-other-windows)
 
 ;; Set load paths for lisp files
@@ -30,6 +31,7 @@
 (global-set-key (kbd "C-M-&") 'enable-my-global-mode)
 
 (define-key my-map (kbd "C-H-\\") 'nispio/switch-to-scratch-and-back)
+(define-key my-map (kbd "M-s N") 'nispio/dired-find-exts)
 
 (require 'nispio/key-utils)
 (nispio/unbind-digit-arguments)
@@ -60,7 +62,7 @@
 (setq frame-title-format "emacs - %b") ; Set frame title to "emacs - <buffer name>"
 
 ;; Set tab width to 4 and put tab stops every 4 characters
-(setq tab-width 4)
+(setq-default tab-width 4)
 (setq tab-stop-list (number-sequence 4 100 4))
 
 
@@ -96,25 +98,16 @@
   (setq default-buffer-file-coding-system 'utf-8-unix)
 
   (require 'dired-x)
-  ;; Open all marked files at once, but only show one
-  (defun nispio/find-marked-files ()
-	(interactive)
-	(let ((file (dired-get-filename nil t))
-		  buf)
-	  (dired-do-find-marked-files t)
-	  (quit-window)
-	  (setq buf (and file (get-file-buffer file)))
-	  (and buf (show-buffer nil buf))))
-  (define-key dired-mode-map "F" 'nispio/find-marked-files)
   ;; Start search in dired buffer with "/"
   (define-key dired-mode-map (kbd "/") 'dired-isearch-filenames)
+  (define-key dired-mode-map "F" 'nispio/find-marked-files)
 
-  ;; Extend dired functionality
-  (use-package dired+ :ensure t)
+  ;; ;; ;; Extend dired functionality
+  ;; ;; (use-package dired+ :ensure t)
 
-  ;; When opening a directory in dired, reuse the current buffer
-  (diredp-toggle-find-file-reuse-dir 1)
-  (customize-set-variable 'diredp-hide-details-initially-flag nil)
+  ;; ;; When opening a directory in dired, reuse the current buffer
+  ;; (diredp-toggle-find-file-reuse-dir 1)
+  ;; (customize-set-variable 'diredp-hide-details-initially-flag nil)
 
   ;; Make ibuffer auto-update after changes
   ;; (source: http://emacs.stackexchange.com/a/2179/93)
@@ -226,7 +219,7 @@
   ;; Use CEDET tools for matlab-mode
   (when (>= emacs-major-version 24)
     (matlab-cedet-setup)
-	)
+  	)
 
   ;; Enable column markers at column 81 to warn of long lines
   ;; (source: http://www.emacswiki.org/emacs/download/column-marker.el)
@@ -404,6 +397,12 @@ for project root directories.")
     (ad-enable-advice 'isearch-search 'after 'isearch-no-fail)
     (ad-activate 'isearch-search)))
 
+;; Activate semantic for all programming modes
+(add-hook 'prog-mode-hook 'semantic-mode)
+
+;; Set the default faces for highlighting with hi-lock
+(setq hi-lock-face-defaults (list "hi-yellow" "hi-pink" "hi-green" "hi-blue"))
+
 ;; Function to turn a delimiter-separated value file into an org table
 (autoload 'nispio/edit-dsv-as-orgtbl "nispio/org-table-utils")
 (global-set-key (kbd "C-c |") 'nispio/edit-dsv-as-orgtbl)
@@ -415,11 +414,36 @@ for project root directories.")
 ;; Make hide-show mode available, turn it on it a buffer with C-c @
 (autoload 'hs-minor-mode "hideshow")
 (global-set-key (kbd "C-c @") 'hs-minor-mode)
+(defvar nispio/hs-mode-map 
+  (let ((map (make-sparse-keymap)))
+	(define-key map (kbd "C-2") 'hs-toggle-hiding)
+	(define-key map (kbd "C-c") 'hs-toggle-hiding)
+	(define-key map (kbd "C-h") 'hs-hide-block)
+	(define-key map (kbd "C-l") 'hs-hide-level)
+	(define-key map (kbd "C-s") 'hs-show-block)
+	(define-key map (kbd "C-M-h") 'hs-hide-all)
+	(define-key map (kbd "C-M-s") 'hs-show-all)
+	map ))
+(define-key my-map (kbd "C-2") nispio/hs-mode-map)
+
+;; Add [] to the list of collapsible entries in js mode (for JSON files)
+(eval-after-load "hideshow"
+  (progn
+	(add-to-list 'hs-special-modes-alist
+				 '(js-mode "\\({\\|\\[\\)" "\\(}\\|\\]\\)" "/[*/]" nil))
+	nil))
+
+;; Use hideshow mode in javascript mode by default
+(add-hook 'js-mode-hook 'hs-minor-mode)
 
 ;; Key bindings for calc
 (require 'calc)
 (define-key calc-mode-map (kbd "<backtab>") 'calc-roll-up)
 (define-key my-map (kbd "H-*") 'nispio/calc-grab-number)
+
+;; Key bindings for re-builder
+(require 're-builder)
+(define-key reb-mode-map (kbd "C-c %") 'nispio/reb-query-replace)
 
 ;; Enable disabled commands
 (put 'narrow-to-page 'disabled nil)
@@ -435,6 +459,10 @@ for project root directories.")
 	(server-force-delete)
 	(server-start)))
 
+;; Activate flymake for python by default
+(add-hook 'python-mode-hook 'flymake-mode-on)
+
+
 
 
 ;; Settings modified via the Customize interface get their own file
@@ -443,3 +471,5 @@ for project root directories.")
   (setq custom-file "~/.emacs.d/settings-tty.el"))
 (load custom-file)
 (put 'set-goal-column 'disabled nil)
+(put 'upcase-region 'disabled nil)
+(put 'downcase-region 'disabled nil)

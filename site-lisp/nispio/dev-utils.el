@@ -309,4 +309,36 @@ Recognized window header names are: 'comint, 'locals, 'registers,
 (add-hook 'c-mode-common-hook 'doxymacs-mode)
 
 
+
+;; Python code checking via flymake and pylint
+(setq nispio/pylint-name "epylint.py")
+(when (load "flymake" t)
+  (defun nispio/flymake-python-init ()
+    (let* ((temp-file (flymake-init-create-temp-buffer-copy
+                       'flymake-create-temp-inplace))
+           (local-file (file-relative-name
+                        temp-file
+                        (file-name-directory buffer-file-name))))
+      (list nispio/pylint-name (list local-file))))
+  (add-to-list 'flymake-allowed-file-name-masks
+               '("\\.py\\'" nispio/flymake-python-init)))
+
+(defun nispio/set-python-keys ()
+  (local-set-key [remap fill-paragraph] 'python-fill-paragraph))
+(add-hook 'python-mode-hook 'nispio/set-python-keys)
+
+
+
+;; Add keybindings to jump between errors in flymake
+(defun nispio/add-flymake-keys ()
+  (local-set-key (kbd "M-n") 'flymake-goto-next-error)
+  (local-set-key (kbd "M-p") 'flymake-goto-prev-error))
+(add-hook 'flymake-mode-hook 'nispio/add-flymake-keys)
+
+;; Disable the window that 'pops' when flymake can't be enabled.
+(setq flymake-gui-warnings-enabled nil)
+
+
+
+
 (provide 'nispio/dev-utils)

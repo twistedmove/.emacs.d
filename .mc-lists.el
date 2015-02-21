@@ -29,15 +29,18 @@
 		dired-mark
 		dired-next-line
 		dired-previous-line
+		downcase-region
 		electric-pair-delete-pair
 		end-of-buffer
 		end-of-visual-line
 		eval-last-sexp
 		eval-print-last-sexp
+		fill-paragraph
 		forward-sentence
 		forward-sexp
 		highlight-symbol-at-point
 		indent-for-tab-command
+		kill-rectangle
 		kill-region
 		kill-visual-line
 		mark-sexp
@@ -56,19 +59,26 @@
 		org-set-tags-command
 		org-todo
 		org-yank
+		phi-rectangle-forward-char
 		phi-rectangle-kill-region
 		phi-rectangle-kill-ring-save
+		phi-rectangle-next-line
+		phi-rectangle-set-mark-command
 		phi-rectangle-yank
 		phi-search
 		phi-search-backward
+		python-fill-paragraph
 		reindent-then-newline-and-indent
 		rm-kill-region
 		semantic-complete-self-insert
+		set-fill-column
 		sgml-slash
 		sh-end-of-command
 		transpose-sexps
 		uncomment-region
+		upcase-region
 		wdired-upcase-word
+		yank-rectangle
 		))
 
 (setq mc/cmds-to-run-once
@@ -78,6 +88,7 @@
 		describe-key
 		describe-key-briefly
 		dired
+		display-local-help
 		end-of-defun
 		eval-expression
 		goto-line
@@ -89,9 +100,9 @@
 		ido-switch-buffer
 		ido-switch-buffer-other-window
 		isearch-printing-char
-		kill-rectangle
 		make-default
 		mouse-save-then-kill
+		mouse-set-region
 		multiple-cursors-mode
 		nispio/compile-c
 		nispio/other-window
@@ -100,7 +111,10 @@
 		scroll-other-window
 		suspend-frame
 		term-char-mode
+		term-send-backspace
+		term-send-raw
 		view-lossage
 		wdired-finish-edit
 		widen
+		window-configuration-to-register
 		))

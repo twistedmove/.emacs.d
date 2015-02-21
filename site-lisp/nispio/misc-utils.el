@@ -1,15 +1,3 @@
-(defun nispio/other-window (&optional arg)
-  "Cycle through windows. With prefix arg, cycle backwards"
-  (interactive "P")
-  (let* ((N (or (and (consp arg) -1) arg 1)))
-    (other-window N 'visible)
-    (select-frame-set-input-focus (selected-frame))))
-
-(defun nispio/previous-window (&optional arg)
-  "Cycle through windows backwards"
-  (interactive)
-  (nispio/other-window -1))
-
 (defun nispio/buffer-file-name ()
   "Display the name of the file backing the current buffer"
   (interactive)
@@ -82,6 +70,7 @@ For more information, refer to the doc string of
 	(window-resize window delta horizontal ignore)))
 
 
+;; This function is used in nispio/run-debugger
 (defun nispio/delete-window-maybe (&optional window)
   "Delete WINDOW.
 WINDOW must be a valid window and defaults to the selected one.
@@ -137,5 +126,61 @@ of the buffer from where this function is called."
         (switch-to-buffer scratch-buffer-name)
         ; (source: http://stackoverflow.com/q/7539615)
         (funcall (intern mode-str))))))
+
+;; (source: http://www.emacswiki.org/emacs/ReBuilder)
+(defun nispio/reb-query-replace (to-string)
+  "Replace current RE from point with `query-replace-regexp'."
+  (interactive
+   (progn (barf-if-buffer-read-only)
+		  (list (query-replace-read-to
+				 (reb-target-binding reb-regexp)
+				 "Query replace"
+				 t ))))
+  (with-current-buffer reb-target-buffer
+	(query-replace-regexp (reb-target-binding reb-regexp) to-string)))
+
+
+
+(defvar find-exts "py m el"
+  "Last arguments given to `find' by \\[nispio/dired-find-exts].")
+
+(defvar find-exts-history nil)
+
+(defun nispio/dired-find-exts (dir exts)
+    "Search DIR recursively for files matching with extensions matching EXTS,
+and run Dired on those files.
+EXTS is a shell wildcard (not an Emacs regexp) and need not be quoted.
+The default command run (after changing into DIR) is
+
+    find . (-path */.git -prune -o (-name *.ext1 -o -name *.ext2)) -a -type f
+
+This function is a wrapper around \\[find-dired]."
+  (interactive (list (read-directory-name "Run find in directory: " nil "" t)
+					 (read-string "Find extensions (no . or *): " find-exts
+								  '(find-exts-history . 1))))
+  (let* ((dir (file-name-as-directory (expand-file-name dir)))
+		 (ext-list (split-string exts))
+		 (ext-glob (lambda (x) (concat "\\*." x)))
+		 (find-args (mapconcat ext-glob ext-list " -o -name "))
+		 (find-args (concat
+					 "\\( -path \\*/.git -prune -o \\( -name "
+					 find-args
+					 " \\) \\) -a -type f")))
+	;; Store this time's input for next time
+	(setq find-exts exts)
+	;; Call `find-dired' to do the rest of the work
+	(find-dired dir find-args)))
+
+;; Open all marked files at once, but only show one
+(defun nispio/find-marked-files ()
+  (interactive)
+  (let ((file (dired-get-filename nil t))
+		buf)
+	(dired-do-find-marked-files 0)
+	(quit-window)
+	(setq buf (and file (get-file-buffer file)))
+	(and buf (show-buffer nil buf))))
+
+
 
 (provide 'nispio/misc-utils)
