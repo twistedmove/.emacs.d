@@ -76,6 +76,7 @@
  '(minimap-recenter-type (quote relative))
  '(minimap-resizes-buffer t)
  '(mlint-programs (quote ("/usr/local/MATLAB/R2014a/bin/glnxa64/mlint")))
+ '(org-agenda-files nil)
  '(page-break-lines-modes
    (quote
 	(emacs-lisp-mode lisp-mode scheme-mode compilation-mode outline-mode help-mode c-mode c++-mode python-mode)))
@@ -88,7 +89,9 @@
  '(python-fill-docstring-style (quote django))
  '(safe-local-variable-values
    (quote
-	((py-indent-offset . 4)
+	((org-enforce-todo-dependencies . t)
+	 (flymake-master-file-name . "../test/test_pipe.cc")
+	 (py-indent-offset . 4)
 	 (visual-line-mode . t)
 	 (auto-fill-mode . 0))))
  '(save-interprogram-paste-before-kill t)

@@ -51,6 +51,10 @@
 (define-key my-map (kbd "C-x <f5>") 'revert-buffer)
 (define-key my-map (kbd "C-x <f6>") 'add-file-local-variable)
 
+(require 'nispio/org-config)
+(define-key my-map (kbd "C-c a") 'org-agenda)
+
+
 ;; Basic editor configuration
 (setq-default truncate-lines t)        ; Truncate lines by default
 (setq inhibit-startup-screen t)        ; Disable splash screen
@@ -216,6 +220,7 @@
   (require 'matlab-load)
   (require 'nispio/matlab-debug)
   (setq matlab-comment-column 50)
+  (add-hook 'matlab-mode-hook 'linum-mode)
   ;; Use CEDET tools for matlab-mode
   (when (>= emacs-major-version 24)
     (matlab-cedet-setup)
@@ -458,9 +463,6 @@ for project root directories.")
 	(require 'server)
 	(server-force-delete)
 	(server-start)))
-
-;; Activate flymake for python by default
-(add-hook 'python-mode-hook 'flymake-mode-on)
 
 
 

@@ -329,14 +329,39 @@ Recognized window header names are: 'comint, 'locals, 'registers,
 
 
 
+;; flymake rules for C++ header files
+(defun nispio/flymake-header-init ()
+  (flymake-master-make-init
+   'flymake-get-include-dirs
+   '("\\.\\(?:c\\(?:c\\|pp\\|xx\\|\\+\\+\\)?\\|CC\\)\\'")
+   "[ \t]*#[ \t]*include[ \t]*\"\\([[:word:]0-9/\\_.]*%s\\)\""))
+
+(add-to-list 'flymake-allowed-file-name-masks
+			 '("\\.h\\(h\\|pp\\)?\\'"
+			   nispio/flymake-header-init
+			   flymake-master-cleanup))
+
+(add-to-list 'flymake-allowed-file-name-masks
+			 '("\\.\\(?:c\\(?:c\\|pp\\|xx\\|\\+\\+\\)?\\)\\'"
+			   flymake-simple-make-init))
+
+
+
+
 ;; Add keybindings to jump between errors in flymake
 (defun nispio/add-flymake-keys ()
   (local-set-key (kbd "M-n") 'flymake-goto-next-error)
   (local-set-key (kbd "M-p") 'flymake-goto-prev-error))
 (add-hook 'flymake-mode-hook 'nispio/add-flymake-keys)
 
-;; Disable the window that 'pops' when flymake can't be enabled.
+;; ;; Disable the window that 'pops' when flymake can't be enabled.
 (setq flymake-gui-warnings-enabled nil)
+
+;; Activate flymake by default
+(add-hook 'find-file-hook 'flymake-mode-on)
+
+;; Do logging of errors for flymake
+(setq flymake-log-level 0)
 
 
 

@@ -29,6 +29,7 @@
 		dired-mark
 		dired-next-line
 		dired-previous-line
+		down-list
 		downcase-region
 		electric-pair-delete-pair
 		end-of-buffer
@@ -52,6 +53,7 @@
 		nispio/eval-and-replace
 		org-backward-sentence
 		org-beginning-of-line
+		org-cycle
 		org-delete-char
 		org-end-of-line
 		org-force-self-insert
@@ -63,6 +65,7 @@
 		phi-rectangle-kill-region
 		phi-rectangle-kill-ring-save
 		phi-rectangle-next-line
+		phi-rectangle-previous-line
 		phi-rectangle-set-mark-command
 		phi-rectangle-yank
 		phi-search
@@ -104,6 +107,7 @@
 		mouse-save-then-kill
 		mouse-set-region
 		multiple-cursors-mode
+		next-multiframe-window
 		nispio/compile-c
 		nispio/other-window
 		org-ctrl-c-ctrl-c
