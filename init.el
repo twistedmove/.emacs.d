@@ -53,7 +53,14 @@
 
 (require 'nispio/org-config)
 (define-key my-map (kbd "C-c a") 'org-agenda)
-
+(define-key my-map (kbd "C-c l") 'org-store-link)
+(define-key my-map (kbd "C-'") 'org-capture)
+(define-key my-map (kbd "C-c C-x C-i") 'org-clock-in)
+(define-key my-map (kbd "C-c C-x <C-i>") 'org-clock-in)
+(define-key my-map (kbd "C-c C-x C-o") 'org-clock-out)
+(define-key my-map (kbd "C-c C-x C-x") 'org-clock-in-last)
+(define-key my-map (kbd "C-c C-x C-e") 'org-clock-modify-effort-estimate)
+(define-key my-map (kbd "C-c C-x <C-m>") 'org-clock-menu)
 
 ;; Basic editor configuration
 (setq-default truncate-lines t)        ; Truncate lines by default
@@ -69,6 +76,23 @@
 (setq-default tab-width 4)
 (setq tab-stop-list (number-sequence 4 100 4))
 
+;; Fromat the appearance of the mode line
+(setq-default mode-line-format
+ '("%e"
+   mode-line-front-space
+   mode-line-mule-info
+   mode-line-client
+   mode-line-modified
+   mode-line-remote
+   mode-line-frame-identification
+   mode-line-buffer-identification
+   " %3l :%3c  "
+   mode-line-modes
+   " "
+   (vc-mode vc-mode)
+   (global-mode-string global-mode-string)
+   mode-line-end-spaces))
+
 
 
 ;; Load init files as appropriate, turning errors into messages
@@ -77,8 +101,6 @@
   (show-paren-mode 1)                ; Show matching parenthesis
   (global-font-lock-mode 1)          ; Enable syntax highlighting
   (column-number-mode t)             ; Show column number on mode line
-  (setq display-time-day-and-date t) ; Dispaly date along with time in status bar
-  (display-time)                     ; Display date and time in status bar
   (ido-mode 1)
   
   (require 'nispio/package-config)
@@ -375,6 +397,7 @@ for project root directories.")
     (setq ac-auto-show-menu t)          ; show menu immediately...
     (setq ac-modes (cons 'matlab-mode ac-modes))  ; Allow auto-complete with matlab-mode
     (define-key ac-mode-map (kbd "C-.") 'auto-complete)
+	(diminish 'auto-complete-mode "")
 
     ;; Add support for Chrome extension "Edit with Emacs"
     ;; (source: https://github.com/stsquad/emacs_chrome.git)
@@ -464,14 +487,12 @@ for project root directories.")
 	(server-force-delete)
 	(server-start)))
 
-
 
 
-;; Settings modified via the Customize interface get their own file
+;; Settings modified via the Customize interface get their own file.  We set
+;; this right up front in case any of the other init functions use the customize
+;; interface.
 (if (display-graphic-p)
     (setq custom-file "~/.emacs.d/settings.el")
   (setq custom-file "~/.emacs.d/settings-tty.el"))
 (load custom-file)
-(put 'set-goal-column 'disabled nil)
-(put 'upcase-region 'disabled nil)
-(put 'downcase-region 'disabled nil)

@@ -6,7 +6,7 @@
 
 (define-minor-mode my-mode
   "A minor mode which provides my personal key bindings."
-  nil " MY" my-map)
+  nil "" my-map)
 
 (defun my-mode-maybe ()
   "Enable minor my-mode in the current buffer, unless in minibuffer"

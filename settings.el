@@ -4,12 +4,12 @@
 (fringe-mode '(nil . 0))	; Left fringes only
 (tool-bar-mode 0)			; Disable toolbar
 
-(when (>= emacs-major-version 24)
-  ;; Use powerline for a nifty mode line
-  (use-package powerline :ensure t)
-  (require 'powerline)
-  (powerline-default-theme)
-  (setq powerline-default-separator 'wave))
+;; (when (>= emacs-major-version 24)
+;;   ;; Use powerline for a nifty mode line
+;;   (use-package powerline :ensure t)
+;;   (require 'powerline)
+;;   (powerline-default-theme)
+;;   (setq powerline-default-separator 'wave))
 
 (load-file "~/.emacs.d/site-lisp/nispio/themes/nispio-dark.el")
 
@@ -21,7 +21,6 @@
  '(Buffer-menu-name-width 50)
  '(column-number-mode t)
  '(dired-omit-files "^\\.?#")
- '(display-time-mode t)
  '(doxymacs-doxygen-style "C++")
  '(font-lock-maximum-decoration (quote ((t . t) (dired-mode . 2))))
  '(font-use-system-font t)
@@ -76,15 +75,12 @@
  '(minimap-recenter-type (quote relative))
  '(minimap-resizes-buffer t)
  '(mlint-programs (quote ("/usr/local/MATLAB/R2014a/bin/glnxa64/mlint")))
- '(org-agenda-files nil)
+ '(org-agenda-files "~/.org/agendas.ini")
+ '(org-directory "~/.org")
  '(page-break-lines-modes
    (quote
 	(emacs-lisp-mode lisp-mode scheme-mode compilation-mode outline-mode help-mode c-mode c++-mode python-mode)))
- '(projectile-mode-line
-   (quote
-	(:eval
-	 (format " Prj[%s]"
-			 (projectile-project-name)))))
+ '(projectile-mode-line (quote (:eval (format " [%s]" (projectile-project-name)))))
  '(projectile-require-project-root nil)
  '(python-fill-docstring-style (quote django))
  '(safe-local-variable-values

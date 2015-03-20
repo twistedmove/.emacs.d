@@ -59,6 +59,7 @@
 		org-force-self-insert
 		org-self-insert-command
 		org-set-tags-command
+		org-shiftmetaright
 		org-todo
 		org-yank
 		phi-rectangle-forward-char
