@@ -34,7 +34,9 @@
                            "TODO(t!)"
                            "STARTED(s!)"
                            "WAIT(w@/!)"
+                           "ASK(a)"
                            "|"
+                           "ANSWERED(A@)"
                            "CANCELLED(x@)"
                            "DONE(d)"
                            "COMPLETE(c!)")))
@@ -92,8 +94,8 @@
 		("p" "Pomodoros" entry (file+datetree "~/.org/pomodoros.org")
 		     "* TODO %i%?\n  - State \"TODO\"       from \"\"           %U"
 		     :jump-to-captured t)
-        ("j" "Journal" entry (file+datetree "~/.org/journal.org")
-             "* %?\n  - Added %U\n")))
+        ("j" "Journal" entry (file+datetree "~/.org/journal.org") "* %?")
+        ("J" "Journal (free writing)" entry (file+datetree "~/.org/freejourn.org") "* %?")))
 
 (defun nispio/linked-todo ()
   "Return a template to be used for pomodoros"
@@ -188,10 +190,10 @@
 ;; detailed control to what kind of entries this should apply:
 
 ;; Skip scheduled entries in agenda view if done
-(customize-set-variable 'org-agenda-skip-scheduled-if-done t)
+(customize-set-variable 'org-agenda-skip-scheduled-if-done nil)
 
 ;; Skip deadline entries in agenda view if done
-(customize-set-variable 'org-agenda-skip-deadline-if-done t)
+(customize-set-variable 'org-agenda-skip-deadline-if-done nil)
 
 ;; People who use Org like a day planner, who schedule all tasks to specific
 ;; dates, often like to not have scheduled tasks listed in their global TODO
@@ -206,7 +208,7 @@
 ;; (customize-set-variable 'org-agenda-todo-ignore-with-date t)
 
 ;; ;; Don't show scheduled tasks in the global TODO list. 
-;; (customize-set-variable 'org-agenda-todo-ignore-scheduled t)
+(customize-set-variable 'org-agenda-todo-ignore-scheduled t)
 
 ;; Should LaTeX fragments be converted to inline images for HTML output? 
 (customize-set-variable 'org-export-with-LaTeX-fragments t)
