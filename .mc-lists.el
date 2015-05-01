@@ -24,6 +24,7 @@
 		comment-dwim
 		comment-region
 		delete-horizontal-space
+		delete-indentation
 		delete-rectangle
 		dired-flag-file-deletion
 		dired-mark
@@ -31,6 +32,7 @@
 		dired-previous-line
 		down-list
 		downcase-region
+		electric-newline-and-maybe-indent
 		electric-pair-delete-pair
 		end-of-buffer
 		end-of-visual-line
@@ -113,11 +115,13 @@
 		nispio/other-window
 		org-ctrl-c-ctrl-c
 		overwrite-mode
+		pop-global-mark
 		scroll-other-window
 		suspend-frame
 		term-char-mode
 		term-send-backspace
 		term-send-raw
+		transpose-words
 		view-lossage
 		wdired-finish-edit
 		widen

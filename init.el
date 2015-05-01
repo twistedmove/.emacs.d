@@ -128,12 +128,12 @@
   (define-key dired-mode-map (kbd "/") 'dired-isearch-filenames)
   (define-key dired-mode-map "F" 'nispio/find-marked-files)
 
-  ;; ;; ;; Extend dired functionality
-  ;; ;; (use-package dired+ :ensure t)
+  ;; ;; Extend dired functionality
+  (use-package dired+ :ensure t)
 
-  ;; ;; When opening a directory in dired, reuse the current buffer
-  ;; (diredp-toggle-find-file-reuse-dir 1)
-  ;; (customize-set-variable 'diredp-hide-details-initially-flag nil)
+  ;; When opening a directory in dired, reuse the current buffer
+  (diredp-toggle-find-file-reuse-dir 1)
+  (customize-set-variable 'diredp-hide-details-initially-flag nil)
 
   ;; Make ibuffer auto-update after changes
   ;; (source: http://emacs.stackexchange.com/a/2179/93)
@@ -250,7 +250,7 @@
 
   ;; Enable column markers at column 81 to warn of long lines
   ;; (source: http://www.emacswiki.org/emacs/download/column-marker.el)
-  ;; (use-package column-marker :ensure t)
+  (use-package column-marker :ensure t)
   (require 'column-marker)
   (defun nispio/column-marker-at-81 ()
     (interactive)
@@ -259,7 +259,7 @@
   (setq-default fill-column 80)
 
 
-  ;; (use-package tex-site :ensure auctex)
+  (use-package tex-site :ensure auctex)
   (require 'tex-site)
   (setq
    TeX-auto-save t
@@ -279,13 +279,13 @@
   (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
 
   ;; SrSpeedbar allows a speedbar that is "docked" in the current frame
-  ;; (use-package sr-speedbar :ensure t)
+  (use-package sr-speedbar :ensure t)
   (require 'sr-speedbar)
   (define-key my-map (kbd "C-c M-SPC") 'sr-speedbar-toggle)
   ;(define-key nispio/gdb-window-map (kbd "w") 'sr-speedbar-select-window)
 
   ;; Display ^L as a horizontal line
-  ;; (use-package page-break-lines :ensure t)
+  (use-package page-break-lines :ensure t)
   (require 'page-break-lines)
   (global-page-break-lines-mode)
   (diminish 'page-break-lines-mode "")
@@ -472,6 +472,9 @@ for project root directories.")
 ;; Key bindings for re-builder
 (require 're-builder)
 (define-key reb-mode-map (kbd "C-c %") 'nispio/reb-query-replace)
+
+;; Do not attempt to open .doc files as Word Documents
+(add-to-list 'auto-mode-alist '("\\.doc\\'" . text-mode))
 
 ;; Enable disabled commands
 (put 'narrow-to-page 'disabled nil)

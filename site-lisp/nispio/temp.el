@@ -832,3 +832,6 @@ of the day at point (if any) or the current HH:MM time."
 		 "Could not start the clock in this capture buffer")))
 	  (if (org-capture-get :immediate-finish)
 	      (org-capture-finalize)))))))))
+
+
+
