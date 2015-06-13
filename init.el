@@ -410,6 +410,9 @@ for project root directories.")
     (add-hook 'edit-server-buffer-closed-hook 'delete-window)
     (edit-server-start)
 
+	(use-package ace-jump-mode :ensure t)
+	(define-key my-map (kbd "C-;") 'ace-jump-word-mode)
+
 	) ;; end with-demote-errors
   ) ;; end emacs 24.3+ customizations
 

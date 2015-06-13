@@ -19,6 +19,8 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(Buffer-menu-name-width 50)
+ '(avy-style (quote at-full))
+ '(bmkp-last-as-first-bookmark-file "~/.emacs.d/bookmarks")
  '(column-number-mode t)
  '(dired-omit-files "^\\.?#")
  '(doxymacs-doxygen-style "C++")

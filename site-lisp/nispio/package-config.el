@@ -33,37 +33,54 @@
 
 
 
-(defun nispio/create-custom-archive (archive-dir)
-  (let* ((elpa-contents-file (format "%s/archive-contents.elpa" archive-dir))
-		 (elpa-contents (nispio/read-archive-contents elpa-contents-file))
-		 (melpa-contents-file (format "%s/archive-contents.melpa" archive-dir))
-		 (melpa-contents (nispio/read-archive-contents melpa-contents-file))
-		 (whitelist-file (format "%s/archive-whitelist" archive-dir))
-		 (whitelist (nispio/read-archive-contents whitelist-file))
-		 (dest-file (format "%s/archive-contents" archive-dir))
-		 (archive (list)))
-	(dolist (package (append elpa-contents melpa-contents))
-	  (if (memq (car package) whitelist)
-		  (setq archive (cons package archive))))
-	(when archive
-	  (nispio/write-archive-to-file archive dest-file))
-	archive))
+(defun nispio/create-custom-archive (whitelist-file &optional repository-list)
+  (let* ((dir (file-name-directory whitelist-file))
+		 (dest-file (concat dir "archive-contents"))
+		 (whitelist (nispio/read-contents whitelist-file))
+		 my-archive name added full-name readme-name)
+	(setq repository-list (or repository-list
+							  '("http://melpa.org/packages/"
+								"http://elpa.gnu.org/packages/")))
+	(dolist (url repository-list)
+	  (dolist (package (cdr (nispio/get-archive-contents url)))
+		(let* ((name (car package))
+			   (full-name (nispio/package-full-name package))
+			   (readme-name (concat (symbol-name name) "-readme.txt")))
+		(when (and (memq name whitelist) (not (memq name added)))
+		  (setq my-archive (cons package my-archive))
+		  (setq added (cons name added))
+		  (message "Downloading %s" full-name)
+		  (url-copy-file (concat url full-name) (concat dir full-name) t)
+		  (url-copy-file (concat url readme-name) (concat dir readme-name) t)))))
+	(nispio/write-archive-to-file my-archive dest-file)))
 
-(defun nispio/read-archive-contents (filename)
+(defun nispio/package-full-name (package)
+  (let* ((name (symbol-name (car package)))
+		 (version (package--ac-desc-version (cdr package)))
+		 (version-string (package-version-join version))
+		 (kind (package--ac-desc-kind (cdr package)))
+		 (suffix (if (eq kind 'tar) "tar" "el")))
+	(concat name "-" version-string "." suffix)))
+
+(defun nispio/get-archive-contents (repository-url)
+  (let* ((file-url (concat repository-url "archive-contents"))
+		 (file (url-file-local-copy file-url)))
+	(nispio/read-contents file)))
+
+(defun nispio/read-contents (filename)
   (if (file-exists-p filename)
 	(with-temp-buffer
 	  (insert-file-contents-literally filename)
 	  (let ((contents (read (current-buffer))))
-		(cdr contents)))
+		contents))
 	(error "Cannot find file %s" filename)))
 
 (defun nispio/write-archive-to-file (archive file)
-   (with-temp-buffer
-     (insert (prin1-to-string (cons '1 archive)))
-     (when (file-writable-p file)
-       (write-region (point-min)
-                     (point-max)
-                     file))))
+  (when archive
+	(with-temp-file file
+		(insert (prin1-to-string (cons '1 archive)))
+	  file)))
+
 
 
 
