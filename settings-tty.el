@@ -34,7 +34,7 @@
  '(mode-line ((t (:inverse-video t :box nil))))
  '(mode-line-highlight ((t (:box nil))))
  '(mode-line-inactive ((t (:box nil))))
- '(org-table ((t (:foreground "DodgerBlue"))) t))
+ '(org-table ((t (:foreground "DodgerBlue")))))
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -42,11 +42,49 @@
  ;; If there is more than one, they won't work right.
  '(Buffer-menu-name-width 50)
  '(column-number-mode t)
+ '(custom-safe-themes
+   (quote
+	("7db66dafe7a65a8a6a403014edb5e53deca2da82279cb8f3f55e4bc336bf48af" default)))
  '(font-lock-maximum-decoration (quote ((t . t) (dired-mode . 2))))
  '(ibuffer-elide-long-columns t)
- '(ibuffer-formats (quote ((mark modified read-only " " (name 35 35 :left :elide) " " (size 9 -1 :right) " " (mode 16 16 :left :elide) " " filename-and-process) (mark " " (name 16 -1) " " filename))))
- '(ibuffer-saved-filter-groups (quote (("default" ("File Buffers" (filename . ".+")) ("Dired Buffers" (used-mode . dired-mode)) ("Special Buffers" (name . "\\b\\*.*\\*\\b"))))))
- '(ibuffer-saved-filters (quote (("gnus" ((or (mode . message-mode) (mode . mail-mode) (mode . gnus-group-mode) (mode . gnus-summary-mode) (mode . gnus-article-mode)))) ("programming" ((or (mode . emacs-lisp-mode) (mode . cperl-mode) (mode . c-mode) (mode . java-mode) (mode . idl-mode) (mode . lisp-mode)))))))
+ '(ibuffer-formats
+   (quote
+	((mark modified read-only " "
+		   (name 35 35 :left :elide)
+		   " "
+		   (size 9 -1 :right)
+		   " "
+		   (mode 16 16 :left :elide)
+		   " " filename-and-process)
+	 (mark " "
+		   (name 16 -1)
+		   " " filename))))
+ '(ibuffer-saved-filter-groups
+   (quote
+	(("default"
+	  ("File Buffers"
+	   (filename . ".+"))
+	  ("Dired Buffers"
+	   (used-mode . dired-mode))
+	  ("Special Buffers"
+	   (name . "\\b\\*.*\\*\\b"))))))
+ '(ibuffer-saved-filters
+   (quote
+	(("gnus"
+	  ((or
+		(mode . message-mode)
+		(mode . mail-mode)
+		(mode . gnus-group-mode)
+		(mode . gnus-summary-mode)
+		(mode . gnus-article-mode))))
+	 ("programming"
+	  ((or
+		(mode . emacs-lisp-mode)
+		(mode . cperl-mode)
+		(mode . c-mode)
+		(mode . java-mode)
+		(mode . idl-mode)
+		(mode . lisp-mode)))))))
  '(ido-max-window-height 2)
  '(linum-format "%3d ")
  '(minimap-dedicated-window nil)

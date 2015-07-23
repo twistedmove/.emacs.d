@@ -22,6 +22,9 @@
  '(avy-style (quote at-full))
  '(bmkp-last-as-first-bookmark-file "~/.emacs.d/bookmarks")
  '(column-number-mode t)
+ '(custom-safe-themes
+   (quote
+	("7db66dafe7a65a8a6a403014edb5e53deca2da82279cb8f3f55e4bc336bf48af" default)))
  '(dired-omit-files "^\\.?#")
  '(doxymacs-doxygen-style "C++")
  '(font-lock-maximum-decoration (quote ((t . t) (dired-mode . 2))))
@@ -29,7 +32,7 @@
  '(helm-buffer-max-length 30)
  '(helm-match-plugin-mode t nil (helm-match-plugin))
  '(helm-split-window-in-side-p t)
- '(helm-truncate-lines t)
+ '(helm-truncate-lines t t)
  '(ibuffer-elide-long-columns t)
  '(ibuffer-formats
    (quote
@@ -107,5 +110,10 @@
  ;; If there is more than one, they won't work right.
  '(default ((t (:background "black" :foreground "WhiteSmoke"))))
  '(flymake-warnline ((t (:underline (:color "#555500" :style wave)))))
+ '(font-lock-variable-name-face ((t (:foreground "RosyBrown1"))))
  '(linemark-funny-face ((t (:background "gray14" :foreground "light yellow"))))
- '(linemark-go-face ((t (:background "gray14" :foreground "honeydew1")))))
+ '(linemark-go-face ((t (:background "gray14" :foreground "honeydew1"))))
+ '(nxml-delimiter ((t (:inherit font-lock-builtin-face))) t)
+ '(nxml-element-local-name ((t (:inherit font-lock-keyword-face))))
+ '(nxml-text ((t (:inherit font-lock-default-face))) t)
+ '(web-mode-html-tag-face ((t (:foreground "steel blue")))))

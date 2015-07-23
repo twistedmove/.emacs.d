@@ -285,10 +285,9 @@
   ;(define-key nispio/gdb-window-map (kbd "w") 'sr-speedbar-select-window)
 
   ;; Display ^L as a horizontal line
-  (use-package page-break-lines :ensure t)
+  (use-package page-break-lines :ensure t :diminish "")
   (require 'page-break-lines)
   (global-page-break-lines-mode)
-  (diminish 'page-break-lines-mode "")
   
   (require 'nispio/dev-utils)
   (define-key nispio/gdb-window-map (kbd "w") 'sr-speedbar-select-window)
@@ -305,8 +304,6 @@
   (with-demoted-errors "INIT ERROR: %s"
     (electric-pair-mode 1) ; Enable automatic bracket closing
 
-    (require 'diminish)
-    
     (require 'nispio/helm-config)
     (define-key helm-map (kbd "M-1") 'nispio/helm-full-frame)
     (define-key my-map (kbd "M-s n") 'find-name-dired)
@@ -371,8 +368,6 @@ for project root directories.")
 		(nconc projectile-project-root-files-functions '(projectile-root-child-of))
 		nil))
 
-
-
     ;; Use helm for projectile
     (use-package helm-projectile :ensure t)
     (eval-after-load "helm-config"
@@ -390,28 +385,33 @@ for project root directories.")
 
     ;; Set up auto-complete
     ;; (source: https://github.com/auto-complete/auto-complete)
-    (use-package auto-complete :ensure t)
+    (use-package auto-complete :ensure t :diminish "")
     (require 'auto-complete-config)
     (ac-config-default)
     (setq ac-auto-start 3)              ; start after 3 characters were typed
     (setq ac-auto-show-menu t)          ; show menu immediately...
     (setq ac-modes (cons 'matlab-mode ac-modes))  ; Allow auto-complete with matlab-mode
     (define-key ac-mode-map (kbd "C-.") 'auto-complete)
-	(diminish 'auto-complete-mode "")
 
-    ;; Add support for Chrome extension "Edit with Emacs"
-    ;; (source: https://github.com/stsquad/emacs_chrome.git)
-    (use-package edit-server :ensure t)
-    (require 'edit-server)
-    (setq edit-server-new-frame nil)
-    (add-hook 'edit-server-start-hook 'flyspell-mode)
-    (add-hook 'edit-server-start-hook 'visual-line-mode)
-    (add-hook 'edit-server-started-hook 'delete-other-windows)
-    (add-hook 'edit-server-buffer-closed-hook 'delete-window)
-    (edit-server-start)
+	;; Jump to anywhere in the buffer with a few keystrokes
+	(use-package avy :ensure t)
+	(define-key my-map (kbd "C-;") 'avy-goto-word-or-subword-1)
 
-	(use-package ace-jump-mode :ensure t)
-	(define-key my-map (kbd "C-;") 'ace-jump-word-mode)
+	;; Zap up to any character with a few keystrokes
+	(use-package avy-zap :ensure t)
+	(define-key my-map (kbd "M-z") 'avy-zap-up-to-char)
+
+	;; Undo history is preserved as a tree, rather than linearly
+	(use-package undo-tree :ensure t :diminish "")
+	(global-undo-tree-mode)
+
+	;; Use ido completion with extended commands (M-x)
+	(use-package smex :ensure t)
+	(define-key my-map (kbd "M-x") 'smex)
+
+	;; Smarter highlighting of shell variables within quotes
+	(use-package sh-extra-font-lock :ensure t)
+	(add-hook 'sh-mode-hook 'sh-extra-font-lock-activate)
 
 	) ;; end with-demote-errors
   ) ;; end emacs 24.3+ customizations

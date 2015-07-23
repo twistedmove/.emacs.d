@@ -74,6 +74,7 @@
 		phi-search
 		phi-search-backward
 		python-fill-paragraph
+		python-nav-backward-up-list
 		reindent-then-newline-and-indent
 		rm-kill-region
 		semantic-complete-self-insert

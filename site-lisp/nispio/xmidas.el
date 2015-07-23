@@ -62,12 +62,6 @@
 
 (set (make-local-variable 'font-lock-defaults) '(xmidas-font-lock-keywords t))
 
-(defvar emacspipe-regexp "tmp\\.[A-Za-z0-9]\\{10\\}"
-  "Regexp describing the name of temp buffers")
-
-(add-to-list 'auto-mode-alist
-  (cons emacspipe-regexp 'view-mode))
-
 (defconst xmidas-keywords
   '("abscissa" "fastfilter" "parse" "ttcmd" "acqmod" "fcalculator" "passfilt"
 "ttuner" "add" "fcreate" "pause" "tubiquitous" "advisory" "fft" "peakpick"

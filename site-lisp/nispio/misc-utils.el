@@ -4,6 +4,12 @@
   (message (or buffer-file-name "no file"))
   buffer-file-name)
 
+(defvar emacspipe-regexp "emacspipe[.][A-Za-z0-9]\\{10\\}"
+  "Regexp describing the name of temp buffers")
+
+(add-to-list 'auto-mode-alist
+  (cons emacspipe-regexp 'view-mode))
+
 ;; Custom function to toggle fullscreen by maximizing or restoring the current frame.
 (defvar nispio/fullscreen-p t "Check if fullscreen is on or off")
 

@@ -3,10 +3,8 @@
 (when (>= emacs-major-version 24)
   (require 'package)
   (setq package-enable-at-startup nil)
-  (add-to-list
-   'package-archives
-   '("melpa" . "http://melpa.milkbox.net/packages/"))
-  ;;(setq package-archives '(("local-elpa" . "/user_data4/emacs/local-elpa/")))
+  (add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/"))
+  (add-to-list 'package-archives '("local-elpa" . "/datastore/jph/emacs/local-elpa-misc/"))
   (package-initialize nil)
 
   ;; Simplify loading of packages from the network with use-package.el
