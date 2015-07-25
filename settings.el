@@ -21,14 +21,7 @@
    (global-mode-string global-mode-string)
    mode-line-end-spaces))
 
-;; (when (>= emacs-major-version 24)
-;;   ;; Use powerline for a nifty mode line
-;;   (use-package powerline :ensure t)
-;;   (require 'powerline)
-;;   (powerline-default-theme)
-;;   (setq powerline-default-separator 'wave))
-
-(load-file "~/.emacs.d/site-lisp/nispio/themes/nispio-dark.el")
+(load-theme 'nispio-dark t)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
