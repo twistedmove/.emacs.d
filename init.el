@@ -15,15 +15,25 @@
 (setq site-lisp "~/.emacs.d/site-lisp")
 (add-to-list 'load-path site-lisp)
 
+;; Settings modified via the Customize interface get their own file.  We set
+;; this right up front in case any of the other init functions use the customize
+;; interface.
+(if (display-graphic-p)
+    (setq custom-file "~/.emacs.d/settings.el")
+  (setq custom-file "~/.emacs.d/settings-tty.el"))
+
 (require 'nispio/misc-utils)
 (setq load-path
 	  (append
 	   ;; Add all folders from site-lisp (except explicitly rejected dirs).
 	   ;; The "nispio" dir is not included because its packages are provided as
 	   ;; (provide 'nispio/package-name)
-	   (nispio/directory-subdirs site-lisp '(".git" "nispio"))
+	   (nispio/directory-subdirs site-lisp '(".hg" ".git" "nispio"))
 	   ;; Put the current load-path at the end
 	   load-path))
+
+;; Make custom themes available
+(customize-set-value 'custom-theme-directory "~/.emacs.d/site-lisp/themes/")
 
 ;; Load my own minor mode for personal keybindings
 (require 'nispio/my-mode)
@@ -76,23 +86,6 @@
 (setq-default tab-width 4)
 (setq tab-stop-list (number-sequence 4 100 4))
 
-;; Fromat the appearance of the mode line
-(setq-default mode-line-format
- '("%e"
-   mode-line-front-space
-   mode-line-mule-info
-   mode-line-client
-   mode-line-modified
-   mode-line-remote
-   mode-line-frame-identification
-   mode-line-buffer-identification
-   " %3l :%3c  "
-   mode-line-modes
-   " "
-   (vc-mode vc-mode)
-   (global-mode-string global-mode-string)
-   mode-line-end-spaces))
-
 
 
 ;; Load init files as appropriate, turning errors into messages
@@ -102,7 +95,12 @@
   (global-font-lock-mode 1)          ; Enable syntax highlighting
   (column-number-mode t)             ; Show column number on mode line
   (ido-mode 1)
-  
+
+  (setq package-archives '())
+  (add-to-list 'package-archives '("local-elpa" . "~/.emacs.d/local-elpa-misc/"))
+  (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/"))
+  (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
+  ;; (add-to-list 'package-archives '("local-elpa" . "/datastore/jph/emacs/local-elpa/"))
   (require 'nispio/package-config)
 
   ;; Display line numbers in all programming buffers
@@ -413,6 +411,21 @@ for project root directories.")
 	(use-package sh-extra-font-lock :ensure t)
 	(add-hook 'sh-mode-hook 'sh-extra-font-lock-activate)
 
+	;; Multiple frames as tabs
+	(use-package elscreen :ensure t)
+	(elscreen-start)
+	(define-key my-map (kbd "C-z z") 'elscreen-toggle-display-tab)
+	(define-key my-map (kbd "C-z C-z") 'elscreen-toggle)
+
+	;; Commands for working with regexps with visual feedback
+	(use-package visual-regexp :ensure t)
+	(use-package visual-regexp-steroids :ensure t)
+	(define-key my-map (kbd "C-c M-5") 'vr/replace)
+	(define-key my-map (kbd "C-c M-%") 'vr/query-replace)
+
+	;; View large files one piece at a time
+	(use-package vlf-setup :ensure vlf)
+
 	) ;; end with-demote-errors
   ) ;; end emacs 24.3+ customizations
 
@@ -495,10 +508,6 @@ for project root directories.")
 
 
 
-;; Settings modified via the Customize interface get their own file.  We set
-;; this right up front in case any of the other init functions use the customize
-;; interface.
-(if (display-graphic-p)
-    (setq custom-file "~/.emacs.d/settings.el")
-  (setq custom-file "~/.emacs.d/settings-tty.el"))
-(load custom-file)
+(setq no-custom-file-p (member "--no-custom-file" command-line-args))
+(setq command-line-args (delete "--no-custom-file" command-line-args))
+(unless no-custom-file-p (load custom-file))

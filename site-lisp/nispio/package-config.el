@@ -3,8 +3,6 @@
 (when (>= emacs-major-version 24)
   (require 'package)
   (setq package-enable-at-startup nil)
-  (add-to-list 'package-archives '("local-elpa" . "~/.emacs.d/local-elpa-misc/"))
-  (add-to-list 'package-archives '("melpa" . "http://melpa.milkbox.net/packages/"))
   (package-initialize nil)
 
   ;; Simplify loading of packages from the network with use-package.el
@@ -38,7 +36,8 @@
 		 my-archive name added full-name readme-name)
 	(setq repository-list (or repository-list
 							  '("http://melpa.org/packages/"
-								"http://elpa.gnu.org/packages/")))
+								"http://elpa.gnu.org/packages/"
+								"file:///home/jph/.emacs.d/local-elpa-misc/")))
 	(dolist (url repository-list)
 	  (dolist (package (cdr (nispio/get-archive-contents url)))
 		(let* ((name (car package))
@@ -62,7 +61,7 @@
 
 (defun nispio/get-archive-contents (repository-url)
   (let* ((file-url (concat repository-url "archive-contents"))
-		 (file (url-file-local-copy file-url)))
+		 (file (or (url-file-local-copy file-url) file-url)))
 	(nispio/read-contents file)))
 
 (defun nispio/read-contents (filename)

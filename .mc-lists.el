@@ -81,6 +81,7 @@
 		set-fill-column
 		sgml-slash
 		sh-end-of-command
+		smex
 		transpose-sexps
 		uncomment-region
 		upcase-region

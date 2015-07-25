@@ -1,6 +1,23 @@
 ;; Use DejaVu Sans Mono as default font
 ;; (source: http://sourceforge.net/projects/dejavu/files/dejavu/2.34/dejavu-fonts-ttf-2.34.tar.bz2)
 
+;; Fromat the appearance of the mode line
+(setq-default mode-line-format
+ '("%e"
+   mode-line-front-space
+   mode-line-mule-info
+   mode-line-client
+   mode-line-modified
+   mode-line-remote
+   mode-line-frame-identification
+   mode-line-buffer-identification
+   " %3l :%3c  "
+   mode-line-modes
+   " "
+   (vc-mode vc-mode)
+   (global-mode-string global-mode-string)
+   mode-line-end-spaces))
+
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
