@@ -1,3 +1,4 @@
 site-lisp/*
 site-lisp/*
 !site-lisp/nispio/
+!site-lisp/themes/

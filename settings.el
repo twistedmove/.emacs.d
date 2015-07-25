@@ -28,12 +28,12 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(ansi-color-faces-vector
+   [default bold shadow italic underline bold bold-italic bold])
  '(ansi-color-names-vector
    ["#242424" "#e5786d" "#95e454" "#cae682" "#8ac6f2" "#333366" "#ccaa8f" "#f6f3e8"])
- '(custom-safe-themes
-   (quote
-	("efe9aa1a078bf00a43342a1fc8b16505d444f8068285f5f83c6275cadcc44b7d" "9b402e9e8f62024b2e7f516465b63a4927028a7055392290600b776e4a5b9905" "94ba29363bfb7e06105f68d72b268f85981f7fba2ddef89331660033101eb5e5" "12722541c8998f056b761bf63a92216aaf4610e4eb1afe7991842a31fa28b6d8" "90d329edc17c6f4e43dbc67709067ccd6c0a3caa355f305de2041755986548f2" default)))
  '(diredp-hide-details-initially-flag nil)
+ '(fci-rule-color "#14151E" t)
  '(org-agenda-ndays 10 t)
  '(org-agenda-restore-windows-after-quit t t)
  '(org-agenda-skip-deadline-if-done nil t)
@@ -98,7 +98,29 @@
  '(org-tags-column -77)
  '(org-todo-keywords
    (quote
-	((sequence "TODO(t!)" "STARTED(s!)" "WAIT(w@/!)" "ASK(a)" "|" "ANSWERED(A@)" "CANCELLED(x@)" "DONE(d)" "COMPLETE(c!)")))))
+	((sequence "TODO(t!)" "STARTED(s!)" "WAIT(w@/!)" "ASK(a)" "|" "ANSWERED(A@)" "CANCELLED(x@)" "DONE(d)" "COMPLETE(c!)"))))
+ '(vc-annotate-background nil)
+ '(vc-annotate-color-map
+   (quote
+	((20 . "#d54e53")
+	 (40 . "goldenrod")
+	 (60 . "#e7c547")
+	 (80 . "DarkOliveGreen3")
+	 (100 . "#70c0b1")
+	 (120 . "DeepSkyBlue1")
+	 (140 . "#c397d8")
+	 (160 . "#d54e53")
+	 (180 . "goldenrod")
+	 (200 . "#e7c547")
+	 (220 . "DarkOliveGreen3")
+	 (240 . "#70c0b1")
+	 (260 . "DeepSkyBlue1")
+	 (280 . "#c397d8")
+	 (300 . "#d54e53")
+	 (320 . "goldenrod")
+	 (340 . "#e7c547")
+	 (360 . "DarkOliveGreen3"))))
+ '(vc-annotate-very-old-color nil))
 (put 'dired-find-alternate-file 'disabled nil)
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

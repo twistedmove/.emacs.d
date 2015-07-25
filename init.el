@@ -34,6 +34,7 @@
 
 ;; Make custom themes available
 (customize-set-value 'custom-theme-directory "~/.emacs.d/site-lisp/themes/")
+(load-file "~/.emacs.d/site-lisp/safe-themes.el")
 
 ;; Load my own minor mode for personal keybindings
 (require 'nispio/my-mode)
