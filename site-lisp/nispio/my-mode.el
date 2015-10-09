@@ -40,10 +40,8 @@
 
 (define-key local-function-key-map [?\C-\]] 'event-apply-hyper-modifier)
 (define-key global-map [?\C-\]] nil)
-(define-key global-map (kbd "<pause>") my-map)
 
 ;; Set up basic keybindings
-(define-key my-map (kbd "<pause>") global-map)
 (define-key my-map (kbd "C-M-&") 'disable-my-global-mode)
 (define-key my-map (kbd "M-0") 'delete-window)
 (define-key my-map (kbd "M-1") 'delete-other-windows)
@@ -52,7 +50,7 @@
 (define-key my-map (kbd "<C-tab>") 'next-multiframe-window)
 (define-key my-map (kbd "<C-iso-lefttab>") 'previous-multiframe-window)
 (define-key my-map (kbd "C-x <f1>") 'nispio/buffer-file-name)
-(define-key my-map (kbd "<f11>") 'nispio/toggle-fullscreen)
+;(define-key my-map (kbd "<f11>") 'nispio/toggle-fullscreen)
 (define-key my-map (kbd "C-j") 'newline-and-indent)
 (define-key my-map [remap list-buffers] 'ibuffer)
 (define-key my-map (kbd "<menu>") 'menu-bar-open)

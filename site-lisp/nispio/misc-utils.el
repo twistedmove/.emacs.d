@@ -8,7 +8,14 @@
   "Regexp describing the name of temp buffers")
 
 (add-to-list 'auto-mode-alist
-  (cons emacspipe-regexp 'view-mode))
+			 (cons emacspipe-regexp 'view-mode))
+
+;; Helper macro to replace `eval-after-load'
+(defmacro nispio/after (mode &rest body)
+  "`eval-after-load' MODE evaluate BODY."
+  (declare (indent defun))
+  `(eval-after-load ,mode
+     '(progn ,@body nil)))
 
 ;; Custom function to toggle fullscreen by maximizing or restoring the current frame.
 (defvar nispio/fullscreen-p t "Check if fullscreen is on or off")
@@ -186,6 +193,14 @@ This function is a wrapper around \\[find-dired]."
 	(quit-window)
 	(setq buf (and file (get-file-buffer file)))
 	(and buf (show-buffer nil buf))))
+
+;; SOURCE: http://emacs.stackexchange.com/a/16854/93
+(defun nispio/set-comment-char (char)
+  "Sets comment char for current buffer."
+  (interactive "sComment char: ")
+  (setq comment-start char)
+  (font-lock-add-keywords nil `((,(concat comment-start ".+") . font-lock-comment-face)))
+  )
 
 
 

@@ -42,7 +42,7 @@
        (secondary-color (face-background 'secondary-selection nil 'region))
        (padding `(:line-width 5 :color ,background-color))
        (org-highlights `(:foreground ,base-font-color :background ,secondary-color)))
-  (custom-theme-set-faces 'org-beautify-theme
+  (custom-theme-set-faces 'org-beautify
                           `(org-agenda-structure ((t (:inherit default ,@sans-font :height 2.0 :underline nil))))
                           `(org-level-8 ((t ,headline)))
                           `(org-level-7 ((t ,headline)))

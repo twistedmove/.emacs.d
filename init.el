@@ -1,7 +1,16 @@
 ;;;; .emacs
 
+;; Configure UI features
+(when (fboundp 'scroll-bar-mode) (scroll-bar-mode 0))  ; Disable scroll bars
+(when (fboundp 'fringe-mode) (fringe-mode '(nil . 0))) ; Left fringes only
+(when (fboundp 'tool-bar-mode) (tool-bar-mode 0))      ; Disable toolbar
+
+;; White text on black background
+(set-background-color "black")
+(set-foreground-color "white smoke")
+
 (message "Welcome to Emacs!\nThis session brought to you by:\n%s"
-		 (mapconcat 'identity command-line-args " "))
+(mapconcat 'identity command-line-args " "))
 
 (message "Loading init file...")
 (switch-to-buffer "*Messages*")
@@ -24,13 +33,13 @@
 
 (require 'nispio/misc-utils)
 (setq load-path
-	  (append
-	   ;; Add all folders from site-lisp (except explicitly rejected dirs).
-	   ;; The "nispio" dir is not included because its packages are provided as
-	   ;; (provide 'nispio/package-name)
-	   (nispio/directory-subdirs site-lisp '(".hg" ".git" "nispio"))
-	   ;; Put the current load-path at the end
-	   load-path))
+      (append
+       ;; Add all folders from site-lisp (except explicitly rejected dirs).
+       ;; The "nispio" dir is not included because its packages are provided as
+       ;; (provide 'nispio/package-name)
+       (nispio/directory-subdirs site-lisp '(".hg" ".git" "nispio"))
+       ;; Put the current load-path at the end
+       load-path))
 
 ;; Make custom themes available
 (customize-set-value 'custom-theme-directory "~/.emacs.d/site-lisp/themes/")
@@ -87,6 +96,9 @@
 (setq-default tab-width 4)
 (setq tab-stop-list (number-sequence 4 100 4))
 
+;; Workaround for an issue with isearch
+(define-key isearch-mode-map (kbd "<return>") 'isearch-exit)
+
 
 
 ;; Load init files as appropriate, turning errors into messages
@@ -98,7 +110,7 @@
   (ido-mode 1)
 
   (setq package-archives '())
-  (add-to-list 'package-archives '("local-elpa" . "~/.emacs.d/local-elpa-misc/"))
+  (add-to-list 'package-archives '("local-misc" . "~/.emacs.d/local-elpa-misc/"))
   (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/"))
   (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
   ;; (add-to-list 'package-archives '("local-elpa" . "/datastore/jph/emacs/local-elpa/"))
@@ -110,13 +122,25 @@
   (add-hook 'prog-mode-hook 'linum-mode)
   (setq linum-format "%3d")
 
+  (unless (fboundp 'forward-symbol)
+    (require 'thingatpt))
+
+  (defun backward-symbol () (interactive) (forward-symbol -1))
+
+  (defun my-prog-mode-keys ()
+    (local-set-key (kbd "M-f") 'forward-symbol)
+    (local-set-key (kbd "M-b") 'backward-symbol)
+    (local-set-key (kbd "M-F") 'forward-word)
+    (local-set-key (kbd "M-B") 'backward-word))
+  (add-hook 'prog-mode-hook 'my-prog-mode-keys)
+
   ;; In Org Mode, use <C-m> as <M-return>
   (defun nispio/fake-M-RET ()
-	(interactive)
-	(let ((command (key-binding (kbd "<M-return>"))))
-	  (setq last-command-event [M-return])
-	  (setq this-command command)
-	  (call-interactively command)))
+    (interactive)
+    (let ((command (key-binding (kbd "<M-return>"))))
+      (setq last-command-event [M-return])
+      (setq this-command command)
+      (call-interactively command)))
   (add-hook 'org-mode-hook (lambda () (local-set-key (kbd "<C-m>") 'nispio/fake-M-RET)))
 
   ;; Use unix line endings by default
@@ -223,7 +247,7 @@
   ;; (source: https://github.com/knu/phi-search-mc.el)
   (eval-after-load "phi-search"
     (progn
-	  (use-package phi-search-mc :ensure t)
+      (use-package phi-search-mc :ensure t)
       (phi-search-mc/setup-keys)
       (phi-search-from-isearch-mc/setup-keys)
       nil))
@@ -238,19 +262,16 @@
   ;; Add support for editing matlab files
   ;; (source: http://matlab-emacs.cvs.sourceforge.net/viewvc/matlab-emacs/matlab-emacs/?view=tar)
   (use-package "matlab-load" :ensure matlab-mode)
-  (require 'matlab-load)
   (require 'nispio/matlab-debug)
   (setq matlab-comment-column 50)
   (add-hook 'matlab-mode-hook 'linum-mode)
   ;; Use CEDET tools for matlab-mode
   (when (>= emacs-major-version 24)
-    (matlab-cedet-setup)
-  	)
+    (matlab-cedet-setup))
 
   ;; Enable column markers at column 81 to warn of long lines
   ;; (source: http://www.emacswiki.org/emacs/download/column-marker.el)
   (use-package column-marker :ensure t)
-  (require 'column-marker)
   (defun nispio/column-marker-at-81 ()
     (interactive)
     (column-marker-1 81))
@@ -259,7 +280,6 @@
 
 
   (use-package tex-site :ensure auctex)
-  (require 'tex-site)
   (setq
    TeX-auto-save t
    TeX-parse-self t
@@ -279,13 +299,11 @@
 
   ;; SrSpeedbar allows a speedbar that is "docked" in the current frame
   (use-package sr-speedbar :ensure t)
-  (require 'sr-speedbar)
   (define-key my-map (kbd "C-c M-SPC") 'sr-speedbar-toggle)
   ;(define-key nispio/gdb-window-map (kbd "w") 'sr-speedbar-select-window)
 
   ;; Display ^L as a horizontal line
   (use-package page-break-lines :ensure t :diminish "")
-  (require 'page-break-lines)
   (global-page-break-lines-mode)
   
   (require 'nispio/dev-utils)
@@ -316,56 +334,54 @@
     (define-key my-map (kbd "M-s O") 'helm-multi-occur)
     (define-key my-map (kbd "M-s r") 'helm-register)
 
-	(use-package helm-swoop :ensure t)
-	(define-key my-map (kbd "M-s i") 'helm-swoop)
-	(define-key my-map (kbd "M-s I") 'helm-multi-swoop)
-	(define-key my-map (kbd "M-s B") 'helm-multi-swoop-all)
+    (use-package helm-swoop :ensure t)
+    (define-key my-map (kbd "M-s i") 'helm-swoop)
+    (define-key my-map (kbd "M-s I") 'helm-multi-swoop)
+    (define-key my-map (kbd "M-s B") 'helm-multi-swoop-all)
 
-	(let ((map isearch-mode-map))
-	  (define-key map [remap isearch-occur] 'helm-occur-from-isearch)
-	  (define-key map (kbd "H-M-s o") 'helm-occur-from-isearch)
-	  (define-key map (kbd "H-M-s O") 'helm-multi-occur-from-isearch)
-	  (define-key map (kbd "H-M-s i") 'helm-swoop-from-isearch)
-	  (define-key map (kbd "H-M-s B") 'helm-multi-swoop-all-from-isearch))
+    (let ((map isearch-mode-map))
+      (define-key map [remap isearch-occur] 'helm-occur-from-isearch)
+      (define-key map (kbd "H-M-s o") 'helm-occur-from-isearch)
+      (define-key map (kbd "H-M-s O") 'helm-multi-occur-from-isearch)
+      (define-key map (kbd "H-M-s i") 'helm-swoop-from-isearch)
+      (define-key map (kbd "H-M-s B") 'helm-multi-swoop-all-from-isearch))
 
 
     ;; Use a more powerful alternative to ido-mode's flex matching.
     ;; SOURCE: https://github.com/lewang/flx.git
     (use-package flx-ido :ensure t)
-    (require 'flx-ido)
 
     ;; Manage and navigate projects easily in Emacs
     ;; SOURCE: https://github.com/bbatsov/projectile.git
-    (use-package projectile :ensure t)
-    (require 'projectile)
+    (use-package projectile :ensure t :diminish "")
     (projectile-global-mode)
     (setq projectile-enable-caching t)
 
-	(defvar project-root-regexps ()
-	  "List of regexps to match against when projectile is searching
+    (defvar project-root-regexps ()
+      "List of regexps to match against when projectile is searching
 for project root directories.")
 
-	;; File containing local project roots on this machine
-	(let ((file "~/.emacs.d/local-projects.el"))
-	  (when (file-exists-p file)
-		(load-file file)))
+    ;; File containing local project roots on this machine
+    (let ((file "~/.emacs.d/local-projects.el"))
+      (when (file-exists-p file)
+        (load-file file)))
   
-	;; Add the ability to use projects that are not 
-	(eval-after-load 'projectile
-	  (progn 
-		;; (source: https://github.com/bbatsov/projectile/issues/364#issuecomment-61296248)
-		(defun projectile-root-child-of (dir &optional list)
-		  (projectile-locate-dominating-file
-		   dir
-		   (lambda (dir)
-			 (--first
-			  (if (and
-				   (s-equals? (file-remote-p it) (file-remote-p dir))
-				   (string-match-p (expand-file-name it) (expand-file-name dir)))
-				  dir)
-			  (or list project-root-regexps (list))))))
-		(nconc projectile-project-root-files-functions '(projectile-root-child-of))
-		nil))
+    ;; Add the ability to use projects that are not 
+    (eval-after-load 'projectile
+      (progn 
+        ;; (source: https://github.com/bbatsov/projectile/issues/364#issuecomment-61296248)
+        (defun projectile-root-child-of (dir &optional list)
+          (projectile-locate-dominating-file
+           dir
+           (lambda (dir)
+             (--first
+              (if (and
+                   (s-equals? (file-remote-p it) (file-remote-p dir))
+                   (string-match-p (expand-file-name it) (expand-file-name dir)))
+                  dir)
+              (or list project-root-regexps (list))))))
+        (nconc projectile-project-root-files-functions '(projectile-root-child-of))
+        nil))
 
     ;; Use helm for projectile
     (use-package helm-projectile :ensure t)
@@ -380,54 +396,103 @@ for project root directories.")
     ;; Emacs frontend to GNU Global source code tagging system.
     ;; SOURCE: https://github.com/leoliu/ggtags
     (use-package ggtags :ensure t)
-    (require 'ggtags)
+
+    (use-package yasnippet :ensure t)
+    (yas-global-mode 1)
 
     ;; Set up auto-complete
     ;; (source: https://github.com/auto-complete/auto-complete)
     (use-package auto-complete :ensure t :diminish "")
+    (use-package ac-c-headers :ensure t)
     (require 'auto-complete-config)
-    (ac-config-default)
+    (global-auto-complete-mode t)
     (setq ac-auto-start 3)              ; start after 3 characters were typed
-    (setq ac-auto-show-menu t)          ; show menu immediately...
-    (setq ac-modes (cons 'matlab-mode ac-modes))  ; Allow auto-complete with matlab-mode
-    (define-key ac-mode-map (kbd "C-.") 'auto-complete)
+    (setq ac-auto-show-menu 0.8)        ; Wait 0.8 seconds to show menu
 
-	;; Jump to anywhere in the buffer with a few keystrokes
-	(use-package avy :ensure t)
-	(define-key my-map (kbd "C-;") 'avy-goto-word-or-subword-1)
+    (setq-default ac-sources '(ac-source-abbrev
+                               ac-source-dictionary
+                               ac-source-words-in-same-mode-buffers))
 
-	;; Zap up to any character with a few keystrokes
-	(use-package avy-zap :ensure t)
-	(define-key my-map (kbd "M-z") 'avy-zap-up-to-char)
+    (defun ac-common-setup ()
+      (add-to-list 'ac-sources 'ac-source-filename))
+    (add-hook 'auto-complete-mode-hook 'ac-common-setup)
 
-	;; Undo history is preserved as a tree, rather than linearly
-	(use-package undo-tree :ensure t :diminish "")
-	(global-undo-tree-mode)
+    (defun ac-cc-mode-setup ()
+      (setq ac-sources
+            (append '(ac-source-c-headers
+                      ac-source-semantic
+                      ac-source-yasnippet
+                      ac-source-gtags)
+                    ac-sources)))
+    (add-hook 'c-mode-common-hook 'ac-cc-mode-setup)
 
-	;; Use ido completion with extended commands (M-x)
-	(use-package smex :ensure t)
-	(define-key my-map (kbd "M-x") 'smex)
+    (defun ac-emacs-lisp-mode-setup ()
+      (setq ac-sources (append '(ac-source-features
+                                 ac-source-functions
+                                 ac-source-yasnippet
+                                 ac-source-variables
+                                 ac-source-symbols)
+                               ac-sources)))
+    (add-hook 'emacs-lisp-mode-hook 'ac-emacs-lisp-mode-setup)
 
-	;; Smarter highlighting of shell variables within quotes
-	(use-package sh-extra-font-lock :ensure t)
-	(add-hook 'sh-mode-hook 'sh-extra-font-lock-activate)
+    (add-to-list 'ac-modes 'matlab-mode)  ; Allow auto-complete with matlab-mode
 
-	;; Multiple frames as tabs
-	(use-package elscreen :ensure t)
-	(elscreen-start)
-	(define-key my-map (kbd "C-z z") 'elscreen-toggle-display-tab)
-	(define-key my-map (kbd "C-z C-z") 'elscreen-toggle)
+    (use-package ac-helm :ensure t)
+    (define-key my-map (kbd "C-.") 'ac-complete-with-helm)
+    (define-key ac-complete-mode-map (kbd "C-.") 'ac-complete-with-helm)
 
-	;; Commands for working with regexps with visual feedback
-	(use-package visual-regexp :ensure t)
-	(use-package visual-regexp-steroids :ensure t)
-	(define-key my-map (kbd "C-c M-5") 'vr/replace)
-	(define-key my-map (kbd "C-c M-%") 'vr/query-replace)
+    ;; Jump to anywhere in the buffer with a few keystrokes
+    (use-package avy :ensure t)
+    (define-key my-map (kbd "C-;") 'avy-goto-word-or-subword-1)
 
-	;; View large files one piece at a time
-	(use-package vlf-setup :ensure vlf)
+    ;; Zap up to any character with a few keystrokes
+    (use-package avy-zap :ensure t)
+    (define-key my-map (kbd "M-z") 'avy-zap-up-to-char)
 
-	) ;; end with-demote-errors
+    ;; Zap up to any character with a few keystrokes
+    (use-package ace-link :ensure t)
+    (ace-link-setup-default)
+
+    ;; Undo history is preserved as a tree, rather than linearly
+    (use-package undo-tree :ensure t :diminish "")
+    (global-undo-tree-mode)
+
+    ;; Use ido completion with extended commands (M-x)
+    (use-package smex :ensure t)
+    (define-key my-map (kbd "M-x") 'smex)
+
+    ;; Smarter highlighting of shell variables within quotes
+    (use-package sh-extra-font-lock :ensure t)
+    (add-hook 'sh-mode-hook 'sh-extra-font-lock-activate)
+
+    ;; Multiple frames as tabs
+    (use-package elscreen :ensure t)
+    (customize-set-value 'elscreen-display-screen-number nil)
+    (customize-set-value 'elscreen-display-tab nil)
+    (customize-set-value 'elscreen-tab-display-control nil)
+    (customize-set-value 'elscreen-tab-display-kill-screen nil)
+    (elscreen-start)
+    (define-key my-map (kbd "C-z z") 'elscreen-toggle-display-tab)
+    (define-key my-map (kbd "C-z C-z") 'elscreen-toggle)
+
+    ;; Commands for working with regexps with visual feedback
+    (use-package visual-regexp :ensure t)
+    (use-package visual-regexp-steroids :ensure t)
+    (define-key my-map (kbd "C-c M-5") 'vr/replace)
+    (define-key my-map (kbd "C-c M-%") 'vr/query-replace)
+
+    ;; View large files one piece at a time
+    (use-package vlf-setup :ensure vlf)
+
+    ;; Automatic unobtrusive whitespace cleanup on save
+    (use-package ws-butler :ensure t)
+    (ws-butler-global-mode)
+
+    ;; Use ido for completing-read
+    (use-package ido-ubiquitous :ensure t)
+    (ido-ubiquitous-mode)
+
+    ) ;; end with-demote-errors
   ) ;; end emacs 24.3+ customizations
 
 
@@ -441,9 +506,6 @@ for project root directories.")
     (isearch-repeat (if isearch-forward 'forward))
     (ad-enable-advice 'isearch-search 'after 'isearch-no-fail)
     (ad-activate 'isearch-search)))
-
-;; Activate semantic for all programming modes
-(add-hook 'prog-mode-hook 'semantic-mode)
 
 ;; Set the default faces for highlighting with hi-lock
 (setq hi-lock-face-defaults (list "hi-yellow" "hi-pink" "hi-green" "hi-blue"))
@@ -461,22 +523,22 @@ for project root directories.")
 (global-set-key (kbd "C-c @") 'hs-minor-mode)
 (defvar nispio/hs-mode-map 
   (let ((map (make-sparse-keymap)))
-	(define-key map (kbd "C-2") 'hs-toggle-hiding)
-	(define-key map (kbd "C-c") 'hs-toggle-hiding)
-	(define-key map (kbd "C-h") 'hs-hide-block)
-	(define-key map (kbd "C-l") 'hs-hide-level)
-	(define-key map (kbd "C-s") 'hs-show-block)
-	(define-key map (kbd "C-M-h") 'hs-hide-all)
-	(define-key map (kbd "C-M-s") 'hs-show-all)
-	map ))
+    (define-key map (kbd "C-2") 'hs-toggle-hiding)
+    (define-key map (kbd "C-c") 'hs-toggle-hiding)
+    (define-key map (kbd "C-h") 'hs-hide-block)
+    (define-key map (kbd "C-l") 'hs-hide-level)
+    (define-key map (kbd "C-s") 'hs-show-block)
+    (define-key map (kbd "C-M-h") 'hs-hide-all)
+    (define-key map (kbd "C-M-s") 'hs-show-all)
+    map ))
 (define-key my-map (kbd "C-2") nispio/hs-mode-map)
 
 ;; Add [] to the list of collapsible entries in js mode (for JSON files)
 (eval-after-load "hideshow"
   (progn
-	(add-to-list 'hs-special-modes-alist
-				 '(js-mode "\\({\\|\\[\\)" "\\(}\\|\\]\\)" "/[*/]" nil))
-	nil))
+    (add-to-list 'hs-special-modes-alist
+                 '(js-mode "\\({\\|\\[\\)" "\\(}\\|\\]\\)" "/[*/]" nil))
+    nil))
 
 ;; Use hideshow mode in javascript mode by default
 (add-hook 'js-mode-hook 'hs-minor-mode)
@@ -502,13 +564,17 @@ for project root directories.")
 
 (when (display-graphic-p)
   (unless no-server-start-p
-	;; Start (or restart) the server
-	(require 'server)
-	(server-force-delete)
-	(server-start)))
+    ;; Start (or restart) the server
+    (require 'server)
+    (server-force-delete)
+    (server-start)))
 
 
 
 (setq no-custom-file-p (member "--no-custom-file" command-line-args))
 (setq command-line-args (delete "--no-custom-file" command-line-args))
 (unless no-custom-file-p (load custom-file))
+
+;; Local Variables:
+;; indent-tabs-mode: nil
+;; End:

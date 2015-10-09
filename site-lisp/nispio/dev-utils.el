@@ -298,10 +298,80 @@ Recognized window header names are: 'comint, 'locals, 'registers,
 
 
 
+(require 'semantic)
 (require 'semantic/ia)
 (require 'semantic/bovine/gcc)
+(global-semanticdb-minor-mode 1)
+(global-semantic-idle-scheduler-mode 1)
+(global-semantic-stickyfunc-mode 1)
+(global-semantic-highlight-func-mode 1)
 (semantic-mode 1)
-(define-key my-map (kbd "H-j")'semantic-ia-fast-jump)
+
+(defun my-semantic-hook ()
+  (imenu-add-to-menubar "TAGS"))
+(add-hook 'semantic-init-hooks 'my-semantic-hook)
+
+(semantic-add-system-include
+ (substitute-in-file-name "$XMDISK/xm/inc")
+ 'c++-mode)
+(semantic-add-system-include
+ (substitute-in-file-name "$XMDISK/xm/include")
+ 'c++-mode)
+
+(require 'ede)
+(global-ede-mode t)
+
+(nispio/after 'ede
+  ;; File containing local project roots on this machine
+  (with-demoted-errors "Error loading local projects: %s"
+	(let ((file "~/.emacs.d/local-projects.el"))
+	  (when (file-exists-p file)
+		(load-file file))))
+
+  ;; Create a project for xmidas
+  (ede-cpp-root-project "xmidas"
+						:name "xmidas"
+						:file (substitute-in-file-name "$XMDISK/xm/version.txt")
+						:include-path '("/inc"
+										"/include"
+										"/include/midas"
+										)
+						:targets 'nil
+						:spp-table '(("__cplusplus" . 1))
+						))
+
+(defun nispio/semantic-ia-fast-jump (point)
+  "Modification of semantic-ia-fast-jump to use push-mark"
+  (interactive "d")
+  (let* ((ctxt (semantic-analyze-current-context point))
+	 (pf (and ctxt (reverse (oref ctxt prefix))))
+	 (first (car pf)) (second (nth 1 pf)))
+    (cond
+     ((semantic-tag-p first)
+	  (push-mark)
+      (when (fboundp 'push-tag-mark) (push-tag-mark))
+      (semantic-ia--fast-jump-helper first))
+     ((semantic-tag-p second)
+	  (push-mark)
+      (when (fboundp 'push-tag-mark) (push-tag-mark))
+      (let ((secondclass (car (reverse (oref ctxt prefixtypes)))))
+	(cond
+	 ((and (semantic-tag-with-position-p secondclass)
+	       (y-or-n-p (format "Could not find `%s'.  Jump to %s? "
+							 first (semantic-tag-name secondclass))))
+	  (semantic-ia--fast-jump-helper secondclass))
+	 ((and (semantic-tag-p second)
+	       (y-or-n-p (format "Could not find `%s'.  Jump to %s? "
+				 first (semantic-tag-name second))))
+	  (semantic-ia--fast-jump-helper second)))))
+     ((semantic-tag-of-class-p (semantic-current-tag) 'include)
+      (require 'semantic/decorate/include)
+	  (push-mark)
+      (when (fboundp 'push-tag-mark) (push-tag-mark))
+      (semantic-decoration-include-visit))
+     (t (error "Could not find suitable jump point for %s" first)))))
+
+(define-key my-map (kbd "H-j") 'nispio/semantic-ia-fast-jump)
 
 
 
